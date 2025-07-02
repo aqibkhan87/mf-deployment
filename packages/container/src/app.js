@@ -14,7 +14,6 @@ const App = () => {
         <BrowserRouter>
           <Switch>
             <Route path="/" component={comp} />
-            <Route path="/marketing" component={<MarketingApp />} />
           </Switch>
         </BrowserRouter>
       </StylesProvider>
