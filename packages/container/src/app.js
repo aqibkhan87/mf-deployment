@@ -4,7 +4,7 @@ import { StylesProvider } from "@material-ui/core/styles";
 import MarketingApp from "./components/MarketingApp";
 
 const comp = () => {
-  return <div>Hi There!!!!</div>;
+  return <div>Hi There!!!! Updated Code For Deploy Script</div>;
 };
 
 const App = () => {
