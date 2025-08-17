@@ -1,11 +1,12 @@
 import React from "react";
-import ReactDom from "react-dom";
+import ReactDOM from "react-dom/client";
 import App from "./app";
 
-console.log("Hi Dashboard MF");
+console.info("Hi Dashboard MF");
 
 const mount = (el) => {
-  ReactDom.render(<App />, el);
+  const root = ReactDOM.createRoot(el);
+  root.render(<App />);
 };
 
 // if we are in development and in isolation

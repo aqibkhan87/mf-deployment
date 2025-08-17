@@ -7,10 +7,8 @@ const commonConfig = require("./webpack.common");
 const devConfig = {
   mode: "development",
   devServer: {
-    port: 8082,
-    historyApiFallback: {
-      index: "index.html",
-    },
+    port: 8081,
+    historyApiFallback: true,
   },
   plugins: [
     new ModuleFederationPlugin({
@@ -20,10 +18,7 @@ const devConfig = {
         "./DashboardApp": './src/bootstrap'
       },
       shared: packageDeps
-    }),
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
-    }),
+    })
   ],
 };
 

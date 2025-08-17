@@ -1,18 +1,22 @@
 const { merge } = require("webpack-merge");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
+const packageDeps = require("../package.json").dependencies;
 
 const prodConfig = {
   mode: "production",
-  devServer: {
-    port: 8081,
-    historyApiFallback: {
-      index: "index.html",
-    },
+  output: {
+    filename: "[name].[contenthash].js",
+    publicPath: "https://dashboard.metacook.in/",
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
+    new ModuleFederationPlugin({
+      name: "dashboard",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./DashboardApp": "./src/bootstrap",
+      },
+      shared: packageDeps,
     }),
   ],
 };
