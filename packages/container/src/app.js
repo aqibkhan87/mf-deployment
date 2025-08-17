@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import { StylesProvider } from "@material-ui/core/styles";
 import MarketingApp from "./components/MarketingApp";
+import DashboardApp from "./components/DashboardApp";
 
 const comp = () => {
   return <div>Hi There!!!! Updated Code For Deploy Script</div>;
@@ -10,10 +11,16 @@ const comp = () => {
 const App = () => {
   return (
     <div>
+      <DashboardApp />
+      <hr/>
       <StylesProvider>
         <BrowserRouter>
           <Switch>
-            <Route path="/" component={comp} />
+            <Route exact path="/marketing" component={MarketingApp} />
+            <Route exact path="/dashboard" component={DashboardApp} />
+            <Route exact path="/" component={comp} />
+            {/* fallback 404 */}
+            <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
         </BrowserRouter>
       </StylesProvider>

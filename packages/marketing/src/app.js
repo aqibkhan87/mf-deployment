@@ -7,14 +7,7 @@ import Pricing from "./components/Pricing";
 
 const App = () => {
   return (
-    <StylesProvider>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/" component={Landing} />
-          <Route exact path="/pricing" component={Pricing} />
-        </Switch>
-      </BrowserRouter>
-    </StylesProvider>
+     <div>Marketing Setup</div>
   );
 };
 

@@ -3,17 +3,20 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const commonConfig = require("./webpack.common");
 const packageDeps = require('../package.json').dependencies;
 
-const domain = process.env.PRODUCTION_DOMAIN;
+const domain = "https://www.metacook.in";
+console.info("domain", domain)
 
 const prodConfig = {
   mode: "production",
   output: {
-    filename: '[name].[contenthash].js'
+    filename: '[name].[contenthash].js',
+    publicPath: "https://www.metacook.in/",
   },
   plugins: [
     new ModuleFederationPlugin({
       remotes: {
-        marketing: `marketing@${domain}/marketing/remoteEntry.js`
+        dashboard: `dashboard@https://dashboard.metacook.in/remoteEntry.js`,
+        marketing: `marketing@https://marketing.metacook.in/remoteEntry.js`
       },
       shared: packageDeps
     })

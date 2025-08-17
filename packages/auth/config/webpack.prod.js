@@ -6,9 +6,7 @@ const prodConfig = {
   mode: "production",
   devServer: {
     port: 8083,
-    historyApiFallback: {
-      index: "index.html",
-    },
+    historyApiFallback: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
