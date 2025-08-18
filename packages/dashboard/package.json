@@ -6,13 +6,11 @@
     "build": "webpack --config config/webpack.prod.js"
   },
   "dependencies": {
-    "chart.js": "3.7.1",
-    "primeflex": "3.1.3",
-    "primeicons": "5.0.0",
-    "primevue": "3.12.0",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vue": "3.2.31"
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
