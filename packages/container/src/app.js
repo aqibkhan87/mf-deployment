@@ -5,7 +5,6 @@ import MarketingApp from "./components/MarketingApp";
 import DashboardApp from "./components/DashboardApp";
 
 const comp = () => {
-  
   return <div>Hi There!!!! Updated Code For Deploy Script</div>;
 };
 
