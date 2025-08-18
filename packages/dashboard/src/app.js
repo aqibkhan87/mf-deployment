@@ -3,7 +3,8 @@ import React from "react";
 import { StyledEngineProvider } from '@mui/material/styles';
 
 const App = () => {
-  console.info("get Called")
+  console.info("get Called");
+  
   return (
     <div>Dashboard Setup</div>
   );
