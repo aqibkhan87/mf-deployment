@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
-import { StylesProvider } from "@material-ui/core/styles";
+import { StyledEngineProvider } from '@mui/material/styles';
 import MarketingApp from "./components/MarketingApp";
 import DashboardApp from "./components/DashboardApp";
 
@@ -13,7 +13,7 @@ const App = () => {
     <div>
       <DashboardApp />
       <hr/>
-      <StylesProvider>
+      <StyledEngineProvider injectFirst>
         <BrowserRouter>
           <Switch>
             <Route exact path="/marketing" component={MarketingApp} />
@@ -23,7 +23,7 @@ const App = () => {
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
         </BrowserRouter>
-      </StylesProvider>
+      </StyledEngineProvider>
       <hr />
       <MarketingApp />
     </div>
