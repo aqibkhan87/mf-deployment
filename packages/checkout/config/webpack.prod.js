@@ -13,6 +13,9 @@ const prodConfig = {
     new ModuleFederationPlugin({
       name: "checkout",
       filename: "remoteEntry.js",
+      remotes: {
+        store: 'store@https://store.metacook.in/remoteEntry.js',
+      },
       exposes: {
         "./CheckoutApp": "./src/bootstrap",
       },
