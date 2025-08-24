@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   module: {
@@ -21,6 +22,10 @@ module.exports = {
     ],
   },
   plugins: [
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: /\.(js|css|html|svg)$/,
+    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),

@@ -9,10 +9,18 @@ const prodConfig = {
     filename: "[name].[contenthash].js",
     publicPath: "https://auth.metacook.in/",
   },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   plugins: [
     new ModuleFederationPlugin({
       name: "auth",
       filename: "remoteEntry.js",
+      remotes: {
+        store: 'store@https://store.metacook.in/remoteEntry.js',
+      },
       exposes: {
         "./AuthApp": "./src/bootstrap",
       },
