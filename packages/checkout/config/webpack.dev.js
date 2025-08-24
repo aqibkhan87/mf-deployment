@@ -6,29 +6,31 @@ const path = require("path");
 
 const devConfig = {
   mode: "development",
+  entry: "./src/index",
   output: {
-    publicPath: "http://localhost:8081/",
+    publicPath: "http://localhost:8082/",
+    clean: true
   },
   devServer: {
-    port: 8081,
+    port: 8082,
     historyApiFallback: true,
     static: {
-      directory: path.join(__dirname, "dist"),
+      directory: path.join(__dirname, "dist"), // v4 syntax
     },
     hot: true, // ✅ enables hot reloading
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'auth',
+      name: 'checkout',
       filename: 'remoteEntry.js',
       remotes: {
           store: 'store@http://localhost:8083/remoteEntry.js',
-      },
+       },
       exposes: {
-        "./AuthApp": './src/bootstrap'
+        "./CheckoutApp": './src/bootstrap'
       },
       shared: packageDeps
-    }),
+    })
   ],
 };
 

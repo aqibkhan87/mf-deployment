@@ -1,15 +1,15 @@
-name: Deploy Dashboard MF
+name: Deploy Auth MF
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'packages/dashboard/**'
+      - 'packages/auth/**'
 
 defaults:
   run:
-    working-directory: packages/dashboard
+    working-directory: packages/auth
 
 jobs:
   build:
@@ -23,8 +23,7 @@ jobs:
       - name: Deploy to S3
         uses: shinyinc/action-aws-cli@v1.2
         with:
-          args: --delete --cache-control max-age=31536000,public
-      - run: aws s3 sync dist s3://${{ secrets.MFE_DASHBOARD_CONTAINER }}/
+          args: aws s3 sync dist s3://${{ secrets.MFE_AUTH_CONTAINER }} --delete --cache-control max-age=31536000,public
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -32,7 +31,7 @@ jobs:
           SOURCE_DIR: ${{ secrets.SOURCE_DIR }}
 
       - name: Invalidate CloudFront
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DASHBOARD_DISTRIBUTE_ID }} --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AUTH_DISTRIBUTE_ID }} --paths "/*"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

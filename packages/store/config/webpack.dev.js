@@ -7,22 +7,23 @@ const path = require("path");
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8080/",
+    publicPath: "http://localhost:8083/",
   },
   devServer: {
-    port: 8080,
+    port: 8083,
     historyApiFallback: true,
     static: {
-      directory: path.join(__dirname, "dist"), // ✅ replaces contentBase
+      directory: path.resolve(__dirname, "dist"), // v4 syntax
     },
-    hot: true, // ✅ Ensure this is enabled
+    hot: true, // ✅ enables hot reloading
   },
   plugins: [
     new ModuleFederationPlugin({
-      remotes: {
-        auth: "auth@http://localhost:8081/remoteEntry.js",
-        checkout: "checkout@http://localhost:8082/remoteEntry.js",
-        store: "store@http://localhost:8083/remoteEntry.js",
+      name: "store",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./authStore": "./src/store/authStore.js",
+        "./productContext": "./src/context/productContext.js",
       },
       shared: packageDeps,
     }),

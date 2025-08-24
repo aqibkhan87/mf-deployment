@@ -1,20 +1,25 @@
 import React from "react";
-import { Route, Switch, BrowserRouter } from "react-router-dom";
+import { Route, Switch, Router } from "react-router-dom";
 import { StyledEngineProvider } from '@mui/material/styles';
+import Login from "./components/login";
+import Signup from "./components/signup";
 
-import Landing from "./components/Landing";
-import Pricing from "./components/Pricing";
+const App = ({ initialPath, defaultHistory }) => {
+  console.log("initialPath", initialPath);
+  console.log("defaultHistory inside Auth", defaultHistory);
 
-const App = () => {
+
   return (
-    <StyledEngineProvider injectFirst>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/" component={Landing} />
-          <Route exact path="/pricing" component={Pricing} />
-        </Switch>
-      </BrowserRouter>
-    </StyledEngineProvider>
+    <div>
+      <StyledEngineProvider injectFirst>
+        <Router initialEntries={[initialPath]} history={defaultHistory}>
+          <Switch>
+            <Route exact path="/signup" component={Signup} />
+            <Route exact path="/login" component={Login} />
+          </Switch>
+        </Router>
+      </StyledEngineProvider>
+    </div>
   );
 };
 

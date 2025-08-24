@@ -7,14 +7,14 @@ const prodConfig = {
   mode: "production",
   output: {
     filename: "[name].[contenthash].js",
-    publicPath: "https://auth.metacook.in/",
+    publicPath: "https://checkout.metacook.in/",
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "auth",
+      name: "checkout",
       filename: "remoteEntry.js",
       exposes: {
-        "./AuthApp": "./src/bootstrap",
+        "./CheckoutApp": "./src/bootstrap",
       },
       shared: packageDeps,
     }),
