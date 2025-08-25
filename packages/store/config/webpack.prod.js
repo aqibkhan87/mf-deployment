@@ -15,6 +15,7 @@ const prodConfig = {
       filename: "remoteEntry.js",
       exposes: {
         "./authStore": "./src/store/authStore",
+        "./productContext": "./src/context/productContext.js",
       },
       shared: packageDeps,
     }),
