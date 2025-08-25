@@ -5,7 +5,7 @@ import App from "./app";
 
 console.info("Hi Auth MF");
 
-const mount = (el, { onNavigate, defaultHistory, initialPath } = {}) => {
+const mount = (el, { onNavigate, defaultHistory, initialPath }) => {
   console.log("initialPath - mount", initialPath, "defaultHistory", defaultHistory);
   const history =
     defaultHistory ||

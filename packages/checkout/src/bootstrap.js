@@ -1,13 +1,12 @@
-import React, {useContext} from "react";
+import React, { lazy } from "react";
 import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
-import { ProductProvider } from "store/productContext";
+const ProductProvider = lazy(() => import("store/productContext").then(m => ({ default: m.ProductProvider })));
 import App from "./app";
 
 console.info("Hi Checkout MF");
 
-const mount = (el, { onNavigate, defaultHistory, initialPath } = {}) => {
-  console.log("defaultHistory, initialPath in checkout", defaultHistory, initialPath)
+const mount = (el, { onNavigate, defaultHistory, initialPath }) => {
   const history =
     defaultHistory ||
     createMemoryHistory({
@@ -22,7 +21,6 @@ const mount = (el, { onNavigate, defaultHistory, initialPath } = {}) => {
 
   const MountWrapper = () => {
     if (onNavigate) {
-      console.log("inside onNaviagte", onNavigate)
       return (
         <App
           onNavigate={onNavigate}

@@ -6,10 +6,8 @@ const path = require("path");
 
 const devConfig = {
   mode: "development",
-  entry: "./src/index",
   output: {
     publicPath: "http://localhost:8082/",
-    clean: true
   },
   devServer: {
     port: 8082,
