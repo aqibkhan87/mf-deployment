@@ -3,4 +3,4 @@
 *.log
 /*/*/package-lock.json
 /*/*/.DS_store
-/*/*/.yarn.lock
+/*/*/yarn.lock

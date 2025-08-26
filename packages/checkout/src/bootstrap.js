@@ -1,7 +1,7 @@
-import React, { lazy } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
-const ProductProvider = lazy(() => import("store/productContext").then(m => ({ default: m.ProductProvider })));
+import { ProductProvider } from "store/productContext";
 import App from "./app";
 
 console.info("Hi Checkout MF");
@@ -19,27 +19,15 @@ const mount = (el, { onNavigate, defaultHistory, initialPath }) => {
 
   const root = ReactDOM.createRoot(el);
 
-  const MountWrapper = () => {
-    if (onNavigate) {
-      return (
-        <App
-          onNavigate={onNavigate}
-          defaultHistory={history}
-          initialPath={initialPath}
-        />
-      );
-    }
-    return (
-      <ProductProvider>
-        <App
-          onNavigate={onNavigate}
-          defaultHistory={history}
-          initialPath={initialPath}
-        />
-      </ProductProvider>
-    );
-  };
-  root.render(<MountWrapper />);
+  root.render(
+    <ProductProvider>
+      <App
+        onNavigate={onNavigate}
+        defaultHistory={history}
+        initialPath={initialPath}
+      />
+    </ProductProvider>
+  );
 
   return {
     onParentNavigate({ pathname: nextPathname }) {

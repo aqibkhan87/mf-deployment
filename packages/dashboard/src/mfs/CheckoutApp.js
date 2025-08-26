@@ -8,7 +8,7 @@ const CheckoutApp = () => {
   const history = useHistory();
 
   // strip /auth prefix for child
-  const subPath = location.pathname.replace(/^\/checkout|products/, "") || "/";
+  const subPath = location.pathname.replace(/^\/\/checkout|\/product/, "") || "/";
 
   const handleChildNavigate = (historyLocation) => {
     const { location: newLocation } = historyLocation
