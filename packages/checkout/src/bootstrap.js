@@ -6,21 +6,41 @@ import App from "./app";
 
 console.info("Hi Checkout MF");
 
-const mount = (
-  el,
-  { updateParentHistory, defaultHistory, initialPath = "/" }
-) => {
-  const history =
-    defaultHistory ||
-    createMemoryHistory({
-      initialEntries: [initialPath],
-    });
+const roots = new Map();
+let history = null;
+
+const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) => {
+  history = defaultHistory || createMemoryHistory({ initialEntries: [initialPath] });
 
   if (updateParentHistory) {
     history.listen(updateParentHistory);
   }
 
+  const existingRoot = roots.get(el);
+
+  if (existingRoot) {
+    // Defer unmount to next tick to avoid sync unmount during render
+    setTimeout(() => {
+      existingRoot.unmount();
+      roots.delete(el);
+
+      const root = ReactDOM.createRoot(el);
+      roots.set(el, root);
+
+      root.render(
+        <ProductProvider>
+          <App history={history} />
+        </ProductProvider>
+      );
+    }, 0);
+
+    return {
+      updateChildHistory: () => {},
+    };
+  }
+
   const root = ReactDOM.createRoot(el);
+  roots.set(el, root);
 
   root.render(
     <ProductProvider>
@@ -30,15 +50,15 @@ const mount = (
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      const { pathname } = history.location;
-      if (pathname !== nextPathname) {
-        history.push(nextPathname); // Update child's history
+      if (history.location.pathname !== nextPathname) {
+        history.push(nextPathname);
       }
     },
   };
 };
 
-// For local development in isolation - use browser history
+
+// For development in isolation - use browser history
 if (process.env.NODE_ENV === "development") {
   const devRoot = document.getElementById("_checkout-dev-root");
   if (devRoot) {
