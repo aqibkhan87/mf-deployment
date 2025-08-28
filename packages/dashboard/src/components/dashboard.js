@@ -1,5 +1,6 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, Box, Button, Container, Grid, Card, CardMedia, CardContent } from "@mui/material";
+import { Link } from "react-router-dom";
+import { Typography, Box, Button, Container, Grid, Card, CardMedia, CardContent } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -77,6 +78,7 @@ export default function DashboardPage() {
             >
               {sec.products.map((p, i) => (
                 <SwiperSlide key={i}>
+                  <Link to="/product/listing">
                   <Card sx={{ textAlign: "center"}}>
                     <CardMedia component="img" height="120" image={p.img} alt={p.name} />
                     <CardContent>
@@ -84,6 +86,7 @@ export default function DashboardPage() {
                       <Typography variant="body2" color="green">{p.price}</Typography>
                     </CardContent>
                   </Card>
+                  </Link>
                 </SwiperSlide>
               ))}
             </Swiper>

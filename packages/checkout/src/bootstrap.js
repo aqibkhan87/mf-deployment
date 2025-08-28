@@ -6,49 +6,44 @@ import App from "./app";
 
 console.info("Hi Checkout MF");
 
-const mount = (el, { onNavigate, defaultHistory, initialPath }) => {
+const mount = (
+  el,
+  { updateParentHistory, defaultHistory, initialPath = "/" }
+) => {
   const history =
     defaultHistory ||
     createMemoryHistory({
-      initialEntries: [initialPath || "/"],
+      initialEntries: [initialPath],
     });
 
-  if (onNavigate) {
-    history.listen(onNavigate);
+  if (updateParentHistory) {
+    history.listen(updateParentHistory);
   }
 
   const root = ReactDOM.createRoot(el);
 
   root.render(
     <ProductProvider>
-      <App
-        onNavigate={onNavigate}
-        defaultHistory={history}
-        initialPath={initialPath}
-      />
+      <App history={history} />
     </ProductProvider>
   );
 
   return {
-    onParentNavigate({ pathname: nextPathname }) {
+    updateChildHistory({ pathname: nextPathname }) {
       const { pathname } = history.location;
-
       if (pathname !== nextPathname) {
-        history.push(nextPathname); // 🔹 Update child’s memory router
+        history.push(nextPathname); // Update child's history
       }
     },
   };
 };
 
-// if we are in development and in isolation
-// call the mount immediately
+// For local development in isolation - use browser history
 if (process.env.NODE_ENV === "development") {
   const devRoot = document.getElementById("_checkout-dev-root");
   if (devRoot) {
     mount(devRoot, { defaultHistory: createBrowserHistory() });
   }
 }
-// if we are running through container
-// and we should export the mount function
 
 export { mount };

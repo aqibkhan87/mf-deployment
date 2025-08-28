@@ -1,32 +1,21 @@
-import React, { useEffect } from "react";
-import { Route, Switch, Router } from "react-router-dom";
+import React from "react";
+import { Router, Route, Switch } from "react-router-dom";
 import ProductDetails from "./components/productDetails";
 import ProductListing from "./components/productlisting";
 import CartPage from "./components/cart";
 import CheckoutPage from "./components/checkout";
 import WishlistPage from "./components/wishlist";
 
-const App = ({ initialPath, defaultHistory }) => {
-  console.log("initialPath in Checkout", initialPath);
-
+const App = ({ history }) => {
+  console.log("history in Checkout MF APP", history)
   return (
-    <Router initialEntries={[initialPath]} history={defaultHistory}>
+    <Router history={history}>
       <Switch>
-        <Route path="/listing">
-          <ProductListing />
-        </Route>
-        <Route path="/details/:id">
-          <ProductDetails />
-        </Route>
-        <Route path="/view">
-          <CartPage />
-        </Route>
-        <Route path="/wishlist">
-          <WishlistPage />
-        </Route>
-        <Route path="/">
-          <CheckoutPage />
-        </Route>
+        <Route exact path="/listing" component={ProductListing} />
+        <Route exact path="/details/:id" component={ProductDetails} />
+        <Route exact path="/view" component={CartPage} />
+        <Route exact path="/wishlist" component={WishlistPage} />
+        <Route exact path="/" component={CheckoutPage} />
       </Switch>
     </Router>
   );
