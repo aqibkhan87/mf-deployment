@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -15,132 +15,14 @@ import {
   Chip,
   Rating,
 } from "@mui/material";
-
-const products = [
-  {
-    id: 1,
-    name: "HOPPUP Xo6 Gaming Earbuds",
-    price: 797,
-    oldPrice: 4999,
-    rating: 4.1,
-    reviews: 7515,
-    image: "https://rukminim2.flixcart.com/image/312/312/x6gaming.jpg?q=70", // replace with actual image
-    discount: "84% off",
-    assured: true,
-  },
-  {
-    id: 2,
-    name: "TRIGGR Kraken X4",
-    price: 799,
-    oldPrice: 3999,
-    rating: 4,
-    reviews: 20220,
-    image: "https://rukminim2.flixcart.com/image/312/312/krakenx4.jpg?q=70",
-    discount: "80% off",
-    assured: true,
-  },
-  {
-    id: 3,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 4,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 5,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 6,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 7,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 8,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 9,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 10,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-  {
-    id: 11,
-    name: "bAot EarBuds BT110",
-    price: 699,
-    oldPrice: 1999,
-    rating: 4.1,
-    reviews: 8,
-    image: "https://rukminim2.flixcart.com/image/312/312/bAotbt110.jpg?q=70",
-    discount: "65% off",
-    assured: true,
-  },
-];
+import { ProductContext } from 'store/productContext';
 
 const ProductListing = () => {
+  const { categoryid } = useParams();
+  const { productsCategories } = useContext(ProductContext);
+  const categoryData = productsCategories?.find((sec) => sec?.categoryid === categoryid) || {};
+  const products = categoryData?.products || [];
+  
   return (
     <Grid container spacing={2} p={2}>
       {/* Sidebar Filters */}
@@ -195,7 +77,7 @@ const ProductListing = () => {
       {/* Product Grid */}
       <Grid item xs={12} md={9}>
         <Typography variant="h6" gutterBottom>
-          Headset (Showing 1–{products.length})
+          Headset (Showing 1–{products?.length})
         </Typography>
         <Box display="flex" gap={2} mb={2}>
           <Button variant="outlined">Popularity</Button>
@@ -208,53 +90,45 @@ const ProductListing = () => {
         <Grid container spacing={2}>
           {products?.map((p) => (
             <Grid item xs={12} sm={6} md={4} key={p.id}>
-              <Link to="/product/details/123">
+              <Link to={`/product/${categoryid}/${p?.id}`}>
                 <Card sx={{ height: "100%" }}>
                   <CardMedia
                     component="img"
                     height="200"
-                    image={p.image}
-                    alt={p.name}
+                    image={p?.productImage}
+                    alt={p?.name}
                   />
                   <CardContent>
                     <Typography variant="body1" gutterBottom>
-                      {p.name}
+                      {p?.name}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={1}>
                       <Rating
                         name="rating"
-                        value={p.rating}
+                        value={p?.rating}
                         precision={0.1}
                         readOnly
                         size="small"
                       />
                       <Typography variant="body2" color="text.secondary">
-                        ({p.reviews.toLocaleString()})
+                        ({p?.reviews?.toLocaleString()})
                       </Typography>
                     </Box>
                     <Typography variant="h6" color="green">
-                      ₹{p.price}
+                      ₹{p?.price}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ textDecoration: "line-through", mr: 1 }}
                     >
-                      ₹{p.oldPrice}
+                      ₹{p?.oldPrice}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ color: "green", fontWeight: "bold" }}
                     >
-                      {p.discount}
+                      {p?.discountPercentage}
                     </Typography>
-                    {p.assured && (
-                      <Chip
-                        label="Assured"
-                        size="small"
-                        color="primary"
-                        sx={{ mt: 1 }}
-                      />
-                    )}
                   </CardContent>
                 </Card>
               </Link>

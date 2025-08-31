@@ -1,42 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Typography, Box, Button, Container, Grid, Card, CardMedia, CardContent } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
+import { ProductContext } from "store/productContext";
 
 export default function DashboardPage() {
-  // Dummy product data
-  const sections = [
-    {
-      title: "Best of Electronics",
-      products: [
-        { name: "TrueWireless Earbuds", price: "₹699", img: "https://picsum.photos/id/1015/1200/300"  },
-        { name: "Mirrorless Camera", price: "₹25,999", img: "https://picsum.photos/id/1025/1200/300"  },
-        { name: "Monitor", price: "₹6,999", img: "https://picsum.photos/id/1074/1200/300"  },
-        { name: "Smartwatch", price: "₹1,399", img: "https://picsum.photos/id/1062/1200/300"  },
-        { name: "Projector", price: "₹6,999", img: "https://picsum.photos/id/1074/1200/300"  },
-        { name: "Mirrorless Camera", price: "₹25,999", img: "https://picsum.photos/id/1025/1200/300"  },
-      ],
-    },
-    {
-      title: "Beauty, Food, Toys & More",
-      products: [
-        { name: "Action Toys", price: "₹499", img: "https://picsum.photos/id/1015/1200/300" },
-        { name: "Coffee Powder", price: "₹299", img: "https://picsum.photos/id/1025/1200/300" },
-        { name: "Stationery", price: "₹49", img: "https://picsum.photos/id/1074/1200/300" },
-        { name: "Cycle", price: "₹3,999", img: "https://picsum.photos/id/1062/1200/300" },
-        { name: "Soft Toys", price: "₹799", img: "https://picsum.photos/id/1074/1200/300" },
-        { name: "Coffee Powder", price: "₹299", img: "https://picsum.photos/id/1025/1200/300" },
-      ],
-    },
-  ];
-
+  const { productsCategories } = useContext(ProductContext);
+  console.log("productsCategories", productsCategories)
   return (
     <Box>
-
-
       {/* 🔹 Banner Carousel */}
       <Box sx={{ mt: 2 }}>
         <Swiper
@@ -58,7 +33,7 @@ export default function DashboardPage() {
 
       {/* 🔹 Product Sections */}
       <Container sx={{ mt: 4 }}>
-        {sections.map((sec, idx) => (
+        {productsCategories?.map((sec, idx) => (
           <Box key={idx} sx={{ mb: 5 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Typography variant="h6">{sec.title}</Typography>
@@ -76,14 +51,14 @@ export default function DashboardPage() {
                 480: { slidesPerView: 2 },
               }}
             >
-              {sec.products.map((p, i) => (
+              {sec?.products?.map((p, i) => (
                 <SwiperSlide key={i}>
-                  <Link to="/product/listing">
+                  <Link to={`/product/${sec?.categoryid}`}>
                   <Card sx={{ textAlign: "center"}}>
-                    <CardMedia component="img" height="120" image={p.img} alt={p.name} />
+                    <CardMedia component="img" height="120" image={p?.productImage} alt={p?.name} />
                     <CardContent>
-                      <Typography variant="body1">{p.name}</Typography>
-                      <Typography variant="body2" color="green">{p.price}</Typography>
+                      <Typography variant="body1">{p?.name}</Typography>
+                      <Typography variant="body2" color="green">{p?.price}</Typography>
                     </CardContent>
                   </Card>
                   </Link>

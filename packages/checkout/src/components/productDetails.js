@@ -12,38 +12,53 @@ import {
   Divider,
   TextField,
 } from "@mui/material";
-
-const product = {
-  name: "HOPPUP Xo6 Gaming Earbuds with 35MS Low Latency, RGB LED, 13MM DRIVERS & 50H PlayTime Bluetooth (Red, True Wireless)",
-  price: 797,
-  oldPrice: 4999,
-  discount: "84% off",
-  rating: 4.1,
-  reviews: 7515,
-  assured: true,
-  warranty: "12 Months Warranty from the date of purchase",
-  images: [
-    "https://rukminim2.flixcart.com/image/612/612/x6gaming.jpg?q=70",
-    "https://rukminim2.flixcart.com/image/612/612/x6gaming2.jpg?q=70",
-    "https://rukminim2.flixcart.com/image/612/612/x6gaming3.jpg?q=70",
-  ],
-};
+import { useCartStore } from "store/cartStore";
 
 const ProductDetail = () => {
-  const { id } = useParams();
   const history = useHistory();
-  console.log("idddddd", id);
-  const { products, addToCart, addToWishlist } = useContext(ProductContext);
-  // const product = products?.find((p) => p.id.toString() === id);
-  const [mainImg, setMainImg] = useState(product.images[0]);
+  const { categoryid, id } = useParams();
+  const { cart, addToCart, updateQuantityInCart } = useCartStore();
+  const { productsCategories, addToWishlist } =
+    useContext(ProductContext);
+  const [mainImg, setMainImg] = useState(product?.productImage);
+  const categoryData =
+    productsCategories?.find(
+      (category) => category?.categoryid === categoryid
+    ) || {};
+  let product =
+      categoryData?.products?.find((pro) => pro?.id?.toString() === id) || {};
 
-  const handleNavigateToAddToCart = () => {
-    history.push('/cart/view')
-  }
-  
-  const handleNavigateToBuyNow = () => {
-    history.push('/checkout')
-  }
+  const handleNavigateToAddToCart = (e) => {
+    e.preventDefault();
+    if(!cart?.length) {
+      product.quantity = 1;
+      addToCart(product);
+    } else {
+      let itemExist = cart?.find((item) => item?.categoryid === categoryid && item?.id?.toString() === id);
+      if(itemExist) {
+        let updateCart = cart?.map((item) => {
+          if(item?.categoryid === categoryid && item?.id?.toString() === id) {
+            item.quantity += 1;
+            return item
+          } 
+          return item;
+        })
+        updateQuantityInCart(updateCart);
+      } else {
+        product.quantity = 1;
+        addToCart(product);
+      }
+    }
+    
+    history.push("/cart/view");
+  };
+
+  const handleNavigateToBuyNow = (e) => {
+    e.preventDefault();
+    product.quantity = 1;
+    addToCart(product);
+    history.push("/checkout");
+  };
 
   if (!product) return <p className="p-4">Product not found</p>;
   return (
@@ -52,37 +67,42 @@ const ProductDetail = () => {
         <Grid container spacing={4}>
           {/* LEFT SIDE: Images */}
           <Grid item xs={12} md={5}>
-            <Box>
-              <img
-                src={mainImg}
-                alt="product"
-                style={{ width: "100%", borderRadius: 8 }}
-              />
-            </Box>
-            <Box display="flex" gap={1} mt={2} overflow="auto">
-              {product.images.map((img, i) => (
+            <Box display="flex">
+              <Box display="grid" gap={2} mt={2}>
+                {product?.images?.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt={`thumb-${i}`}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      border:
+                        mainImg === img
+                          ? "2px solid #1976d2"
+                          : "1px solid #ddd",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => setMainImg(img)}
+                  />
+                ))}
+              </Box>
+              <Box display="flex" style={{ width: 'calc(100% - 140px)'}} mx={"auto"} mt={2}>
                 <img
-                  key={i}
-                  src={img}
-                  alt={`thumb-${i}`}
-                  style={{
-                    width: 60,
-                    height: 60,
-                    border:
-                      mainImg === img ? "2px solid #1976d2" : "1px solid #ddd",
-                    borderRadius: 4,
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setMainImg(img)}
+                  src={mainImg}
+                  alt="product"
+                  style={{ width: "100%", borderRadius: 8 }}
                 />
-              ))}
+              </Box>
             </Box>
+
             <Box mt={3} display="flex" gap={2}>
               <Button
                 variant="contained"
                 sx={{ bgcolor: "#ff9f00", flex: 1 }}
                 startIcon={<span>🛒</span>}
-                onClick={() => handleNavigateToAddToCart()}
+                onClick={(e) => handleNavigateToAddToCart(e)}
               >
                 Add to Cart
               </Button>
@@ -90,7 +110,7 @@ const ProductDetail = () => {
                 variant="contained"
                 sx={{ bgcolor: "#fb641b", flex: 1 }}
                 startIcon={<span>⚡</span>}
-                onClick={() => handleNavigateToBuyNow()}
+                onClick={(e) => handleNavigateToBuyNow(e)}
               >
                 Buy Now
               </Button>
@@ -132,7 +152,7 @@ const ProductDetail = () => {
                 ₹{product.oldPrice}
               </Typography>
               <Typography variant="body1" sx={{ color: "green" }}>
-                {product.discount}
+                {product.discountPercentage}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
@@ -182,7 +202,7 @@ const ProductDetail = () => {
       {/* Recommendations */}
       <div className="col-span-2 mt-6">
         <Recommendations
-          products={products?.filter((p) => p.id !== product.id)}
+          products={categoryData?.products?.filter((p) => p.id !== product.id)}
         />
       </div>
     </div>
