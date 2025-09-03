@@ -34,6 +34,8 @@ const prodConfig = {
       },
       exposes: {
         "./AuthApp": "./src/bootstrap",
+        "./authFormPopup": './src/common/authFormPopup',
+        "./signupFormPopup": './src/common/signupFormPopup',
       },
       shared: packageDeps,
     }),

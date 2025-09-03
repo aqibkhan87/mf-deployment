@@ -3,15 +3,15 @@ import { create } from "zustand";
 
 console.log("Inside Store");
 export const useAuthStore = create((set, get) => ({
-  user: null,
+  user: JSON.parse(localStorage.getItem('user')) || {},
   theme: "light",
   settings: {},
 
   setUser: (user) => set({ user }),
   logout: () => set({ user: null }),
-  toggleTheme: () =>
-    set((s) => ({ theme: s.theme === "light" ? "dark" : "light" })),
+  // toggleTheme: () =>
+  //   set((s) => ({ theme: s.theme === "light" ? "dark" : "light" })),
 
-  setSetting: (key, value) =>
-    set({ settings: { ...get().settings, [key]: value } }),
+  // setSetting: (key, value) =>
+  //   set({ settings: { ...get().settings, [key]: value } }),
 }));

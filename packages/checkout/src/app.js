@@ -3,7 +3,7 @@ import { Router, Route, Switch } from "react-router-dom";
 import ProductDetails from "./components/productDetails";
 import ProductListing from "./components/productlisting";
 import CartPage from "./components/cartPage";
-import CheckoutPage from "./components/checkout";
+import CheckoutPage from "./components/checkoutPage";
 import WishlistPage from "./components/wishlist";
 
 const App = ({ history }) => {

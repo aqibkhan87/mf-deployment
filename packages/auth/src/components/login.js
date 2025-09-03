@@ -8,10 +8,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
 
-export default function Login() {
+const Login = () => {
   return (
     <Box
       sx={{
@@ -32,13 +31,6 @@ export default function Login() {
           alignItems: "center",
         }}
       >
-        {/* Logo */}
-        <GitHubIcon sx={{ fontSize: 60, mb: 2, color: "black" }} />
-
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
-          Sign in to GitHub
-        </Typography>
-
         {/* Form */}
         <Box
           sx={{
@@ -155,3 +147,5 @@ export default function Login() {
     </Box>
   );
 }
+
+export default Login;

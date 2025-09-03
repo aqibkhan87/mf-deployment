@@ -23,6 +23,7 @@ const devConfig = {
       filename: 'remoteEntry.js',
       remotes: {
           store: 'store@http://localhost:8083/remoteEntry.js',
+          auth: 'auth@http://localhost:8081/remoteEntry.js',
        },
       exposes: {
         "./CheckoutApp": './src/bootstrap'

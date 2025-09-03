@@ -9,7 +9,7 @@ import {
   IconButton,
   Chip,
   Card,
-  CardMedia
+  CardMedia,
 } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -38,13 +38,17 @@ const CheckoutItems = () => {
   return (
     <Paper sx={{ p: 2, mt: 2, mb: 2 }}>
       {/* ITEMS SUMMARY */}
-      <Chip label="3" sx={{ background: "#e3ebfd", fontWeight: 600, mr: 1 }} />
-      <Typography
-        variant="subtitle1"
-        sx={{ fontWeight: 600, display: "inline" }}
-      >
-        ITEMS
-      </Typography>
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item>
+          <Chip
+            label="3"
+            sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2 }}
+          />
+        </Grid>
+        <Grid item xs>
+          <Typography sx={{ fontWeight: 600 }}>CHECKOUT ITEMS</Typography>
+        </Grid>
+      </Grid>
       <Divider sx={{ my: 1 }} />
 
       {cart?.map((product, ind) => (

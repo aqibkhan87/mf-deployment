@@ -1,9 +1,9 @@
 import React from "react";
-import { Box, Paper, Typography, Grid, Divider } from "@mui/material";
+import { Paper, Typography, Grid, Divider } from "@mui/material";
 import { useCartStore } from "store/cartStore";
 
 const OrderSummary = () => {
-  const { cart, cartCount, totalAmount, discountedAmount } = useCartStore();
+  const { cart, totalAmount, discountedAmount } = useCartStore();
 
   return (
     <Grid item xs={12} md={4}>

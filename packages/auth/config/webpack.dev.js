@@ -25,7 +25,8 @@ const devConfig = {
           store: 'store@http://localhost:8083/remoteEntry.js',
       },
       exposes: {
-        "./AuthApp": './src/bootstrap'
+        "./AuthApp": './src/bootstrap',
+        "./authFormPopup": './src/common/authFormPopup',
       },
       shared: packageDeps
     }),

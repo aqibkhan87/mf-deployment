@@ -7,7 +7,7 @@ const CheckoutApp = () => {
   const history = useHistory();
 
   // Base paths that child MFs are mounted under
-  const basePaths = ["/checkout", "/product", "/cart"];
+  const basePaths = ["/checkout", "/product", "/cart", "/auth"];
 
   // Function to get subpath by stripping base path prefix
   const getSubPath = (pathname) => {
