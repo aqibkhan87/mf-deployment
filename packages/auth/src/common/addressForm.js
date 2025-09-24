@@ -19,8 +19,10 @@ import {
   Radio,
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useAuthStore } from "store/authStore";
 import { statesOfIndia } from "../../../checkout/src/utils/constants";
 import { eventEmitter } from "../../utils/helper";
+import { saveNewAddress } from "../apis/address";
 
 const initialFields = {
   name: "",
@@ -36,6 +38,7 @@ const initialFields = {
 };
 
 const AddressForm = () => {
+  const { setNewAddress } = useAuthStore();
   const [fields, setFields] = useState(initialFields);
   const [touched, setTouched] = useState({});
   const [saving, setSaving] = useState(true);
@@ -94,7 +97,7 @@ const AddressForm = () => {
     setFields({ ...fields, addressType: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched(
       requiredFields.reduce((acc, key) => ({ ...acc, [key]: true }), {})
@@ -102,13 +105,13 @@ const AddressForm = () => {
     if (Object.values(errors).every((err) => !err)) {
       setSaving(true);
       setTimeout(() => setSaving(false), 1200);
-      let address = "";
-      for (let value of Object.values(fields)) {
-        address += value + ", ";
-      }
-      const eventData = { address: address };
-      eventEmitter("addressData", eventData);
       setOpenAddressForm(false);
+      const newAddressRes = await saveNewAddress(fields);
+      debugger;
+      if (newAddressRes?.status === 200 && newAddressRes?.address) {
+        setNewAddress(newAddressRes?.address);
+        onClose();
+      }
     }
   };
 

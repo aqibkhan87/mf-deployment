@@ -7,23 +7,10 @@ import { useAuthStore } from "store/authStore";
 import { eventEmitter } from "../utils/helper";
 
 const Checkout = () => {
-  const { user } = useAuthStore();
+  const { user, address } = useAuthStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
-  const [address, setAddress] = useState("");
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
-
-  useEffect(() => {
-    const handler = (event) => {
-      const payload = event.detail;
-      setAddress(payload.address);
-      setStep("");
-    };
-    window.addEventListener("addressData", handler);
-    return () => {
-      window.removeEventListener("addressData", handler);
-    };
-  }, []);
 
   useEffect(() => {
     if (step == "auth" && isEditMode && user?.email && !address) {
