@@ -26,7 +26,8 @@ const devConfig = {
       },
       exposes: {
         "./AuthApp": './src/bootstrap',
-        "./authFormPopup": './src/common/authFormPopup',
+        "./loginSummary": './src/common/loginSummary',
+        "./addressForm": './src/common/addressForm',
       },
       shared: packageDeps
     }),

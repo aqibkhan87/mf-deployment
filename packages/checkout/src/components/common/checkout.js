@@ -14,7 +14,6 @@ import {
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import VerifiedIcon from "@mui/icons-material/Verified";
 import { useCartStore } from "store/cartStore";
 import { addQuantity, subtractQuantity } from "../../utils/helper";
 

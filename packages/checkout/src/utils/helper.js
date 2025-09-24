@@ -1,3 +1,10 @@
+export const eventEmitter = (eventName, eventData) => {
+  const customEvent = new CustomEvent(eventName, {
+    detail: eventData,
+  });
+  window.dispatchEvent(customEvent);
+};
+
 export const addQuantity = (categoryid, productid, cart) => {
   return cart?.map((pro) => {
     if (pro?.categoryid === categoryid && pro?.id === productid) {

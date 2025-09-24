@@ -6,9 +6,10 @@ import { useAuthStore } from "store/authStore";
 import { ProductProvider } from "store/productContext";
 import OrdersPage from "./components/orderHistory";
 import OrderDetails from "./components/orderDetails";
-
 import MainNav from "./components/mainNav";
 import DashboardPage from "./components/dashboard";
+import AuthComponents from "./components/common/auth";
+import CheckoutComponents from "./components/common/checkout";
 
 const App = () => {
   const user = useAuthStore((s) => s.user);
@@ -31,6 +32,8 @@ const App = () => {
               <Route exact path="/" component={DashboardPage} />
               <Route component={() => <h1>404 Not Found</h1>} />
             </Switch>
+            <AuthComponents />
+            <CheckoutComponents />
           </main>
         </ProductProvider>
       </BrowserRouter>

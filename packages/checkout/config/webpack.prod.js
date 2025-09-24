@@ -15,7 +15,6 @@ const prodConfig = {
       filename: "remoteEntry.js",
       remotes: {
         store: 'store@https://store.metacook.in/remoteEntry.js',
-        auth: 'auth@https://auth.metacook.in/remoteEntry.js',
       },
       exposes: {
         "./CheckoutApp": "./src/bootstrap",
