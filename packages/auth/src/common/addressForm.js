@@ -107,7 +107,6 @@ const AddressForm = () => {
       setTimeout(() => setSaving(false), 1200);
       setOpenAddressForm(false);
       const newAddressRes = await saveNewAddress(fields);
-      debugger;
       if (newAddressRes?.status === 200 && newAddressRes?.address) {
         setNewAddress(newAddressRes?.address);
         onClose();
