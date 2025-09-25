@@ -20,9 +20,12 @@ const CheckoutApp = () => {
   };
 
   const subPath = getSubPath(history.location.pathname);
+  console.log("history in dashboard checkout", history, subPath)
 
   const handleChildNavigate = (childLocation) => {
+
     const { pathname: childPath } = childLocation?.location ?? childLocation;
+    console.log("childLocation")
     // Prepend the matching base path before pushing to parent history
     for (const basePath of basePaths) {
       if (childPath.startsWith(basePath)) {
@@ -52,7 +55,7 @@ const CheckoutApp = () => {
     const unlisten = history.listen(updateChildHistory);
 
     return () => unlisten();
-  }, [history.location.pathname]);
+  }, [history.location.pathname, history]);
 
   return <div ref={ref} />;
 };

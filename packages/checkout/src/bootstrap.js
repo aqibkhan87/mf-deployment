@@ -13,6 +13,7 @@ const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) =
   history = defaultHistory || createMemoryHistory({ initialEntries: [initialPath] });
 
   if (updateParentHistory) {
+    console.log("updateParentHistory")
     history.listen(updateParentHistory);
   }
 

@@ -53,7 +53,7 @@ const AuthApp = () => {
     // Sync child when parent navigates
     const unlisten = history.listen(updateChildHistory);
     return () => unlisten();
-  }, [history.location.pathname]);
+  }, [history.location.pathname, history]);
 
   return <div ref={ref} />;
 };
