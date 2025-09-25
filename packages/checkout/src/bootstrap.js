@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createMemoryHistory, createBrowserHistory } from "history";
+import { createBrowserHistory } from "history";
 import { ProductProvider } from "store/productContext";
 import App from "./app";
 
@@ -9,21 +9,16 @@ console.info("Hi Checkout MF");
 const roots = new Map();
 let history = null;
 
-const mount = (
-  el,
-  { updateParentHistory, defaultHistory, initialPath = "/" }
-) => {
+const mount = (el, { updateParentHistory, defaultHistory }) => {
   history = defaultHistory;
 
   if (updateParentHistory) {
-    console.log("updateParentHistory", history);
     history.listen(updateParentHistory);
   }
 
   const existingRoot = roots.get(el);
 
   if (existingRoot) {
-    // Defer unmount to next tick to avoid sync unmount during render
     setTimeout(() => {
       existingRoot.unmount();
       roots.delete(el);
@@ -54,19 +49,9 @@ const mount = (
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      console.log(
-        "history.location.pathname !== nextPathname",
-        history.location.pathname,
-        nextPathname
-      );
-
       if (history.location.pathname !== nextPathname) {
-        console.log("inside condition");
         history.push(nextPathname);
-      } else {
-        // Force navigation if child wants to "refresh" the same route
-        history.replace(nextPathname);
-      }
+      } 
     },
   };
 };
