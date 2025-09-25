@@ -21,7 +21,6 @@ import {
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuthStore } from "store/authStore";
 import { statesOfIndia } from "../../../checkout/src/utils/constants";
-import { eventEmitter } from "../../utils/helper";
 import { saveNewAddress } from "../apis/address";
 
 const initialFields = {

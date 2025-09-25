@@ -35,7 +35,7 @@ export const login = ({ contact, password }) => {
   }
   return Promise.reject({
     message: "User Doesn't exist",
-    user: null,
+    user: {},
     status: 404,
   });
 };
@@ -67,7 +67,7 @@ export const signup = (data) => {
   }
   return {
     message: "User Doesn't exist",
-    user: null,
+    user: {},
     status: 404,
   };
 };

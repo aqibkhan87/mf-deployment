@@ -2,7 +2,6 @@ import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import CheckoutApp from "./mfs/CheckoutApp";
 import AuthApp from "./mfs/AuthApp";
-import { useAuthStore } from "store/authStore";
 import { ProductProvider } from "store/productContext";
 import OrdersPage from "./components/orderHistory";
 import OrderDetails from "./components/orderDetails";
@@ -12,8 +11,6 @@ import AuthComponents from "./components/common/auth";
 import CheckoutComponents from "./components/common/checkout";
 
 const App = () => {
-  const user = useAuthStore((s) => s.user);
-  const setUser = useAuthStore((s) => s.setUser);
 
   return (
     <div className="min-h-screen">

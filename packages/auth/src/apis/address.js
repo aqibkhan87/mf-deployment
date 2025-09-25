@@ -13,7 +13,7 @@ export const saveNewAddress = (payload) => {
   }
   return Promise.reject({
     message: "",
-    address: null,
+    address: "",
     status: 404,
   });
 };

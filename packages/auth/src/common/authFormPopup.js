@@ -219,7 +219,6 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
       if (userDetails?.status === 200 && userDetails?.user) {
         setUser(userDetails?.user)
         onClose();
-      } else {
       }
     }
   };
