@@ -49,6 +49,7 @@ const mount = (el, { updateParentHistory, defaultHistory }) => {
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
+      console.log("in Checkout mf nextPathname", nextPathname, "historyhistory", history)
       if (history.location.pathname !== nextPathname) {
         history.push(nextPathname);
       } 

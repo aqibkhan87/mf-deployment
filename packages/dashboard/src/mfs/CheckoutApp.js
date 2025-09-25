@@ -8,7 +8,7 @@ const CheckoutApp = () => {
   
   const handleChildNavigate = (childLocation) => {
     const { pathname: childPath } = childLocation?.location ?? childLocation;
-    console.log("childLocation", childPath)
+    console.log("in dashboard MF childLocation", childPath, "historyhistory", history)
    
     if (childPath !== history?.location.pathname) {
       history.push(childPath);
