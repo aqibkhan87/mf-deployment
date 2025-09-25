@@ -19,6 +19,7 @@ import { ProductContext } from 'store/productContext';
 
 const ProductListing = () => {
   const { categoryid } = useParams();
+  console.log("categoryid", categoryid)
   const { productsCategories } = useContext(ProductContext);
   const categoryData = productsCategories?.find((sec) => sec?.categoryid === categoryid) || {};
   const products = categoryData?.products || [];

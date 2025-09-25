@@ -51,7 +51,9 @@ const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) =
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
+      console.log("history.location.pathname !== nextPathname", history.location.pathname, nextPathname)
       if (history.location.pathname !== nextPathname) {
+        console.log("inside condition")
         history.push(nextPathname);
       }
     },
