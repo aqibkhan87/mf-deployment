@@ -59,10 +59,13 @@ const mount = (
         history.location.pathname,
         nextPathname
       );
-      
+
       if (history.location.pathname !== nextPathname) {
         console.log("inside condition");
         history.push(nextPathname);
+      } else {
+        // Force navigation if child wants to "refresh" the same route
+        history.replace(nextPathname);
       }
     },
   };
