@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const { cart, addToCart, updateQuantityInCart } = useCartStore();
   const { productsCategories, addToWishlist } =
     useContext(ProductContext);
+  console.log("productsCategories in product detail", productsCategories)  
   const [mainImg, setMainImg] = useState(product?.productImage);
   const categoryData =
     productsCategories?.find(

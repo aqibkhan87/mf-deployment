@@ -38,7 +38,7 @@ export const useCartStore = create((set, get) => ({
     for (const [key, value] of Object.entries(
       updateCartDetails([...get().cart])
     )) {
-      localStorage.setItem(key, value);
+      if (value) localStorage.setItem(key, value);
     }
   },
   updateQuantityInCart: (cart) => {

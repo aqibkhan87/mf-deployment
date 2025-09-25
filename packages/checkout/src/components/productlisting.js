@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -15,15 +15,23 @@ import {
   Chip,
   Rating,
 } from "@mui/material";
-import { ProductContext } from 'store/productContext';
+import { ProductContext } from "store/productContext";
 
 const ProductListing = () => {
   const { categoryid } = useParams();
-  console.log("categoryid", categoryid)
+  const history = useHistory()
+  console.log("categoryid", categoryid);
+  console.log("inside product listing", categoryid);
   const { productsCategories } = useContext(ProductContext);
-  const categoryData = productsCategories?.find((sec) => sec?.categoryid === categoryid) || {};
+  const categoryData =
+    productsCategories?.find((sec) => sec?.categoryid === categoryid) || {};
   const products = categoryData?.products || [];
-  
+
+  const navigateToProductDetail = (e, p) => {
+    e.preventDefault();
+    history.push(`/product/${categoryid}/${p?.id}`);
+  };
+
   return (
     <Grid container spacing={2} p={2}>
       {/* Sidebar Filters */}
@@ -91,7 +99,7 @@ const ProductListing = () => {
         <Grid container spacing={2}>
           {products?.map((p) => (
             <Grid item xs={12} sm={6} md={4} key={p.id}>
-              <Link to={`/product/${categoryid}/${p?.id}`}>
+              <a onClick={(e) => navigateToProductDetail(e, p)}>
                 <Card sx={{ height: "100%" }}>
                   <CardMedia
                     component="img"
@@ -132,7 +140,7 @@ const ProductListing = () => {
                     </Typography>
                   </CardContent>
                 </Card>
-              </Link>
+              </a>
             </Grid>
           ))}
         </Grid>

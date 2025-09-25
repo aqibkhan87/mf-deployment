@@ -10,10 +10,10 @@ const roots = new Map();
 let history = null;
 
 const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) => {
-  history = defaultHistory || createMemoryHistory({ initialEntries: [initialPath] });
+  history = defaultHistory;
 
   if (updateParentHistory) {
-    console.log("updateParentHistory")
+    console.log("updateParentHistory", history)
     history.listen(updateParentHistory);
   }
 

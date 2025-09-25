@@ -5,6 +5,7 @@ import { mount } from "checkout/CheckoutApp";
 const CheckoutApp = () => {
   const ref = useRef(null);
   const history = useHistory();
+  
 
   // Base paths that child MFs are mounted under
   const basePaths = ["/checkout", "/product", "/cart", "/auth"];
@@ -50,6 +51,7 @@ const CheckoutApp = () => {
     const { updateChildHistory } = mount(ref.current, {
       initialPath: subPath,
       updateParentHistory: handleChildNavigate,
+      defaultHistory: history
     });
 
     const unlisten = history.listen(updateChildHistory);
