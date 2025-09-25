@@ -9,11 +9,14 @@ console.info("Hi Checkout MF");
 const roots = new Map();
 let history = null;
 
-const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) => {
+const mount = (
+  el,
+  { updateParentHistory, defaultHistory, initialPath = "/" }
+) => {
   history = defaultHistory;
 
   if (updateParentHistory) {
-    console.log("updateParentHistory", history)
+    console.log("updateParentHistory", history);
     history.listen(updateParentHistory);
   }
 
@@ -51,15 +54,19 @@ const mount = (el, { updateParentHistory, defaultHistory, initialPath = "/" }) =
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      console.log("history.location.pathname !== nextPathname", history.location.pathname, nextPathname)
+      console.log(
+        "history.location.pathname !== nextPathname",
+        history.location.pathname,
+        nextPathname
+      );
+      
       if (history.location.pathname !== nextPathname) {
-        console.log("inside condition")
+        console.log("inside condition");
         history.push(nextPathname);
       }
     },
   };
 };
-
 
 // For development in isolation - use browser history
 if (process.env.NODE_ENV === "development") {

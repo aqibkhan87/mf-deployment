@@ -8,7 +8,7 @@ const CheckoutApp = () => {
   
 
   // Base paths that child MFs are mounted under
-  const basePaths = ["/checkout", "/product", "/cart", "/auth"];
+  // const basePaths = ["/checkout", "/product", "/cart", "/auth"];
 
   // Function to get subpath by stripping base path prefix
   const getSubPath = (pathname) => {
@@ -20,36 +20,36 @@ const CheckoutApp = () => {
     return pathname; // no base path matched (unlikely)
   };
 
-  const subPath = getSubPath(history.location.pathname);
-  console.log("history in dashboard checkout", history, subPath)
+  // const subPath = getSubPath(history.location.pathname);
+  // console.log("history in dashboard checkout", history, subPath)
 
   const handleChildNavigate = (childLocation) => {
 
     const { pathname: childPath } = childLocation?.location ?? childLocation;
     console.log("childLocation")
-    // Prepend the matching base path before pushing to parent history
-    for (const basePath of basePaths) {
-      if (childPath.startsWith(basePath)) {
-        // Already has basePath
-        if (childPath !== history?.location.pathname) {
-          history.push(childPath);
-        }
-        return;
-      }
-    }
-    // If child path did not include base path, prepend based on current location
-    const parentBasePath = basePaths.find((base) =>
-      history?.location.pathname.startsWith(base)
-    );
-    const newParentPath = (parentBasePath || "") + childPath;
-    if (newParentPath !== history?.location.pathname) {
-      history.push(newParentPath);
+    // // Prepend the matching base path before pushing to parent history
+    // for (const basePath of basePaths) {
+    //   if (childPath.startsWith(basePath)) {
+    //     // Already has basePath
+    //     if (childPath !== history?.location.pathname) {
+    //       history.push(childPath);
+    //     }
+    //     return;
+    //   }
+    // }
+    // // If child path did not include base path, prepend based on current location
+    // const parentBasePath = basePaths.find((base) =>
+    //   history?.location.pathname.startsWith(base)
+    // );
+    // const newParentPath = (parentBasePath || "") + childPath;
+    if (childPath !== history?.location.pathname) {
+      history.push(childPath);
     }
   };
 
   useEffect(() => {
     const { updateChildHistory } = mount(ref.current, {
-      initialPath: subPath,
+      // initialPath: subPath,
       updateParentHistory: handleChildNavigate,
       defaultHistory: history
     });
