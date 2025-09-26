@@ -4,54 +4,18 @@ import { createMemoryHistory, createBrowserHistory } from "history";
 import { ProductProvider } from "store/productContext";
 import App from "./app";
 
-console.info("Hi Checkout MF");
-
-const roots = new Map();
-let history = null;
-
 const mount = (
   el,
-  { updateParentHistory, defaultHistory, initialPath = "/" }
+  { updateParentHistory, defaultHistory = null, initialPath = "/" }
 ) => {
-  history =
+  const history =
     defaultHistory || createMemoryHistory({ initialEntries: [initialPath] });
 
   if (updateParentHistory) {
-    history.listen((location) => {
-      console.log("in Child MF TO LISTEN FOR PARENT ROUTE", location);
-      updateParentHistory(location);
-    });
+    history.listen(updateParentHistory);
   }
 
-  // const existingRoot = roots.get(el);
-
-  // if (existingRoot) {
-  //   setTimeout(() => {
-  //     existingRoot.unmount();
-  //     roots.delete(el);
-
-  //     const root = ReactDOM.createRoot(el);
-  //     roots.set(el, root);
-
-  //     root.render(
-  //       <ProductProvider>
-  //         <App history={history} />
-  //       </ProductProvider>
-  //     );
-  //   }, 0);
-
-  //   return {
-  //     updateChildHistory: ({ pathname: nextPathname }) => {
-  //       debugger;
-  //       if (history.location.pathname !== nextPathname) {
-  //         history.push(nextPathname);
-  //       }
-  //     },
-  //   };
-  // }
-
   const root = ReactDOM.createRoot(el);
-  // roots.set(el, root);
 
   root.render(
     <ProductProvider>

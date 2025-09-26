@@ -8,7 +8,12 @@ const CheckoutApp = () => {
 
   const updateParentHistory = (childLocation) => {
     const { pathname: childPath } = childLocation?.location ?? childLocation;
-    console.log("In CHECKOUT updateParentHistory", childLocation, "HISTORY", history)
+    console.log(
+      "In CHECKOUT updateParentHistory",
+      childLocation,
+      "HISTORY",
+      history
+    );
     debugger;
 
     // Prepend the matching base path before pushing to parent history
@@ -52,13 +57,8 @@ const CheckoutApp = () => {
       initialPath: subPath,
     });
 
-    const unlisten = history.listen((location) => {
-      debugger;
-      updateChildHistory(location);
-    });
-
-    return () => unlisten();
-  }, [history.location.pathname, history]);
+    history.listen(updateChildHistory);
+  }, [history.location.pathname]);
 
   return <div ref={ref} />;
 };
