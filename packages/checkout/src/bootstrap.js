@@ -25,12 +25,6 @@ const mount = (
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      console.log(
-        "IN CHECKOUT MF updateChildHistory",
-        history.location.pathname,
-        "nextPathname",
-        nextPathname
-      );
       if (history.location.pathname !== nextPathname) {
         history.push(nextPathname);
       }
@@ -42,7 +36,10 @@ const mount = (
 if (process.env.NODE_ENV === "development") {
   const devRoot = document.getElementById("_checkout-dev-root");
   if (devRoot) {
-    mount(devRoot, { defaultHistory: createBrowserHistory() });
+    mount(devRoot, {
+      initialPath: "/",
+      defaultHistory: createBrowserHistory(),
+    });
   }
 }
 
