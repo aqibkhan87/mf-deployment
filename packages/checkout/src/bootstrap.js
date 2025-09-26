@@ -25,7 +25,6 @@ const mount = (
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      debugger;
       console.log(
         "IN CHECKOUT MF updateChildHistory",
         history.location.pathname,
