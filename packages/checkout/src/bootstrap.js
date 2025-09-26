@@ -23,35 +23,35 @@ const mount = (
     });
   }
 
-  const existingRoot = roots.get(el);
+  // const existingRoot = roots.get(el);
 
-  if (existingRoot) {
-    setTimeout(() => {
-      existingRoot.unmount();
-      roots.delete(el);
+  // if (existingRoot) {
+  //   setTimeout(() => {
+  //     existingRoot.unmount();
+  //     roots.delete(el);
 
-      const root = ReactDOM.createRoot(el);
-      roots.set(el, root);
+  //     const root = ReactDOM.createRoot(el);
+  //     roots.set(el, root);
 
-      root.render(
-        <ProductProvider>
-          <App history={history} />
-        </ProductProvider>
-      );
-    }, 0);
+  //     root.render(
+  //       <ProductProvider>
+  //         <App history={history} />
+  //       </ProductProvider>
+  //     );
+  //   }, 0);
 
-    return {
-      updateChildHistory: ({ pathname: nextPathname }) => {
-        debugger;
-        if (history.location.pathname !== nextPathname) {
-          history.push(nextPathname);
-        }
-      },
-    };
-  }
+  //   return {
+  //     updateChildHistory: ({ pathname: nextPathname }) => {
+  //       debugger;
+  //       if (history.location.pathname !== nextPathname) {
+  //         history.push(nextPathname);
+  //       }
+  //     },
+  //   };
+  // }
 
   const root = ReactDOM.createRoot(el);
-  roots.set(el, root);
+  // roots.set(el, root);
 
   root.render(
     <ProductProvider>
@@ -62,6 +62,12 @@ const mount = (
   return {
     updateChildHistory({ pathname: nextPathname }) {
       debugger;
+      console.log(
+        "IN CHECKOUT MF updateChildHistory",
+        history.location.pathname,
+        "nextPathname",
+        nextPathname
+      );
       if (history.location.pathname !== nextPathname) {
         history.push(nextPathname);
       }
