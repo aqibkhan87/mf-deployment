@@ -5,23 +5,38 @@ import { mount } from "checkout/CheckoutApp";
 const CheckoutApp = () => {
   const ref = useRef(null);
   const history = useHistory();
-  
+  const isSyncing = useRef(false);
+
   const handleChildNavigate = (childLocation) => {
     const { pathname: childPath } = childLocation?.location ?? childLocation;
-    console.log("in dashboard MF childLocation", childPath, "historyhistory", history)
-   
+    console.log(
+      "in dashboard MF childLocation",
+      childPath,
+      "historyhistory",
+      history
+    );
+
     if (childPath !== history?.location.pathname) {
+      isSyncing.current = true;
       history.push(childPath);
+      isSyncing.current = false;
     }
   };
 
   useEffect(() => {
     const { updateChildHistory } = mount(ref.current, {
       updateParentHistory: handleChildNavigate,
-      defaultHistory: history
+      defaultHistory: history,
     });
 
-    const unlisten = history.listen(updateChildHistory);
+    const unlisten = history.listen((location) => {
+      console.log("location in unlisten from parent Checkout", location);
+      if (!isSyncing.current) {
+        isSyncing.current = true;
+        updateChildHistory(location);
+        isSyncing.current = false;
+      }
+    });
 
     return () => unlisten();
   }, [history.location.pathname, history]);

@@ -8,12 +8,20 @@ console.info("Hi Checkout MF");
 
 const roots = new Map();
 let history = null;
+let isSyncing = false;
 
 const mount = (el, { updateParentHistory, defaultHistory }) => {
   history = defaultHistory;
 
   if (updateParentHistory) {
-    history.listen(updateParentHistory);
+    history.listen((location) => {
+      console.log("in Child MF TO LISTEN FOR PARENT ROUTE", location);
+      if (!isSyncing) {
+        isSyncing = true;
+        updateParentHistory(location);
+        isSyncing = false;
+      }
+    });
   }
 
   const existingRoot = roots.get(el);
@@ -49,10 +57,15 @@ const mount = (el, { updateParentHistory, defaultHistory }) => {
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      console.log("in Checkout mf nextPathname", nextPathname, "historyhistory", history)
+      console.log(
+        "in Checkout mf nextPathname",
+        nextPathname,
+        "historyhistory",
+        history
+      );
       if (history.location.pathname !== nextPathname) {
         history.push(nextPathname);
-      } 
+      }
     },
   };
 };
