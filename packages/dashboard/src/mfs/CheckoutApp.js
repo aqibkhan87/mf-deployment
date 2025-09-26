@@ -8,16 +8,25 @@ const CheckoutApp = () => {
 
   const updateParentHistory = (childLocation) => {
     const { pathname: childPath } = childLocation?.location ?? childLocation;
-    console.log(
-      "in dashboard MF childLocation",
-      childPath,
-      "historyhistory",
-      history
-    );
     debugger;
 
-    if (childPath !== history?.location.pathname) {
-      history.push(childPath);
+    // Prepend the matching base path before pushing to parent history
+    for (const basePath of basePaths) {
+      if (childPath.startsWith(basePath)) {
+        // Already has basePath
+        if (childPath !== history?.location.pathname) {
+          history.push(childPath);
+        }
+        return;
+      }
+    }
+    // If child path did not include base path, prepend based on current location
+    const parentBasePath = basePaths.find((base) =>
+      history?.location.pathname.startsWith(base)
+    );
+    const newParentPath = (parentBasePath || "") + childPath;
+    if (newParentPath !== history?.location.pathname) {
+      history.push(newParentPath);
     }
   };
 
@@ -43,7 +52,7 @@ const CheckoutApp = () => {
     });
 
     const unlisten = history.listen((location) => {
-      console.log("location in unlisten from parent Checkout", location);
+      debugger;
       updateChildHistory(location);
     });
 

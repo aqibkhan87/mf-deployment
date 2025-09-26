@@ -61,12 +61,6 @@ const mount = (
 
   return {
     updateChildHistory({ pathname: nextPathname }) {
-      console.log(
-        "in Checkout mf nextPathname",
-        nextPathname,
-        "historyhistory",
-        history
-      );
       debugger;
       if (history.location.pathname !== nextPathname) {
         history.push(nextPathname);
