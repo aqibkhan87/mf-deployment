@@ -61,9 +61,11 @@ const mount = (el, { updateParentHistory, defaultHistory }) => {
         "in Checkout mf nextPathname",
         nextPathname,
         "historyhistory",
-        history
+        history,
+        "window.location",
+        window.location
       );
-      if (history.location.pathname !== nextPathname) {
+      if (window.location.pathname !== nextPathname) {
         history.push(nextPathname);
       }
     },

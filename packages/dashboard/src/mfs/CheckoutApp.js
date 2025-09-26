@@ -13,10 +13,12 @@ const CheckoutApp = () => {
       "in dashboard MF childLocation",
       childPath,
       "historyhistory",
-      history
+      history,
+      "window.location",
+      window.location
     );
 
-    if (childPath !== history?.location.pathname) {
+    if (childPath !== window?.location.pathname) {
       isSyncing.current = true;
       history.push(childPath);
       isSyncing.current = false;
