@@ -11,11 +11,11 @@ const App = ({ history }) => {
   return (
     <Router history={history}>
       <Switch>
-        <Route exact path="/cart/view" component={CartPage} />
-        <Route exact path="/product/wishlist" component={WishlistPage} />
-        <Route exact path="/product/:categoryid" component={ProductListing} />
-        <Route exact path="/product/:categoryid/:id" component={ProductDetails} />
-        <Route exact path="/checkout" component={CheckoutPage} />
+        <Route exact path="/view" component={CartPage} />
+        <Route exact path="/wishlist" component={WishlistPage} />
+        <Route exact path="/:categoryid" component={ProductListing} />
+        <Route exact path="/:categoryid/:id" component={ProductDetails} />
+        <Route exact path="/" component={CheckoutPage} />
       </Switch>
     </Router>
   );
