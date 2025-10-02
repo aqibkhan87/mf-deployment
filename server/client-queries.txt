@@ -1,0 +1,67 @@
+query fetchAllUsers {
+  users {
+    _id
+    firstName
+    lastName
+    email
+    quotes {
+      comment
+      _id
+    }
+  } 
+}
+-------------------------------------
+query fetchAllQuotes {
+  quotes {
+    _id
+    comment
+  }
+}
+-------------------------------------
+query fetchUserById {
+  user(_id: 124) {
+    _id
+    firstName
+    lastName
+    quotes {
+      comment
+      _id
+    }
+  }
+}
+------------------------------------------
+mutation signup($userNew: UserInputType!){
+  createUser(userNew: $userNew) {
+    _id
+    firstName
+    lastName
+    email
+    password
+  }
+}
+
+payload: -
+{
+  "userNew": {
+    "firstName": "Aqib", 
+    "lastName": "khan", 
+    "email": "abcd@abcd.com", 
+    "password": "123456"
+  }
+}
+
+----------------------------------------
+mutation signIn($payload: SignInInput!){
+  signinUser(payload: $payload) {
+    token
+  }
+}
+
+payload: -
+{
+  "payload": {
+    "email": "abcd@abcd.com",
+    "password": "123456"
+  }
+}
+---------------------------------------
