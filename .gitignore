@@ -1,6 +1,10 @@
 /*/*/node_modules/
+/*/node_modules/
 /*/*/dist/
 *.log
 /*/*/package-lock.json
+/*/package-lock.json
 /*/*/.DS_store
+/*/.DS_store
+/.DS_store
 /*/*/yarn.lock
