@@ -2,8 +2,7 @@
 const typeDefs = `#graphql
   type Query {
     users: [User]
-    user(_id: ID!): User
-    quotes: [Quote]
+    getAllProductCategories: [ProductsCategories]!
   }
 
   type User {
@@ -12,21 +11,40 @@ const typeDefs = `#graphql
    lastName: String!
    email: String!
    password: String!
-   quotes: [Quote]
+  }
+
+  type ProductsCategories {
+   categoryid: String!
+   title: String!
+   products: [Product]!
+  }
+
+  type Product {
+   _id: ID!
+   categoryid: String!
+   name: String!
+   rating: String!
+   reviews: String!
+   productImage: String!
+   images: [String]!
+   seller: String!
+   price: String!
+   discountedPrice: String!
+   actualPrice: String!
   }
 
   type TokenType {
    token: String!
   }
 
-  type Quote {
-   _id: ID!
-   comment: String!
+  type ProductCategoryInsertion {
+   message: String!
   }
 
   type Mutation {
     createUser(userNew: UserInputType!): User
     signinUser(payload: SignInInput!): TokenType
+    addProducts(payload: [ProductsCategoryInput!]!): ProductCategoryInsertion
   }
 
   input UserInputType {
@@ -39,6 +57,25 @@ const typeDefs = `#graphql
   input SignInInput {
     email: String!
     password: String!
+  }
+
+  input ProductsCategoryInput {
+    title: String!
+    categoryid: String!
+    products: [ProductInput]!
+  }
+
+  input ProductInput {
+    categoryid: String!
+    name: String!
+    rating: String!
+    reviews: String!
+    productImage: String!
+    images: [String]!
+    seller: String!
+    price: String!
+    discountedPrice: String!
+    actualPrice: String!
   }
 `;
 
