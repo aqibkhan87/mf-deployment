@@ -7,6 +7,7 @@ const updateCartDetails = (cart) => {
   let cartCount = 0;
   let totalAmount = 0;
   let discountedAmount = 0;
+  
   cart?.forEach((item) => {
     cartCount = cartCount + Number(item?.quantity);
     totalAmount =
@@ -14,7 +15,7 @@ const updateCartDetails = (cart) => {
     discountedAmount =
       discountedAmount +
       Number(
-        Number(item?.quantity) * Number(item?.oldPrice) -
+        Number(item?.quantity) * Number(item?.actualPrice) -
           Number(item?.quantity) * Number(item?.price)
       );
   });
@@ -30,6 +31,7 @@ export const useCartStore = create((set, get) => ({
   cartCount: JSON.parse(localStorage.getItem("cartCount")) || 0,
   totalAmount: JSON.parse(localStorage.getItem("totalAmount")) || 0,
   discountedAmount: JSON.parse(localStorage.getItem("discountedAmount")) || 0,
+  wishlist: JSON.parse(localStorage.getItem("wishlist")) || 0,
 
   addToCart: (item) => {
     set({ cart: [...get().cart, item] });

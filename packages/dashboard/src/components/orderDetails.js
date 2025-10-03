@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
-import { ProductContext } from "store/productContext";
+import { useOrderStore } from "store/orderStore";
 
 const OrderDetails = () => {
   const { orderid } = useParams();
-  const { orders } = useContext(ProductContext);
+  const { orders } = useOrderStore();
   const order = orders?.find((o) => o.id.toString() === orderid);
 
   if (!order) return <p>Order not found</p>;

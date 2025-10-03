@@ -24,7 +24,8 @@ const devConfig = {
       exposes: {
         "./authStore": "./src/store/authStore.js",
         "./cartStore": "./src/store/cartStore.js",
-        "./productContext": "./src/context/productContext.js",
+        "./orderStore": "./src/store/orderStore.js",
+        "./productStore": "./src/store/productStore.js",
       },
       shared: packageDeps,
     }),

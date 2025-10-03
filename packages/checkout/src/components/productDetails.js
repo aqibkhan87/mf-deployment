@@ -1,6 +1,5 @@
-import React, { useContext, lazy, useState } from "react";
-import { useParams, Link, useHistory } from "react-router-dom";
-import { ProductContext } from "store/productContext";
+import React, { useState, useEffect } from "react";
+import { useParams, useHistory } from "react-router-dom";
 import Recommendations from "./recommendations";
 import {
   Box,
@@ -13,44 +12,47 @@ import {
   TextField,
 } from "@mui/material";
 import { useCartStore } from "store/cartStore";
+import { useProductStore } from "store/productStore";
+import { getProductById, getProductByCategory } from "../apis/products";
 
 const ProductDetail = () => {
   const history = useHistory();
-  const { categoryid, id } = useParams();
+  const { categoryid, productid } = useParams();
   const { cart, addToCart, updateQuantityInCart } = useCartStore();
-  const { productsCategories, addToWishlist } =
-    useContext(ProductContext);
-  console.log("productsCategories in product detail", productsCategories)  
+  const { product, productsByCategory } = useProductStore();
   const [mainImg, setMainImg] = useState(product?.productImage);
-  const categoryData =
-    productsCategories?.find(
-      (category) => category?.categoryid === categoryid
-    ) || {};
-  let product =
-      categoryData?.products?.find((pro) => pro?.id?.toString() === id) || {};
+  console.log("productsByCategory in product detail", productsByCategory);
+  console.log("product in product detail", product);
+
+  useEffect(() => {
+    if (productid) getProductById(productid);
+    if (categoryid) getProductByCategory(categoryid);
+  }, []);
 
   const handleNavigateToAddToCart = (e) => {
     e.preventDefault();
-    if(!cart?.length) {
+    if (!cart?.length) {
       product.quantity = 1;
       addToCart(product);
     } else {
-      let itemExist = cart?.find((item) => item?.categoryid === categoryid && item?.id?.toString() === id);
-      if(itemExist) {
+      let itemExist = cart?.find(
+        (item) => item?.categoryid === categoryid && item?.id?.toString() === id
+      );
+      if (itemExist) {
         let updateCart = cart?.map((item) => {
-          if(item?.categoryid === categoryid && item?.id?.toString() === id) {
+          if (item?.categoryid === categoryid && item?.id?.toString() === id) {
             item.quantity += 1;
-            return item
-          } 
+            return item;
+          }
           return item;
-        })
+        });
         updateQuantityInCart(updateCart);
       } else {
         product.quantity = 1;
         addToCart(product);
       }
     }
-    
+
     history.push("/cart/view");
   };
 
@@ -89,7 +91,12 @@ const ProductDetail = () => {
                   />
                 ))}
               </Box>
-              <Box display="flex" style={{ width: 'calc(100% - 140px)'}} mx={"auto"} mt={2}>
+              <Box
+                display="flex"
+                style={{ width: "calc(100% - 140px)" }}
+                mx={"auto"}
+                mt={2}
+              >
                 <img
                   src={mainImg}
                   alt="product"
@@ -126,7 +133,7 @@ const ProductDetail = () => {
 
             <Box display="flex" alignItems="center" gap={1} mb={1}>
               <Rating
-                value={product.rating}
+                value={Number(product.rating)}
                 precision={0.1}
                 readOnly
                 size="small"
@@ -150,10 +157,10 @@ const ProductDetail = () => {
                 variant="body2"
                 sx={{ textDecoration: "line-through", color: "gray" }}
               >
-                ₹{product.oldPrice}
+                ₹{product.actualPrice}
               </Typography>
               <Typography variant="body1" sx={{ color: "green" }}>
-                {product.discountPercentage}
+                {product.discountedPrice}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
@@ -179,11 +186,6 @@ const ProductDetail = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Warranty */}
-            <Typography variant="body2">{product.warranty}</Typography>
-
-            <Divider sx={{ my: 2 }} />
-
             {/* Delivery Check */}
             <Box display="flex" gap={1} alignItems="center">
               <TextField
@@ -203,7 +205,7 @@ const ProductDetail = () => {
       {/* Recommendations */}
       <div className="col-span-2 mt-6">
         <Recommendations
-          products={categoryData?.products?.filter((p) => p.id !== product.id)}
+          products={productsByCategory?.products?.filter((p) => p._id !== product._id)}
         />
       </div>
     </div>

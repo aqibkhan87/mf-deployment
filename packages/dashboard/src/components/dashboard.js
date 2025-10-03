@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 import {
   Typography,
   Box,
   Button,
   Container,
-  Grid,
   Card,
   CardMedia,
   CardContent,
@@ -14,18 +13,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
-import { ProductContext } from "store/productContext";
+import { useProductStore } from "store/productStore";
+import { getAllProductsCategoryies } from "../apis/products";
 
 export default function DashboardPage() {
-  const { productsCategories } = useContext(ProductContext);
+  const { allCategories } = useProductStore();
   const history = useHistory()
-  console.log("productsCategories 123", productsCategories);
+  console.log("allCategories 123", allCategories);
 
   const navigateToProductCategory = (e, sec) => {
     e.preventDefault();
-    
     history.push(`/product/${sec?.categoryid}`);
   };
+
+  useEffect(() => {
+    getAllProductsCategoryies();
+  }, []);
 
   return (
     <Box>
@@ -58,7 +61,7 @@ export default function DashboardPage() {
 
       {/* 🔹 Product Sections */}
       <Container sx={{ mt: 4 }}>
-        {productsCategories?.map((sec, idx) => (
+        {allCategories?.map((sec, idx) => (
           <Box key={idx} sx={{ mb: 5 }}>
             <Box
               display="flex"

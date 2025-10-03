@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
-import { ProductProvider } from "store/productContext";
 import App from "./app";
 
 const mount = (
@@ -17,11 +16,7 @@ const mount = (
 
   const root = ReactDOM.createRoot(el);
 
-  root.render(
-    <ProductProvider>
-      <App history={history} />
-    </ProductProvider>
-  );
+  root.render(<App history={history} />);
 
   return {
     updateChildHistory({ pathname: nextPathname }) {

@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import { ProductContext } from "store/productContext";
+import React from "react";
 import { Box, Grid } from "@mui/material";
 import OrderSummary from "./common/orderSummary";
 import Cart from "./common/cart";

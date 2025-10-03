@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { ProductContext } from "store/productContext";
 
 const OrderHistory = () => {
-  const { orders } = useContext(ProductContext);
+  const { orders } = useOrderStore();
 
   return (
     <div className="p-4">

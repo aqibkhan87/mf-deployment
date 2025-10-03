@@ -1,14 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
-import { ProductContext } from "store/productContext";
 import Badge from "@mui/material/Badge";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 
 const MainNav = () => {
-  const { wishlist } = useContext(ProductContext);
-  const { cart, cartCount } = useCartStore();
+  const { cart, cartCount, wishlist } = useCartStore();
   const { user, setUser } = useAuthStore();
   const wishlistCount = wishlist?.reduce(
     (count, item) => item?.quantity + count,

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import {
   Box,
@@ -15,22 +15,23 @@ import {
   Chip,
   Rating,
 } from "@mui/material";
-import { ProductContext } from "store/productContext";
+import { useProductStore } from "store/productStore";
+import { getProductByCategory } from "../apis/products.js";
 
 const ProductListing = () => {
   const { categoryid } = useParams();
-  const history = useHistory()
-  console.log("categoryid", categoryid);
-  console.log("inside product listing", categoryid);
-  const { productsCategories } = useContext(ProductContext);
-  const categoryData =
-    productsCategories?.find((sec) => sec?.categoryid === categoryid) || {};
-  const products = categoryData?.products || [];
+  const history = useHistory();
+  const { productsByCategory } = useProductStore();
+  const products = productsByCategory?.products || [];
 
   const navigateToProductDetail = (e, p) => {
     e.preventDefault();
-    history.push(`/product/${categoryid}/${p?.id}`);
+    history.push(`/product/${categoryid}/${p?._id}`);
   };
+
+  useEffect(() => {
+    if (categoryid) getProductByCategory(categoryid);
+  }, []);
 
   return (
     <Grid container spacing={2} p={2}>
@@ -97,8 +98,8 @@ const ProductListing = () => {
         </Box>
 
         <Grid container spacing={2}>
-          {products?.map((p) => (
-            <Grid item xs={12} sm={6} md={4} key={p.id}>
+          {products?.map((p, i) => (
+            <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
               <a onClick={(e) => navigateToProductDetail(e, p)}>
                 <Card sx={{ height: "100%" }}>
                   <CardMedia
@@ -114,7 +115,7 @@ const ProductListing = () => {
                     <Box display="flex" alignItems="center" gap={1}>
                       <Rating
                         name="rating"
-                        value={p?.rating}
+                        value={Number(p?.rating)}
                         precision={0.1}
                         readOnly
                         size="small"
@@ -130,13 +131,13 @@ const ProductListing = () => {
                       variant="body2"
                       sx={{ textDecoration: "line-through", mr: 1 }}
                     >
-                      ₹{p?.oldPrice}
+                      ₹{p?.actualPrice}
                     </Typography>
                     <Typography
                       variant="body2"
                       sx={{ color: "green", fontWeight: "bold" }}
                     >
-                      {p?.discountPercentage}
+                      {p?.discountedPrice}
                     </Typography>
                   </CardContent>
                 </Card>

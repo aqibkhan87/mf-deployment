@@ -1,10 +1,8 @@
 import React, { createContext, useState, useEffect } from "react";
-import { productsCategoriesData } from "../utils/products";
 
 export const ProductContext = createContext();
 
 export const ProductProvider = ({ children }) => {
-  const [productsCategories] = useState(productsCategoriesData || []);
   
   const [wishlist, setWishlist] = useState(
     () => JSON.parse(localStorage.getItem("wishlist")) || []
@@ -25,7 +23,6 @@ export const ProductProvider = ({ children }) => {
   return (
     <ProductContext.Provider
       value={{
-        productsCategories,
         wishlist,
         orders,
         removeFromCart,

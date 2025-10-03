@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
-import { useCartStore } from "store/cartStore";
 import {
   Box,
   Typography,
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { useCartStore } from "store/cartStore";
 import { addQuantity, subtractQuantity } from "../../utils/helper";
 
 const Cart = () => {
@@ -122,13 +122,13 @@ const Cart = () => {
                       color: "#888",
                     }}
                   >
-                    ₹{product?.oldPrice}
+                    ₹{product?.actualPrice}
                   </span>
                   <span style={{ fontWeight: 600, marginLeft: 8 }}>
                     ₹{product?.price}
                   </span>
                   <span style={{ color: "green", marginLeft: 8 }}>
-                    {product?.discountPercentage}
+                    {product?.discountedPrice}
                   </span>
                 </Typography>
               </CardContent>
