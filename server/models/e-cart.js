@@ -1,31 +1,29 @@
 import mongoose from "mongoose";
-import ProductModel from "./e-product";
 const Schema = mongoose.Schema;
+import CartItemSchema from "./e-cart-item.js";
 
-const cartSchema = new Schema({
-  userid: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: "user",
+const cartSchema = new Schema(
+  {
+    userId: {
+      type: String,
+      required: true,
+      default: "anonymous",
+    },
+    products: [CartItemSchema],
+    savedAmount: {
+      type: String,
+    },
+    discountedAmount: {
+      type: String,
+    },
+    actualAmount: {
+      type: String,
+    },
   },
-  cartid: {
-    type: Schema.Types.ObjectId,
-    required: true,
-  },
-  products: [ProductModel],
-  savedAmount: {
-    type: String,
-    required: true,
-  },
-  discountedAmount: {
-    type: String,
-    required: true,
-  },
-  actualAmount: {
-    type: String,
-    required: true,
-  },
-});
+  {
+    collection: "cart", // exact collection name you want
+  }
+);
 
 const CartModel = mongoose.model("cart", cartSchema);
 export default CartModel;

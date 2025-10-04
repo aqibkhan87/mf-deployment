@@ -36,8 +36,10 @@ app.use(
     ], // Only frontend origin allowed
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"], // if needed
-  })
+  }),
+  express.json(),
 );
+
 app.use(
   "/graphql", // Only GraphQL requests hit this middleware
   express.json(),

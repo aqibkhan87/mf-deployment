@@ -19,6 +19,8 @@
     "graphql": "^16.11.0",
     "ioredis": "^5.8.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.3"
+    "mongoose": "^8.18.3",
+    "redis": "^5.8.3",
+    "uuid": "^13.0.0"
   }
 }
