@@ -7,8 +7,8 @@ import cors from "cors";
 import Redis from "ioredis";
 import jwt from "jsonwebtoken";
 
-import typeDefs from "./src/schemaType.js";
-import resolvers from "./src/resolvers.js";
+import typeDefs from "./src/schemas/index.js";
+import resolvers from "./src/resolvers/index.js";
 import connectDB from "./db.js";
 import apiRouter from "./src/apiRouter.js";
 
