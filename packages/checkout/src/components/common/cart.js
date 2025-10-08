@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import {
   Box,
@@ -15,25 +15,55 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
-import { addQuantity, subtractQuantity } from "../../utils/helper";
+import { updateQuantity } from "../../utils/helper";
+import { getCart, updateInCart } from "../..//apis/cart";
 
 const Cart = () => {
   const history = useHistory();
-  const { cart, updateQuantityInCart } = useCartStore();
+  const { cart } = useCartStore();
 
+  console.log("cartrtttrtr in cart", cart);
   const navigateToProduct = (product) => {
-    history.push(`/product/${product?.categoryid}/${product?.id}`);
+    history.push(`/product/${product?.categoryid}/${product?._id}`);
   };
 
   const addItemQuantity = (categoryid, productid) => {
-    const updatedCart = addQuantity(categoryid, productid, cart)
-    updateQuantityInCart(updatedCart)
+    debugger;
+    const updatedCart = updateQuantity(
+      categoryid,
+      productid,
+      cart?.products,
+      "add"
+    );
+    const existingCartProducts =
+      updatedCart?.map(({ productDetail, quantity }) => ({
+        _id: productDetail?._id,
+        quantity,
+      })) || [];
+    debugger;
+    updateInCart(existingCartProducts);
   };
 
   const subtractItemQuantity = (categoryid, productid) => {
-    const updatedCart = subtractQuantity(categoryid, productid, cart)
-    updateQuantityInCart(updatedCart)
+    debugger;
+    const updatedCart = updateQuantity(
+      categoryid,
+      productid,
+      cart?.products,
+      "subtract"
+    );
+    const existingCartProducts =
+      updatedCart?.map(({ productDetail, quantity }) => ({
+        _id: productDetail?._id,
+        quantity,
+      })) || [];
+    debugger;
+    updateInCart(existingCartProducts);
   };
+
+  useEffect(() => {
+    getCart();
+  }, []);
 
   return (
     <Grid item xs={12} md={7}>
@@ -82,7 +112,7 @@ const Cart = () => {
         </Paper>
       )}
       <Card>
-        {cart?.map((product, i) => (
+        {cart?.products?.map((product, i) => (
           <Box
             key={i}
             sx={{ display: "flex", mb: 2 }}
@@ -97,8 +127,8 @@ const Cart = () => {
                 m: 2,
                 borderRadius: 2,
               }}
-              image={product?.productImage}
-              alt={product?.name}
+              image={product?.productDetail?.productImage}
+              alt={product?.productDetail?.name}
             />
             <Box
               sx={{
@@ -109,11 +139,13 @@ const Cart = () => {
             >
               <CardContent sx={{ pb: 1 }}>
                 <Typography variant="h6" noWrap>
-                  {product?.name}
+                  {product?.productDetail?.name}
                 </Typography>
-                <Typography color="text.secondary">{product?.color}</Typography>
+                <Typography color="text.secondary">
+                  {product?.productDetail?.color}
+                </Typography>
                 <Typography variant="body2">
-                  Seller: {product?.seller}
+                  Seller: {product?.productDetail?.seller}
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>
                   <span
@@ -122,13 +154,13 @@ const Cart = () => {
                       color: "#888",
                     }}
                   >
-                    ₹{product?.actualPrice}
+                    ₹{product?.productDetail?.actualPrice}
                   </span>
                   <span style={{ fontWeight: 600, marginLeft: 8 }}>
-                    ₹{product?.price}
+                    ₹{product?.productDetail?.price}
                   </span>
                   <span style={{ color: "green", marginLeft: 8 }}>
-                    {product?.discountedPrice}
+                    {product?.productDetail?.discountedPrice}
                   </span>
                 </Typography>
               </CardContent>
@@ -137,7 +169,10 @@ const Cart = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    subtractItemQuantity(product?.categoryid, product?.id);
+                    subtractItemQuantity(
+                      product?.productDetail?.categoryid,
+                      product?.productDetail?._id
+                    );
                   }}
                 >
                   <RemoveIcon />
@@ -147,7 +182,10 @@ const Cart = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    addItemQuantity(product?.categoryid, product?.id);
+                    addItemQuantity(
+                      product?.productDetail?.categoryid,
+                      product?.productDetail?._id
+                    );
                   }}
                 >
                   <AddIcon />
@@ -160,7 +198,9 @@ const Cart = () => {
                 </Button>
               </Box>
             </Box>
-            {cart?.length - 1 !== i ? <Divider sx={{ my: 2 }} /> : null}
+            {cart?.products?.length - 1 !== i ? (
+              <Divider sx={{ my: 2 }} />
+            ) : null}
           </Box>
         ))}
       </Card>

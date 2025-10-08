@@ -6,7 +6,7 @@ import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 
 const MainNav = () => {
-  const { cart, cartCount, wishlist } = useCartStore();
+  const { cartCount, wishlist } = useCartStore();
   const { user, setUser } = useAuthStore();
   const wishlistCount = wishlist?.reduce(
     (count, item) => item?.quantity + count,

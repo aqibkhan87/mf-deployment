@@ -9,7 +9,7 @@ const CartPage = () => {
 
   return (
     <div className="p-4">
-      {cart?.length === 0 ? (
+      {cart?.products?.length === 0 ? (
         <p>No items in cart</p>
       ) : (
         <Box sx={{ p: 3, background: "#f7fbff", minHeight: "100vh" }}>

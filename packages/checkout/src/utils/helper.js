@@ -5,25 +5,21 @@ export const eventEmitter = (eventName, eventData) => {
   window.dispatchEvent(customEvent);
 };
 
-export const addQuantity = (categoryid, productid, cart) => {
-  return cart?.map((pro) => {
-    if (pro?.categoryid === categoryid && pro?.id === productid) {
-      pro.quantity = pro?.quantity ? pro?.quantity + 1 : 1;
+export const updateQuantity = (
+  categoryid,
+  productid,
+  products,
+  operation = "add"
+) => {
+  return products?.map((pro) => {
+    if (pro?.productDetail?.categoryid === categoryid && pro?.productDetail?._id === productid) {
+      if (operation === "add") {
+        pro.quantity = pro?.quantity ? pro?.quantity + 1 : 1;
+      } else if (operation === "subtract") {
+        pro.quantity = pro?.quantity ? pro?.quantity - 1 : 1;
+      }
       return pro;
     }
     return pro;
-  });
-};
-
-export const subtractQuantity = (categoryid, productid, cart) => {
-  return cart?.filter((pro) => {
-    if (pro?.categoryid === categoryid && pro?.id === productid) {
-      if (pro?.quantity > 1) {
-        pro.quantity -= 1;
-        return pro;
-      }
-    } else {
-      return pro;
-    }
   });
 };

@@ -7,7 +7,7 @@ const updateCartDetails = (cart) => {
   let cartCount = 0;
   let totalAmount = 0;
   let discountedAmount = 0;
-  
+
   cart?.forEach((item) => {
     cartCount = cartCount + Number(item?.quantity);
     totalAmount =
@@ -27,30 +27,33 @@ const updateCartDetails = (cart) => {
 };
 
 export const useCartStore = create((set, get) => ({
-  cart: JSON.parse(localStorage.getItem("cart")) || [],
-  cartCount: JSON.parse(localStorage.getItem("cartCount")) || 0,
-  totalAmount: JSON.parse(localStorage.getItem("totalAmount")) || 0,
-  discountedAmount: JSON.parse(localStorage.getItem("discountedAmount")) || 0,
-  wishlist: JSON.parse(localStorage.getItem("wishlist")) || 0,
+  cart: localStorage.getItem("cart")
+    ? JSON.parse(localStorage.getItem("cart"))
+    : [],
+  cartId: localStorage.getItem("cartId")
+    ? JSON.parse(localStorage.getItem("cartId"))
+    : "",
+  cartCount: localStorage.getItem("cartCount")
+    ? JSON.parse(localStorage.getItem("cartCount"))
+    : 0,
+  totalAmount: localStorage.getItem("totalAmount")
+    ? JSON.parse(localStorage.getItem("totalAmount"))
+    : 0,
+  discountedAmount: localStorage.getItem("discountedAmount")
+    ? JSON.parse(localStorage.getItem("discountedAmount"))
+    : 0,
+  wishlist: localStorage.getItem("wishlist")
+    ? JSON.parse(localStorage.getItem("wishlist") || 0)
+    : 0,
 
-  addToCart: (item) => {
-    set({ cart: [...get().cart, item] });
-    set({ ...updateCartDetails([...get().cart]) });
-    localStorage.setItem("cart", JSON.stringify([...get().cart]));
-    for (const [key, value] of Object.entries(
-      updateCartDetails([...get().cart])
-    )) {
-      if (value) localStorage.setItem(key, value);
-    }
-  },
-  updateQuantityInCart: (cart) => {
-    set({ cart: [...cart] });
-    set({ ...updateCartDetails([...cart]) });
-    localStorage.setItem("cart", JSON.stringify([...cart]));
-    for (const [key, value] of Object.entries(
-      updateCartDetails([...get().cart])
-    )) {
-      localStorage.setItem(key, value);
-    }
-  },
+  // addToCart: (item) => {
+  //   set({ cart: [...get().cart, item] });
+  //   set({ ...updateCartDetails([...get().cart]) });
+  //   localStorage.setItem("cart", JSON.stringify([...get().cart]));
+  //   for (const [key, value] of Object.entries(
+  //     updateCartDetails([...get().cart])
+  //   )) {
+  //     if (value) localStorage.setItem(key, value);
+  //   }
+  // },
 }));

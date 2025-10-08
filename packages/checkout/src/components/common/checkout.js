@@ -15,23 +15,23 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useCartStore } from "store/cartStore";
-import { addQuantity, subtractQuantity } from "../../utils/helper";
+// import { addQuantity, subtractQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {
-  const { cart, updateQuantityInCart } = useCartStore();
+  const { cart } = useCartStore();
 
   const navigateToProduct = (product) => {
     history.push(`/product/${product?.categoryid}/${product?.id}`);
   };
 
   const addItemQuantity = (categoryid, productid) => {
-    const updatedCart = addQuantity(categoryid, productid, cart);
-    updateQuantityInCart(updatedCart);
+    // const updatedCart = addQuantity(categoryid, productid, cart);
+    // updateQuantityInCart(updatedCart);
   };
 
   const subtractItemQuantity = (categoryid, productid) => {
-    const updatedCart = subtractQuantity(categoryid, productid, cart);
-    updateQuantityInCart(updatedCart);
+    // const updatedCart = subtractQuantity(categoryid, productid, cart);
+    // updateQuantityInCart(updatedCart);
   };
 
   return (
