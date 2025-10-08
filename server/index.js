@@ -5,52 +5,57 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import Redis from "ioredis";
-const redis = new Redis({ host: "localhost", port: 6379 }); // connect to localhost by default or specify URL
+import jwt from "jsonwebtoken";
 
 import typeDefs from "./src/schemaType.js";
 import resolvers from "./src/resolvers.js";
 import connectDB from "./db.js";
 import apiRouter from "./src/apiRouter.js";
 
-// Create Express app and HTTP server
+const redis = new Redis({ host: "localhost", port: 6379 });
 const app = express();
 const httpServer = http.createServer(app);
 
-// Create Apollo Server instance and use drain plugin
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-  context: async ({ req }) => ({ redis }),
 });
 await server.start();
 
-// Attach Apollo middleware to /graphql route only
+// 🔥 context must be defined HERE, not inside ApolloServer()
 app.use(
+  "/graphql",
   cors({
     origin: [
       "http://localhost:8080",
       "http://localhost:8081",
       "http://localhost:8082",
       "http://localhost:8083",
-    ], // Only frontend origin allowed
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"], // if needed
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
   express.json(),
-);
-
-app.use(
-  "/graphql", // Only GraphQL requests hit this middleware
-  express.json(),
   expressMiddleware(server, {
-    context: async ({ req }) => ({ redis }),
+    context: async ({ req }) => {
+      const { authorization } = req.headers;
+      if (authorization) {
+        try {
+          const userId = jwt.verify(authorization, "SECRET");
+          return { redis, userId };
+        } catch (err) {
+          console.error("JWT error:", err.message);
+          return { redis };
+        }
+      }
+      return { redis };
+    },
   })
 );
 
 app.use("/apis", apiRouter);
 
-// Start HTTP server
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 console.log("🚀 Server ready at http://localhost:4000");
 connectDB();

@@ -1,9 +1,10 @@
 import express from "express";
 // Example REST API nested route
 const apiRouter = express.Router();
-import ProductModel from "../models/e-product.js";
-import ProductCategoryModel from "../models/e-product-category.js";
-import CartModel from "../models/e-cart.js";
+import ProductModel from "../src/models/e-product.js";
+import ProductCategoryModel from "../src/models/e-product-category.js";
+import CartModel from "../src/models/e-cart.js";
+import { calculateCartSummary } from "./utils/helper.js";
 
 apiRouter.get("/health", (req, res) => res.json({ status: "API is healthy" }));
 
@@ -33,7 +34,6 @@ apiRouter.post("/add-to-cart", async (req, res) => {
     if (!Array.isArray(products) || products?.length === 0) {
       return res.status(400).json({ error: "No products provided." });
     }
-    console.log("req.body", req.body);
     // Find or create cart
     let cart = "";
     if (cartId?.length) {
@@ -81,20 +81,69 @@ apiRouter.get("/get-cart/:cartId", async (req, res) => {
   try {
     const { cartId } = req.params;
 
-    console.log("carttttt", cartId)
+    console.log("carttttt", cartId);
     let cart = {};
+    let cartCount = 0;
     if (cartId === "anonymous") {
       throw new Error("Invalid cart Id provided.");
     } else if (cartId) {
       cart = await CartModel.findOne({ _id: cartId }).populate(
         "products.productDetail"
       );
-      console.log("new cart", cart);
+      cart?.products?.forEach((item) => {
+        console.log("new cart item", item);
+        cartCount += item?.quantity;
+      });
     }
 
     res.json({
       cart: cart,
+      cartCount: cartCount,
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+apiRouter.put("/update-cart", async (req, res) => {
+  try {
+    const { cartId, products } = req.body;
+
+    if (!cartId || cartId === "anonymous") {
+      return res.status(400).json({ error: "Valid cart Id required." });
+    }
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ error: "Products not found." });
+    }
+
+    // Find the cart by ID
+    let cart = await CartModel.findOne({ _id: cartId }).populate(
+      "products.productDetail"
+    );
+    if (!cart) return res.status(404).json({ error: "Cart not found." });
+
+    // Update quantities of specific products
+    for (const { _id, quantity } of products) {
+      console.log(quantity, "cart", cart, "_id", _id);
+      if (quantity < 1) continue; // optionally skip invalid quantities
+      const index = cart?.products?.findIndex(
+        (item) => item?.productDetail?._id?.toString() === _id // Depending on your schema
+      );
+      console.log("indexindex", index);
+      if (index > -1) {
+        cart.products[index].quantity = quantity;
+      }
+    }
+
+    cart = calculateCartSummary(cart);
+    console.log("summary saved cart", cart);
+    await cart.save();
+
+    // Optionally populate products.productDetail before returning
+    console.log("cart updated ", cart);
+    res.json({ cart });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

@@ -6,9 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 // Set up Redis client
 const redisClient = redis.createClient();
 
-import UserModel from "../models/user.js";
-import ProductCategoryModel from "../models/e-product-category.js";
-import ProductModel from "../models/e-product.js";
+import UserModel from "../src/models/user.js";
+import ProductCategoryModel from "../src/models/e-product-category.js";
+import ProductModel from "../src/models/e-product.js";
 
 // Helper: get cart from Redis
 const getCart = async (cartId) => {

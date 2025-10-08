@@ -13,10 +13,10 @@ const cartSchema = new Schema(
     savedAmount: {
       type: String,
     },
-    discountedAmount: {
+    totalAmount: {
       type: String,
     },
-    actualAmount: {
+    totalActual: {
       type: String,
     },
   },
