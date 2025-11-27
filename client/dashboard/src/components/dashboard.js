@@ -17,6 +17,7 @@ import { useProductStore } from "store/productStore";
 import { getAllProductsCategoryies } from "../apis/products";
 
 export default function DashboardPage() {
+  
   const { allCategories } = useProductStore();
   const history = useHistory()
   console.log("allCategories 123", allCategories);

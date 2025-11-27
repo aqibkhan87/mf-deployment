@@ -7,6 +7,7 @@ import CheckoutPage from "./components/checkoutPage";
 import WishlistPage from "./components/wishlist";
 
 const App = ({ history }) => {
+  
   console.log("history in Checkout MF APP", history)
   return (
     <Router history={history}>

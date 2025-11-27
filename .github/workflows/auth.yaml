@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - 'packages/auth/**'
+      - 'client/auth/**'
 
 defaults:
   run:
-    working-directory: packages/auth
+    working-directory: client/auth
 
 jobs:
   build:

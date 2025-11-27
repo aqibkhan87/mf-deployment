@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - 'packages/dashboard/**'
+      - 'client/dashboard/**'
 
 defaults:
   run:
-    working-directory: packages/dashboard
+    working-directory: client/dashboard
 
 jobs:
   build:

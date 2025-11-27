@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - 'packages/store/**'
+      - 'client/store/**'
 
 defaults:
   run:
-    working-directory: packages/store
+    working-directory: client/store
 
 jobs:
   build:
