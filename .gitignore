@@ -2,8 +2,7 @@
 /*/node_modules/
 /*/*/dist/
 *.log
-/*/*/package-lock.json
-/*/package-lock.json
+/client/*/package-lock.json
 /*/*/.DS_store
 /*/.DS_store
 /.DS_store

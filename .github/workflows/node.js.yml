@@ -27,13 +27,6 @@ jobs:
           cache: npm
           cache-dependency-path: server/package-lock.json
 
-      # (No need to copy anything unless your structure demands)
-      - name: Prepare server workspace
-        run: |
-          mkdir -p ./server
-          cp -R ./mf-deployment/server ./server-temp
-          mv ./server-temp/server ./server  
-
       - name: Install server dependencies
         run: |
           cd server
