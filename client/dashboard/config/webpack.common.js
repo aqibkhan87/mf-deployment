@@ -1,4 +1,3 @@
-const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
@@ -26,9 +25,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.DefinePlugin({
-      "process.env": JSON.stringify(process.env),
-    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),
