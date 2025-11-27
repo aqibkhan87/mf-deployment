@@ -22,13 +22,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: '_work/mf-deployment/mf-deployment/server/package-lock.json'
+          cache-dependency-path: '/mf-deployment/server/package-lock.json'
 
       # Copy server folder (actually no need — repo already contains it)
       - name: Prepare server workspace
         run: |
           mkdir -p ./server
-          cp -R ./_work/mf-deployment/mf-deployment/server ./server-temp
+          cp -R ./mf-deployment/server ./server-temp
           mv ./server-temp/server ./server  
 
       - name: Install server dependencies
