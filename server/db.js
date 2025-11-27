@@ -5,7 +5,6 @@ async function connectDB() {
   const mongoURI = process.env.MONGO_URL;
   try {
     await mongoose.connect(mongoURI);
-    
 
     // // Find all airports with bad coordinate order
     // const badAirports = await Airport.find({
