@@ -1,17 +1,36 @@
-import mongoose from 'mongoose';
-
-const mongoURI = 'mongodb+srv://aqibkhan87912:Hosting@web-app.qc3qc0y.mongodb.net/web-app-db?retryWrites=true&w=majority&appName=web-app';
-// or your MongoDB Atlas URI
-
-// Optional: set strictQuery to prevent deprecation warnings (v8+ handles this safely)
-// mongoose.set('strictQuery', false);
+import mongoose from "mongoose";
+import Airport from "./src/models/flights/airports.js";
 
 async function connectDB() {
+  const mongoURI = process.env.MONGO_URL;
   try {
     await mongoose.connect(mongoURI);
-    console.log('Connected to MongoDB!');
+
+    // // Find all airports with bad coordinate order
+    // const badAirports = await Airport.find({
+    //   "location.coordinates.0": { $gte: -90, $lte: 90 }, // latitude range in first position
+    //   "location.coordinates.1": { $gte: -180, $lte: 180 }, // longitude range in second position
+    // });
+
+    // console.log(`⚙️ Found ${badAirports.length} airports to fix`);
+
+    // for (const airport of badAirports) {
+    //   const [lat, lng] = airport.location.coordinates;
+    //   airport.location.coordinates = [lng, lat]; // swap
+    //   await airport.save();
+    // }
+
+    // console.log("✅ All coordinates fixed");
+
+    // // Try creating index now
+    // await Airport.collection.createIndex({ location: "2dsphere" });
+    // console.log("✅ 2dsphere index created successfully!");
+
+    // await Airport.collection.createIndex({ location: "2dsphere" });
+    // console.log("✅ 2dsphere index created on location");
+    console.log("Connected to MongoDB!");
   } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
+    console.error("Failed to connect to MongoDB:", error);
     process.exit(1);
   }
 }

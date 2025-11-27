@@ -1,0 +1,117 @@
+.booking-widget {
+  background: #fff;
+  border-radius: 24px;
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  .widget-tabs {
+    display: flex;
+    gap: 32px;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+
+    .tab {
+      color: #757575;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+
+      &.active {
+        color: #0d47a1;
+        border-bottom: 3px solid #0d47a1;
+        padding-bottom: 6px;
+      }
+    }
+  }
+
+  .trip-type {
+    margin-bottom: 12px;
+    label {
+      font-weight: 500;
+      color: #212121;
+    }
+  }
+
+  .inputs-row {
+    margin-top: 8px;
+
+    .MuiTextField-root {
+      background: #fafafa;
+      border-radius: 8px;
+    }
+
+    .MuiInputBase-root {
+      height: 56px;
+    }
+  }
+
+  .offers-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+
+    .offer-chip {
+      font-weight: 600;
+      color: #0d47a1;
+      border: 2px solid #0d47a1;
+      border-radius: 20px;
+      background: #f1f5ff;
+      padding: 4px 8px;
+    }
+
+    .promo-btn {
+      border-radius: 20px;
+      border: 2px dashed #ccc;
+      color: #424242;
+      font-weight: 600;
+      text-transform: none;
+      padding: 6px 14px;
+    }
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+
+    .pay-select {
+      width: 200px;
+    }
+
+    .search-btn {
+      background-color: #0d47a1;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border-radius: 28px;
+      padding: 12px 32px;
+      text-transform: none;
+      transition: 0.3s ease all;
+
+      &:hover {
+        background-color: #002171;
+      }
+    }
+  }
+
+  .flight-card {
+    margin-top: 16px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      border-color: #0d47a1;
+    }
+  }
+}
