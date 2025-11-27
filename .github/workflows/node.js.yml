@@ -19,15 +19,15 @@ jobs:
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
-
-      - name: Debug workspace
-        run: ls -R .  
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: 'server/package-lock.json'
+          cache: npm
+          cache-dependency-path: server/package-lock.json
 
-      # Copy server folder (actually no need — repo already contains it)
+      - name: Debug workspace
+        run: ls -R .
+
+      # (No need to copy anything unless your structure demands)
       - name: Prepare server workspace
         run: |
           mkdir -p ./server
@@ -42,4 +42,4 @@ jobs:
       - name: Injecting Secrets
         run: |
           touch server/.env
-          echo ${{ secrets.PROD_ENV_SECRETS }} > server/.env
+          echo "${{ secrets.PROD_ENV_SECRETS }}" > server/.env
