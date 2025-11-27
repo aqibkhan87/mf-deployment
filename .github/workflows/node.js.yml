@@ -23,6 +23,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      # Copy server folder (actually no need — repo already contains it)
+      - name: Prepare server workspace
+        run: |
+          mkdir -p ./server
+          cp -R ./mf-deployment/server ./server-temp
+          mv ./server-temp/server ./server  
+
       - name: Install server dependencies
         run: |
           cd server
