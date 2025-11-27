@@ -5,7 +5,6 @@ async function connectDB() {
   const mongoURI = process.env.MONGO_URL;
   try {
     await mongoose.connect(mongoURI);
-
     // // Find all airports with bad coordinate order
     // const badAirports = await Airport.find({
     //   "location.coordinates.0": { $gte: -90, $lte: 90 }, // latitude range in first position
