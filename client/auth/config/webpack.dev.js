@@ -1,6 +1,7 @@
+const webpack = require("webpack");
 const { merge } = require("webpack-merge");
-const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const packageDeps = require('../package.json').dependencies;
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const packageDeps = require("../package.json").dependencies;
 const commonConfig = require("./webpack.common");
 const path = require("path");
 
@@ -16,20 +17,25 @@ const devConfig = {
       directory: path.join(__dirname, "dist"),
     },
     hot: true, // ✅ enables hot reloading
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,OPTIONS,HEAD,PUT,POST,DELETE",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'auth',
-      filename: 'remoteEntry.js',
+      name: "auth",
+      filename: "remoteEntry.js",
       remotes: {
-          store: 'store@http://localhost:8083/remoteEntry.js',
+        store: "store@http://localhost:8083/remoteEntry.js",
       },
       exposes: {
-        "./AuthApp": './src/bootstrap',
-        "./loginSummary": './src/common/loginSummary',
-        "./addressForm": './src/common/addressForm',
+        "./AuthApp": "./src/bootstrap",
+        "./loginSummary": "./src/common/loginSummary",
+        "./addressForm": "./src/common/addressForm",
       },
-      shared: packageDeps
+      shared: packageDeps,
     }),
   ],
 };
