@@ -6,12 +6,8 @@ import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 
 const MainNav = () => {
-  const { cartCount, wishlist } = useCartStore();
+  const { cartCount, wishlistCount } = useCartStore();
   const { user, setUser } = useAuthStore();
-  const wishlistCount = wishlist?.reduce(
-    (count, item) => item?.quantity + count,
-    0
-  );
 
   const handleLogOut = (e) => {
     e.preventDefault();
