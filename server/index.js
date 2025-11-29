@@ -14,7 +14,7 @@ import typeDefs from "./src/grapghql/schemas/index.js";
 import resolvers from "./src/grapghql/resolvers/index.js";
 import connectDB from "./db.js";
 import apiRouter from "./src/apiRouter.js";
-import "./src/cron/updateFlightData.js"
+import "./src/cron/updateFlightData.js";
 
 const redis = new Redis({ host: "localhost", port: 6379 });
 const app = express();
@@ -27,20 +27,36 @@ const server = new ApolloServer({
 });
 await server.start();
 
+// All your MF domains:
+const allowedOrigins = [
+  "http://localhost:8080",
+  "http://localhost:8081",
+  "http://localhost:8082",
+  "http://localhost:8083",
+  "https://www.metacook.in",
+];
+
+// CORS config for multiple origins
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
 // 🔥 context must be defined HERE, not inside ApolloServer()
 app.use(
   "/graphql",
-  cors({
-    origin: [
-      "http://localhost:8080",
-      "http://localhost:8081",
-      "http://localhost:8082",
-      "http://localhost:8083",
-      "http://www.metacook.in",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+  cors(corsOptions),
   express.json(),
   expressMiddleware(server, {
     context: async ({ req }) => {
@@ -59,20 +75,10 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:8080",
-      "http://localhost:8081",
-      "http://localhost:8082",
-      "http://localhost:8083",
-      "http://www.metacook.in",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-  express.json()
-);
+app.use(cors(corsOptions), express.json());
+
+// Preflight for all routes
+app.options(/.*/, cors(corsOptions));
 
 app.use("/api", apiRouter);
 
