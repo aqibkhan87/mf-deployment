@@ -8,3 +8,5 @@
 /.DS_store
 /*/*/yarn.lock
 /server/.env
+/metacook.in.key
+/metacook.in.pem
