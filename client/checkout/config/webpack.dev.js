@@ -26,6 +26,11 @@ const devConfig = {
       directory: path.join(__dirname, "dist"), // v4 syntax
     },
     hot: true, // ✅ enables hot reloading
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,OPTIONS,HEAD,PUT,POST,DELETE",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),

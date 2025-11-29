@@ -5,7 +5,7 @@ const commonConfig = require("./webpack.common");
 const packageDeps = require("../package.json").dependencies;
 const path = require("path");
 const dotenv = require("dotenv");
-const env = dotenv.config({ path: path.resolve(__dirname, "../.env") }).parsed;
+const env = dotenv.config({ path: path.resolve(__dirname, "../.env.production") }).parsed;
 
 const envKeys = Object.keys(env).reduce((prev, next) => {
   prev[`process.env.${next}`] = JSON.stringify(env[next]);
