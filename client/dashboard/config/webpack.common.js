@@ -15,6 +15,13 @@ module.exports = {
         },
       },
       {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/images/[name].[contenthash][ext]",
+        },
+      },
+      {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },

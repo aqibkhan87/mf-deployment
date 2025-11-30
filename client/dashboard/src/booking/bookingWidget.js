@@ -14,14 +14,12 @@ import {
   InputLabel,
   FormControl,
   CircularProgress,
-  Chip,
   Autocomplete,
 } from "@mui/material";
 import {
   fetchAirports,
   searchAirports,
   searchFlights,
-  getOffers,
   createBooking,
 } from "./apis";
 import "./bookingWidget.scss";
@@ -41,9 +39,6 @@ const BookingWidget = () => {
   const [departDate, setDepartDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [passengers, setPassengers] = useState(1);
-  const [paymentType, setPaymentType] = useState("cash");
-  const [promoCode, setPromoCode] = useState("");
-  const [offers, setOffers] = useState([]);
   const [loadingAirports, setLoadingAirports] = useState(false);
   const [fromOptions, setFromOptions] = useState([]);
   const [toOptions, setToOptions] = useState([]);
@@ -53,18 +48,6 @@ const BookingWidget = () => {
   const [flights, setFlights] = useState([]);
 
   console.log("fromOptionsfromOptions", fromOptions);
-
-  useEffect(() => {
-    getOffers()
-      .then((res) => setOffers(res))
-      .catch(() =>
-        setOffers([
-          { id: 1, title: "Exclusive" },
-          { id: 2, title: "Students" },
-          { id: 3, title: "Family & Friends" },
-        ])
-      );
-  }, []);
 
   useEffect(() => {
     fetchAirports()
@@ -106,7 +89,6 @@ const BookingWidget = () => {
       from: from.iata || from.name,
       to: to.iata || to.name,
       date: departDate,
-      promo: promoCode,
     };
 
     try {
@@ -128,8 +110,6 @@ const BookingWidget = () => {
       departDate,
       returnDate: tripType === "round" ? returnDate : null,
       passengers,
-      paymentType,
-      promoCode,
     };
 
     try {
@@ -143,273 +123,223 @@ const BookingWidget = () => {
 
   return (
     <Paper elevation={0} className="booking-widget">
-      {/* Trip Type */}
-      <RadioGroup
-        row
-        value={tripType}
-        onChange={(e) => setTripType(e.target.value)}
-        className="trip-type"
-      >
-        <FormControlLabel value="oneway" control={<Radio />} label="One Way" />
-        <FormControlLabel
-          value="round"
-          control={<Radio />}
-          label="Round Trip"
-        />
-        <FormControlLabel
-          value="multi"
-          control={<Radio />}
-          label="Multi City"
-        />
-      </RadioGroup>
+      <Box sx={{ p: 2 }}>
+        {/* Trip Type */}
+        <RadioGroup
+          row
+          value={tripType}
+          onChange={(e) => setTripType(e.target.value)}
+          className="trip-type"
+        >
+          <FormControlLabel
+            value="oneway"
+            control={<Radio />}
+            label="One Way"
+          />
+          <FormControlLabel
+            value="round"
+            control={<Radio />}
+            label="Round Trip"
+          />
+          <FormControlLabel
+            value="multi"
+            control={<Radio />}
+            label="Multi City"
+          />
+        </RadioGroup>
 
-      {/* Inputs Row */}
-      <Grid container spacing={2} alignItems="center" className="inputs-row">
-        {/* From */}
-        <Grid item xs={12} md={3}>
-          <Autocomplete
-            options={fromOptions}
-            getOptionLabel={(opt) =>
-              opt?.name
-                ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
-                : ""
-            }
-            value={from}
-            inputValue={fromInput}
-            onInputChange={(_, val) => {
-              setFromInput(val);
-              debouncedSearch(val, "from");
-            }}
-            filterOptions={(x) => x}
-            onChange={(_, val) => setFrom(val)}
-            isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
-            loading={loadingAirports}
-            renderOption={(props, option) => (
-              <li {...props} key={option._id}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                    justifyContent: "space-between",
+        {/* Inputs Row */}
+        <Grid container spacing={2} alignItems="center" className="inputs-row">
+          {/* From */}
+          <Grid item xs={12} md={3}>
+            <Autocomplete
+              options={fromOptions}
+              getOptionLabel={(opt) =>
+                opt?.name
+                  ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
+                  : ""
+              }
+              value={from}
+              inputValue={fromInput}
+              onInputChange={(_, val) => {
+                setFromInput(val);
+                debouncedSearch(val, "from");
+              }}
+              filterOptions={(x) => x}
+              onChange={(_, val) => setFrom(val)}
+              isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
+              loading={loadingAirports}
+              renderOption={(props, option) => (
+                <li {...props} key={option._id}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontWeight: 600 }}>{option.name}</span>
+                      <span style={{ fontSize: 13, color: "gray" }}>
+                        {option.city}, {option.country}
+                      </span>
+                      <span style={{ fontSize: 13, color: "gray" }}>
+                        {option?.distanceInKm
+                          ? `${Math.round(option?.distanceInKm)} Km`
+                          : ""}
+                      </span>
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 600 }}>{option.iata}</p>
+                    </div>
+                  </div>
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="From"
+                  placeholder="Search by place/airport"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingAirports ? (
+                          <CircularProgress color="inherit" size={18} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: 600 }}>{option.name}</span>
-                    <span style={{ fontSize: 13, color: "gray" }}>
-                      {option.city}, {option.country}
-                    </span>
-                    <span style={{ fontSize: 13, color: "gray" }}>
-                      {option?.distanceInKm
-                        ? `${Math.round(option?.distanceInKm)} Km`
-                        : ""}
-                    </span>
-                  </div>
-                  <div>
-                    <p style={{ fontWeight: 600 }}>{option.iata}</p>
-                  </div>
-                </div>
-              </li>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="From"
-                placeholder="Search by place/airport"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {loadingAirports ? (
-                        <CircularProgress color="inherit" size={18} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-        </Grid>
+                />
+              )}
+            />
+          </Grid>
 
-        {/* To */}
-        <Grid item xs={12} md={3}>
-          <Autocomplete
-            options={toOptions}
-            getOptionLabel={(opt) =>
-              opt?.name
-                ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
-                : ""
-            }
-            value={to}
-            inputValue={toInput}
-            onInputChange={(_, val) => {
-              setToInput(val);
-              debouncedSearch(val, "to");
-            }}
-            filterOptions={(x) => x}
-            onChange={(_, val) => setTo(val)}
-            isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
-            loading={loadingAirports}
-            renderOption={(props, option) => (
-              <li {...props} key={option._id}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                    justifyContent: "space-between",
+          {/* To */}
+          <Grid item xs={12} md={3}>
+            <Autocomplete
+              options={toOptions}
+              getOptionLabel={(opt) =>
+                opt?.name
+                  ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
+                  : ""
+              }
+              value={to}
+              inputValue={toInput}
+              onInputChange={(_, val) => {
+                setToInput(val);
+                debouncedSearch(val, "to");
+              }}
+              filterOptions={(x) => x}
+              onChange={(_, val) => setTo(val)}
+              isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
+              loading={loadingAirports}
+              renderOption={(props, option) => (
+                <li {...props} key={option._id}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <span style={{ fontWeight: 600 }}>{option.name}</span>
+                      <span style={{ fontSize: 13, color: "gray" }}>
+                        {option.city}, {option.country}
+                      </span>
+                      <span style={{ fontSize: 13, color: "gray" }}>
+                        {option?.distanceInKm
+                          ? `${Math.round(option?.distanceInKm)} Km`
+                          : ""}
+                      </span>
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: 600 }}>{option.iata}</p>
+                    </div>
+                  </div>
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="To"
+                  placeholder="Search by place/airport"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingAirports ? (
+                          <CircularProgress color="inherit" size={18} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
                   }}
-                >
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: 600 }}>{option.name}</span>
-                    <span style={{ fontSize: 13, color: "gray" }}>
-                      {option.city}, {option.country}
-                    </span>
-                    <span style={{ fontSize: 13, color: "gray" }}>
-                      {option?.distanceInKm
-                        ? `${Math.round(option?.distanceInKm)} Km`
-                        : ""}
-                    </span>
-                  </div>
-                  <div>
-                    <p style={{ fontWeight: 600 }}>{option.iata}</p>
-                  </div>
-                </div>
-              </li>
-            )}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="To"
-                placeholder="Search by place/airport"
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {loadingAirports ? (
-                        <CircularProgress color="inherit" size={18} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-          />
-        </Grid>
+                />
+              )}
+            />
+          </Grid>
 
-        {/* Dates */}
-        <Grid item xs={12} md={2}>
-          <TextField
-            fullWidth
-            label="Departure"
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            value={departDate}
-            onChange={(e) => setDepartDate(e.target.value)}
-          />
-        </Grid>
-
-        {tripType === "round" && (
+          {/* Dates */}
           <Grid item xs={12} md={2}>
             <TextField
               fullWidth
-              label="Return"
+              label="Departure"
               type="date"
               InputLabelProps={{ shrink: true }}
-              value={returnDate}
-              onChange={(e) => setReturnDate(e.target.value)}
+              value={departDate}
+              onChange={(e) => setDepartDate(e.target.value)}
             />
           </Grid>
-        )}
 
-        {/* Passengers */}
-        <Grid item xs={12} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Passengers</InputLabel>
-            <Select
-              value={passengers}
-              label="Passengers"
-              onChange={(e) => setPassengers(e.target.value)}
-            >
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <MenuItem key={n} value={n}>
-                  {n} Passenger{n > 1 ? "s" : ""}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {tripType === "round" && (
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Return"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+              />
+            </Grid>
+          )}
+
+          {/* Passengers */}
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>Passengers</InputLabel>
+              <Select
+                value={passengers}
+                label="Passengers"
+                onChange={(e) => setPassengers(e.target.value)}
+              >
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <MenuItem key={n} value={n}>
+                    {n} Passenger{n > 1 ? "s" : ""}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Offers */}
-      <div className="offers-section">
-        {offers.map((offer, i) => (
-          <Chip key={i} label={`${offer.title} Offer`} className="offer-chip" />
-        ))}
-        <Button variant="outlined" size="small" className="promo-btn">
-          + Add PROMOCODE
-        </Button>
-      </div>
-
-      {/* Payment and Search */}
-      <div className="bottom-row">
-        <div className="pay-select">
-          <FormControl fullWidth>
-            <InputLabel>Pay With</InputLabel>
-            <Select
-              value={paymentType}
-              label="Pay With"
-              onChange={(e) => setPaymentType(e.target.value)}
-            >
-              <MenuItem value="cash">Cash</MenuItem>
-              <MenuItem value="card">Credit/Debit Card</MenuItem>
-              <MenuItem value="upi">UPI</MenuItem>
-            </Select>
-          </FormControl>
+        {/* Search */}
+        <div className="bottom-row">
+          <Button
+            variant="contained"
+            className="search-btn"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            {loading ? "Searching..." : "Search"}
+          </Button>
         </div>
-
-        <Button
-          variant="contained"
-          className="search-btn"
-          onClick={handleSearch}
-          disabled={loading}
-        >
-          {loading ? "Searching..." : "Search"}
-        </Button>
-      </div>
-
-      {/* Flights */}
-      {flights.length > 0 && (
-        <Box mt={3}>
-          <Typography variant="h6" gutterBottom>
-            Available Flights ({flights.length})
-          </Typography>
-          {flights.map((f) => (
-            <Paper key={f.id} className="flight-card">
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {f.airline} - {f.flightNumber}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {f.from} → {f.to} | {f.departTime} → {f.arriveTime}
-                </Typography>
-              </Box>
-              <Box textAlign="right">
-                <Typography variant="h6">₹{f.price}</Typography>
-                <Button
-                  size="small"
-                  variant="contained"
-                  onClick={() => handleBooking(f)}
-                >
-                  Book
-                </Button>
-              </Box>
-            </Paper>
-          ))}
-        </Box>
-      )}
+      </Box>
     </Paper>
   );
 };

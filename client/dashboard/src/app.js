@@ -2,24 +2,19 @@ import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import CheckoutApp from "./mfs/CheckoutApp";
 import AuthApp from "./mfs/AuthApp";
-import OrdersPage from "./components/orderHistory";
-import OrderDetails from "./components/orderDetails";
+import OrdersPage from "./components/order/orderHistory";
+import OrderDetails from "./components/order/orderDetails";
 import MainNav from "./components/mainNav";
-import DashboardPage from "./components/dashboard";
-import AuthComponents from "./components/common/auth";
-import CheckoutComponents from "./components/common/checkout";
-import BookingWidget from "./booking/bookingWidget.js";
+import DashboardPage from "./components/dashboard/dashboard";
+import AuthComponents from "./components/common-mfs-components/auth";
+import CheckoutComponents from "./components/common-mfs-components/checkout";
 
 const App = () => {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "f8f8f8" }}>
+    <div className="min-h-screen">
       <BrowserRouter>
         <MainNav />
-        <main
-          className="max-w-6xl mx-auto px-4 py-6"
-          style={{ background: "#f7fbff" }}
-        >
-          <BookingWidget />
+        <main className="max-w-6xl mx-auto px-4 py-6">
           <Switch>
             <Route path="/auth" component={AuthApp} />
             <Route path="/dashboard" component={DashboardPage} />

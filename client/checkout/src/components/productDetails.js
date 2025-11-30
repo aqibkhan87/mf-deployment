@@ -87,8 +87,8 @@ const ProductDetail = () => {
                     src={img}
                     alt={`thumb-${i}`}
                     style={{
-                      width: 80,
-                      height: 80,
+                      width: 100,
+                      height: 100,
                       border:
                         mainImg === img
                           ? "2px solid #1976d2"
@@ -102,7 +102,7 @@ const ProductDetail = () => {
               </Box>
               <Box
                 display="flex"
-                style={{ width: "calc(100% - 140px)" }}
+                style={{ width: "calc(100% - 140px)", height: 450 }}
                 mx={"auto"}
                 mt={2}
               >

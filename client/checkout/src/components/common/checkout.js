@@ -50,7 +50,7 @@ const CheckoutItems = () => {
       </Grid>
       <Divider sx={{ my: 1 }} />
 
-      {cart?.map((product, ind) => (
+      {cart?.products?.map((product, ind) => (
         <Grid
           container
           spacing={2}
@@ -61,31 +61,31 @@ const CheckoutItems = () => {
             <CardMedia
               component="img"
               sx={{
-                width: 120,
-                height: 120,
+                width: 100,
+                height: 100,
                 objectFit: "cover",
                 m: 1,
                 borderRadius: 2,
               }}
-              image={product?.productImage}
-              alt={product?.name}
+              image={product?.productDetail?.productImage}
+              alt={product?.productDetail?.name}
             />
           </Grid>
           <Grid item xs={9.8}>
-            <Typography sx={{ fontWeight: 600 }}>{product?.name}</Typography>
+            <Typography sx={{ fontWeight: 600 }}>{product?.productDetail?.name}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Size: {product?.size}, {product?.color}
+              Size: {product?.productDetail?.size}, {product?.productDetail?.color}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Seller: {product?.seller}
+              Seller: {product?.productDetail?.seller}
             </Typography>
 
             <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                ₹{product?.price}
+                ₹{product?.productDetail?.price}
               </Typography>
               <Typography variant="body2" color="green">
-                {product.offers} offers available
+                {product?.productDetail?.offers} offers available
               </Typography>
               <InfoOutlinedIcon fontSize="small" color="action" />
             </Box>

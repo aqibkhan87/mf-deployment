@@ -14,12 +14,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useProductStore } from "store/productStore";
-import { getAllProductsCategoryies } from "../apis/products";
+import { getAllProductsCategoryies } from "../../apis/products.js";
+import BookingWidget from "../../booking/bookingWidget.js";
+import "./dashboard.scss";
+import bannerImage from "../../assets/images/booking-banner.png";
 
 export default function DashboardPage() {
-  
   const { allCategories } = useProductStore();
-  const history = useHistory()
+  const history = useHistory();
   console.log("allCategories 123", allCategories);
 
   const navigateToProductCategory = (e, sec) => {
@@ -32,9 +34,9 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <Box>
+    <Box className="dashboard-page">
       {/* 🔹 Banner Carousel */}
-      <Box sx={{ mt: 2 }}>
+      {/* <Box sx={{ mt: 2 }}>
         <Swiper
           navigation={true}
           modules={[Navigation]}
@@ -58,6 +60,10 @@ export default function DashboardPage() {
             />
           </SwiperSlide>
         </Swiper>
+      </Box> */}
+      <Box>
+        <img src={bannerImage} alt="banner1" className="banner-image" />
+        <BookingWidget />
       </Box>
 
       {/* 🔹 Product Sections */}
@@ -71,27 +77,32 @@ export default function DashboardPage() {
               mb={2}
             >
               <Typography variant="h6">{sec.title}</Typography>
-              <Button variant="text">View All</Button>
+              <Button
+                variant="text"
+                onClick={(e) => navigateToProductCategory(e, sec)}
+              >
+                View All
+              </Button>
             </Box>
 
             <Swiper
               navigation={true}
               modules={[Navigation]}
               spaceBetween={20}
-              slidesPerView={5}
+              slidesPerView={4}
               breakpoints={{
-                1024: { slidesPerView: 5 },
+                1024: { slidesPerView: 4 },
                 768: { slidesPerView: 3 },
                 480: { slidesPerView: 2 },
               }}
             >
               {sec?.products?.map((p, i) => (
-                <SwiperSlide key={i}>
+                <SwiperSlide key={`${i}-${p?.name}`} className="cursor">
                   <a onClick={(e) => navigateToProductCategory(e, sec)}>
                     <Card sx={{ textAlign: "center" }}>
                       <CardMedia
                         component="img"
-                        height="120"
+                        height="180"
                         image={p?.productImage}
                         alt={p?.name}
                       />

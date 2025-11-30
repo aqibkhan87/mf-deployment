@@ -13,69 +13,73 @@ const MainNav = () => {
     e.preventDefault();
     localStorage.setItem("user", JSON.stringify({}));
     setUser({});
-  }
+  };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <AppBar
+      className="shadow-md top-0 z-20"
+      sx={{
+        backgroundColor: "white",
+        position: "sticky"
+      }}
+    >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <AppBar position="static" sx={{ bgcolor: "#2874f0" }}>
-          <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Link to={"/"} style={{ textDecoration: "none" }}>
-              <Typography variant="h6">Metacook</Typography>
-            </Link>
-            <Box>
-              {!user?.email ? (
-                <Button color="inherit">
-                  <Link to="/auth/login" style={{ textDecoration: "none" }}>
-                    Login
-                  </Link>
-                </Button>
-              ) : (
-                <Button color="inherit" onClick={(e) => handleLogOut(e)}>
-                  <Link to="/auth/login" style={{ textDecoration: "none" }}>
-                    Logout
-                  </Link>
-                </Button>
-              )}
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Link to={"/"} style={{ textDecoration: "none" }}>
+            <Typography variant="h6">Metacook</Typography>
+          </Link>
+          <Box>
+            {!user?.email ? (
               <Button color="inherit">
-                <Link to="/cart/view">
-                  <Badge
-                    badgeContent={cartCount}
-                    color="error"
-                    max={1000}
-                    sx={{
-                      // Use transform to shift badge position
-                      "& .MuiBadge-badge": {
-                        transform: "translate(15px, -15px)",
-                      },
-                    }}
-                  >
-                    Cart
-                  </Badge>
+                <Link to="/auth/login" style={{ textDecoration: "none" }}>
+                  Login
                 </Link>
               </Button>
-              <Button color="inherit">
-                <Link to="/product/wishlist">
-                  <Badge
-                    badgeContent={wishlistCount}
-                    color="error"
-                    max={1000}
-                    sx={{
-                      // Use transform to shift badge position
-                      "& .MuiBadge-badge": {
-                        transform: "translate(15px, -15px)",
-                      },
-                    }}
-                  >
-                    Wishlist
-                  </Badge>
+            ) : (
+              <Button color="inherit" onClick={(e) => handleLogOut(e)}>
+                <Link to="/auth/login" style={{ textDecoration: "none" }}>
+                  Logout
                 </Link>
               </Button>
-            </Box>
-          </Toolbar>
-        </AppBar>
+            )}
+            <Button color="inherit">
+              <Link to="/cart/view">
+                <Badge
+                  badgeContent={cartCount}
+                  color="error"
+                  max={1000}
+                  sx={{
+                    // Use transform to shift badge position
+                    "& .MuiBadge-badge": {
+                      transform: "translate(15px, -15px)",
+                    },
+                  }}
+                >
+                  Cart
+                </Badge>
+              </Link>
+            </Button>
+            <Button color="inherit">
+              <Link to="/product/wishlist">
+                <Badge
+                  badgeContent={wishlistCount}
+                  color="error"
+                  max={1000}
+                  sx={{
+                    // Use transform to shift badge position
+                    "& .MuiBadge-badge": {
+                      transform: "translate(15px, -15px)",
+                    },
+                  }}
+                >
+                  Wishlist
+                </Badge>
+              </Link>
+            </Button>
+          </Box>
+        </Toolbar>
       </div>
-    </header>
+    </AppBar>
   );
 };
 
