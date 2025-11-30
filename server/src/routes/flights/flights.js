@@ -2,7 +2,7 @@ import express from "express";
 import FlightPrice from "../../models/flights/flightPrice.js";
 import { applyPromoToPrice } from "../../services/flights/pricing.js";
 import offersData from "./../offerdata.js"; // small helper, or call /api/offers
-
+import AirlinesMapping from "./airlinesMapping.js";
 const router = express.Router();
 
 /**
@@ -28,7 +28,7 @@ router.get("/", async (req, res) => {
   const startDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
   const endDate = new Date(`${year}-${month}-${day}T23:59:59.999Z`);
   console.log("req.query;req.query;redis", req.query, "redis", redis, day, month, year);
-  const record = await FlightPrice.findOne({
+  let record = await FlightPrice.findOne({
     origin: from.toUpperCase(),
     destination: to.toUpperCase(),
     date: {
@@ -36,7 +36,6 @@ router.get("/", async (req, res) => {
       $lte: endDate,
     },
   });
-  console.log("recordrecord", record);
   if (!record) return res.json({ flights: [] });
 
   // const promoObj = promo
@@ -57,6 +56,31 @@ router.get("/", async (req, res) => {
   //     availableSeats: f.availableSeats,
   //   };
   // });
+
+   // Map fares to include airline info + logo
+  const fares = record.fares.map((f) => {
+    const airline = AirlinesMapping[f?.validatingAirline] || {
+      name: f.validatingAirline,
+      code: f.validatingAirline,
+      logo: "https://via.placeholder.com/48?text=?",
+    };
+
+    return {
+      providerOfferId: f.providerOfferId,
+      airline: {
+        name: airline.name,
+        code: airline.code,
+        logo: airline.logo,
+      },
+      totalPrice: f.totalPrice,
+      basePrice: f.basePrice,
+      currency: f.currency,
+      duration: f.duration,
+      segments: f.segments,
+    };
+  });
+
+  record = { ...record.toObject(), fares }; // make sure Mongoose doc to plain object
 
   const payload = { flights: record };
   if (redis) await redis.set(cacheKey, JSON.stringify(payload), "EX", 60 * 60); // cache 1h

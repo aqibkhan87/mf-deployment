@@ -107,6 +107,7 @@ const ProductListing = () => {
                     height="200"
                     image={p?.productImage}
                     alt={p?.name}
+                    style={{ height: 250 }}
                   />
                   <CardContent>
                     <Typography variant="body1" gutterBottom>

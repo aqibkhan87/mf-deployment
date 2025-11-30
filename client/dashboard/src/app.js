@@ -4,17 +4,18 @@ import CheckoutApp from "./mfs/CheckoutApp";
 import AuthApp from "./mfs/AuthApp";
 import OrdersPage from "./components/order/orderHistory";
 import OrderDetails from "./components/order/orderDetails";
-import MainNav from "./components/mainNav";
-import DashboardPage from "./components/dashboard/dashboard";
-import AuthComponents from "./components/common-mfs-components/auth";
-import CheckoutComponents from "./components/common-mfs-components/checkout";
+import MainNav from "./components/mainNav.jsx";
+import FlightResults from "./booking/flightSearch.jsx";
+import DashboardPage from "./components/dashboard/dashboard.jsx";
+import AuthComponents from "./components/common-mfs-components/auth/index.jsx";
+import CheckoutComponents from "./components/common-mfs-components/checkout/index.jsx";
 
 const App = () => {
   return (
     <div className="min-h-screen">
       <BrowserRouter>
         <MainNav />
-        <main className="max-w-6xl mx-auto px-4 py-6">
+        <main className="">
           <Switch>
             <Route path="/auth" component={AuthApp} />
             <Route path="/dashboard" component={DashboardPage} />
@@ -24,6 +25,7 @@ const App = () => {
             <Route path="/product" component={CheckoutApp} />
             <Route path="/cart" component={CheckoutApp} />
             <Route exact path="/" component={DashboardPage} />
+            <Route exact path="/flight-search" component={FlightResults} />
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
           <AuthComponents />

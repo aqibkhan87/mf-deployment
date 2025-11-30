@@ -4,7 +4,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.m?js|jsx$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -23,7 +23,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: ["style-loader", "css-loader", "postcss-loader"] // <-- required for Tailwind,
       },
       {
         test: /\.scss$/i,

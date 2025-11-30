@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -8,7 +9,6 @@ import {
   Radio,
   RadioGroup,
   Button,
-  Typography,
   MenuItem,
   Select,
   InputLabel,
@@ -16,12 +16,7 @@ import {
   CircularProgress,
   Autocomplete,
 } from "@mui/material";
-import {
-  fetchAirports,
-  searchAirports,
-  searchFlights,
-  createBooking,
-} from "./apis";
+import { fetchAirports, searchAirports } from "./apis";
 import "./bookingWidget.scss";
 
 const debounce = (fn, delay) => {
@@ -33,6 +28,7 @@ const debounce = (fn, delay) => {
 };
 
 const BookingWidget = () => {
+  const history = useHistory();
   const [tripType, setTripType] = useState("oneway");
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
@@ -45,7 +41,6 @@ const BookingWidget = () => {
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [flights, setFlights] = useState([]);
 
   console.log("fromOptionsfromOptions", fromOptions);
 
@@ -84,41 +79,11 @@ const BookingWidget = () => {
       alert("Please select From, To, and Departure date.");
       return;
     }
-
-    const searchData = {
-      from: from.iata || from.name,
-      to: to.iata || to.name,
-      date: departDate,
-    };
-
-    try {
-      setLoading(true);
-      const res = await searchFlights(searchData);
-      setFlights(res || []);
-    } catch (err) {
-      console.error("Search failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBooking = async (flight) => {
-    const payload = {
-      flightId: flight.id,
-      from,
-      to,
-      departDate,
-      returnDate: tripType === "round" ? returnDate : null,
-      passengers,
-    };
-
-    try {
-      const res = await createBooking(payload);
-      alert(`✅ Booking confirmed! ID: ${res.bookingId}`);
-    } catch (err) {
-      console.error("Booking failed:", err);
-      alert("❌ Booking failed. Try again later.");
-    }
+    history.push(
+      `/flight-search?from=${from.iata || from.name}&to=${
+        to.iata || to.name
+      }&date=${departDate}&passengers=${passengers}`
+    );
   };
 
   return (

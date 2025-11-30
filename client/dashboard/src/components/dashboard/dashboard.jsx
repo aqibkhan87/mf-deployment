@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useProductStore } from "store/productStore";
 import { getAllProductsCategoryies } from "../../apis/products.js";
-import BookingWidget from "../../booking/bookingWidget.js";
+import BookingWidget from "../../booking/bookingWidget.jsx";
 import "./dashboard.scss";
 import bannerImage from "../../assets/images/booking-banner.png";
 
@@ -97,19 +97,19 @@ export default function DashboardPage() {
               }}
             >
               {sec?.products?.map((p, i) => (
-                <SwiperSlide key={`${i}-${p?.name}`} className="cursor">
+                <SwiperSlide key={`${i}-${p?.name}`} className="cursor-pointer">
                   <a onClick={(e) => navigateToProductCategory(e, sec)}>
                     <Card sx={{ textAlign: "center" }}>
                       <CardMedia
                         component="img"
-                        height="180"
                         image={p?.productImage}
                         alt={p?.name}
+                        style={{ height: 200 }}
                       />
-                      <CardContent>
+                      <CardContent style={{ paddingBottom: "16px" }}>
                         <Typography variant="body1">{p?.name}</Typography>
                         <Typography variant="body2" color="green">
-                          {p?.price}
+                          ₹{p?.price}
                         </Typography>
                       </CardContent>
                     </Card>
