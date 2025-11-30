@@ -14,8 +14,8 @@ const AirlinesMapping = {
 
   "6E": { name: "IndiGo", code: "6E", logo: "https://content.airhex.com/content/logos/airlines_6E_200_200_r.png" },
   AI: { name: "Air India", code: "AI", logo: "https://content.airhex.com/content/logos/airlines_AI_200_200_r.png" },
-  CZ: { name: "China Southern", code: "CZ", logo: "https://content.airhex.com/content/logos/airlines_CZ_200_200_r.png" },
-  MU: { name: "China Eastern", code: "MU", logo: "https://content.airhex.com/content/logos/airlines_MU_200_200_r.png" },
+  CZ: { name: "China Southern Airlines", code: "CZ", logo: "https://content.airhex.com/content/logos/airlines_CZ_200_200_r.png" },
+  MU: { name: "China Eastern Airlines", code: "MU", logo: "https://content.airhex.com/content/logos/airlines_MU_200_200_r.png" },
   CA: { name: "Air China", code: "CA", logo: "https://content.airhex.com/content/logos/airlines_CA_200_200_r.png" },
 
   TK: { name: "Turkish Airlines", code: "TK", logo: "https://content.airhex.com/content/logos/airlines_TK_200_200_r.png" },
@@ -27,6 +27,33 @@ const AirlinesMapping = {
   AS: { name: "Alaska Airlines", code: "AS", logo: "https://content.airhex.com/content/logos/airlines_AS_200_200_r.png" },
   W6: { name: "Wizz Air", code: "W6", logo: "https://content.airhex.com/content/logos/airlines_W6_200_200_r.png" },
   G3: { name: "Gol Linhas Aéreas", code: "G3", logo: "https://content.airhex.com/content/logos/airlines_G3_200_200_r.png" },
+
+  // === 25 additional airlines ===
+  BA: { name: "British Airways", code: "BA", logo: "https://content.airhex.com/content/logos/airlines_BA_200_200_r.png" },
+  CX: { name: "Cathay Pacific", code: "CX", logo: "https://content.airhex.com/content/logos/airlines_CX_200_200_r.png" },
+  EY: { name: "Etihad Airways", code: "EY", logo: "https://content.airhex.com/content/logos/airlines_EY_200_200_r.png" },
+  MH: { name: "Malaysia Airlines", code: "MH", logo: "https://content.airhex.com/content/logos/airlines_MH_200_200_r.png" },
+  NZ: { name: "Air New Zealand", code: "NZ", logo: "https://content.airhex.com/content/logos/airlines_NZ_200_200_r.png" },
+  QF: { name: "Qantas", code: "QF", logo: "https://content.airhex.com/content/logos/airlines_QF_200_200_r.png" },
+  JL: { name: "Japan Airlines", code: "JL", logo: "https://content.airhex.com/content/logos/airlines_JL_200_200_r.png" },
+  AC: { name: "Air Canada", code: "AC", logo: "https://content.airhex.com/content/logos/airlines_AC_200_200_r.png" },
+  AZ: { name: "Alitalia", code: "AZ", logo: "https://content.airhex.com/content/logos/airlines_AZ_200_200_r.png" },
+  TG: { name: "Thai Airways International", code: "TG", logo: "https://content.airhex.com/content/logos/airlines_TG_200_200_r.png" },
+  BR: { name: "EVA Air", code: "BR", logo: "https://content.airhex.com/content/logos/airlines_BR_200_200_r.png" },
+  VA: { name: "Virgin Australia", code: "VA", logo: "https://content.airhex.com/content/logos/airlines_VA_200_200_r.png" },
+  IB: { name: "Iberia", code: "IB", logo: "https://content.airhex.com/content/logos/airlines_IB_200_200_r.png" },
+  SK: { name: "Scandinavian Airlines", code: "SK", logo: "https://content.airhex.com/content/logos/airlines_SK_200_200_r.png" },
+  LX: { name: "SWISS", code: "LX", logo: "https://content.airhex.com/content/logos/airlines_LX_200_200_r.png" },
+  KL: { name: "KLM Royal Dutch Airlines", code: "KL", logo: "https://content.airhex.com/content/logos/airlines_KL_200_200_r.png" },
+  VN: { name: "Vietnam Airlines", code: "VN", logo: "https://content.airhex.com/content/logos/airlines_VN_200_200_r.png" },
+  LX: { name: "SWISS International Air Lines", code: "LX", logo: "https://content.airhex.com/content/logos/airlines_LX_200_200_r.png" },
+  KL: { name: "KLM", code: "KL", logo: "https://content.airhex.com/content/logos/airlines_KL_200_200_r.png" },
+  ET: { name: "Ethiopian Airlines", code: "ET", logo: "https://content.airhex.com/content/logos/airlines_ET_200_200_r.png" },
+  GA: { name: "Garuda Indonesia", code: "GA", logo: "https://content.airhex.com/content/logos/airlines_GA_200_200_r.png" },
+  QV: { name: "Cebu Pacific", code: "QV", logo: "https://content.airhex.com/content/logos/airlines_QV_200_200_r.png" },
+  NH: { name: "All Nippon Airways", code: "NH", logo: "https://content.airhex.com/content/logos/airlines_NH_200_200_r.png" },
+  S7: { name: "S7 Airlines", code: "S7", logo: "https://content.airhex.com/content/logos/airlines_S7_200_200_r.png" },
+  SU: { name: "Aeroflot", code: "SU", logo: "https://content.airhex.com/content/logos/airlines_SU_200_200_r.png" },
 };
 
 export default AirlinesMapping;
