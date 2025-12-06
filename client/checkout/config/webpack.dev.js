@@ -42,6 +42,7 @@ const devConfig = {
       },
       exposes: {
         "./CheckoutApp": "./src/bootstrap",
+        "./payment": "./src/common/payment.jsx",
       },
       shared: packageDeps,
     }),

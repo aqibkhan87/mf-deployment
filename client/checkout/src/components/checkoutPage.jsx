@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Grid, Button, Chip } from "@mui/material";
-
-import OrderSummary from "./common/orderSummary";
-import CheckoutItems from "./common/checkout";
 import { useAuthStore } from "store/authStore";
-import { eventEmitter } from "../utils/helper";
+import { useBookingStore } from "store/bookingStore";
+import OrderSummary from "../common/orderSummary.jsx";
+import CheckoutItems from "../common/checkout.jsx";
+import { eventEmitter } from "../utils/helper.js";
 
 const Checkout = () => {
   const { user, address } = useAuthStore();
+  const { selectedFlight, setBookingId } = useBookingStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
@@ -154,6 +155,45 @@ const Checkout = () => {
     );
   };
 
+  const handlePayment = async () => {
+    const payload = {
+      providerFlightId: selectedFlight.providerOfferId,
+      source: selectedFlight.segments[0].departureAirport,
+      destination: selectedFlight.segments[0].arrivalAirport,
+      travelDate: selectedFlight.segments[0].departureTime,
+
+      contact: {
+        email: "aqib@test.com",
+        phone: "9999999999",
+      },
+
+      passengers: [
+        {
+          firstName: "Aqib",
+          lastName: "Khan",
+          age: 28,
+          gender: "M",
+        },
+      ],
+
+      pricing: {
+        basePrice: selectedFlight.basePrice,
+        discountApplied: 0,
+        finalPrice: selectedFlight.totalPrice,
+      },
+    };
+
+    const { data } = await createBooking(payload);
+
+    setBookingId(data.bookingId);
+
+    if (!data.paymentRequired) {
+      navigate("/success");
+    } else {
+      navigate("/payment");
+    }
+  };
+
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
       <Grid container spacing={2}>
@@ -174,8 +214,9 @@ const Checkout = () => {
             color="warning"
             sx={{ float: "right", fontSize: 16, px: 6, mb: 4 }}
             disabled={isContinueDisabled}
+            onClick={handlePayment}
           >
-            CONTINUE
+            Continue to Payment
           </Button>
         </Grid>
         <OrderSummary />

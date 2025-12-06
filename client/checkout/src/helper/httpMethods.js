@@ -9,11 +9,12 @@ import axiosInstance from './axiosInstance.js';  // your configured axios
  * @param {object} [config] - Additional Axios config (headers, params, etc.)
  * @returns {Promise} Axios response promise
  */
-const httpRequest = async (method, url, data = null, config = {}) => {
+const httpRequest = async (method, url="", data = null, config = {}) => {
   try {
+    const BASE_URL = process.env.API_BASE_URL || "http://localhost:4000";
     const options = {
       method: method.toLowerCase(),
-      url,
+      url: BASE_URL + url,
       ...config,
     };
 

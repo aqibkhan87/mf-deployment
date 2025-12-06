@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Grid } from "@mui/material";
-import OrderSummary from "./common/orderSummary";
-import Cart from "./common/cart";
 import { useCartStore } from "store/cartStore";
+import OrderSummary from "../common/orderSummary.jsx";
+import Cart from "../common/cart.jsx";
 
 const CartPage = () => {
   const { cart } = useCartStore();

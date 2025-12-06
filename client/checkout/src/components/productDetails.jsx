@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import Recommendations from "./recommendations";
 import {
   Box,
   Grid,
@@ -15,6 +14,8 @@ import { useCartStore } from "store/cartStore";
 import { useProductStore } from "store/productStore";
 import { getProductById, getProductByCategory } from "../apis/products";
 import { getCart, addToCart } from "../apis/cart";
+import Recommendations from "./recommendations.jsx";
+
 
 const ProductDetail = () => {
   const history = useHistory();

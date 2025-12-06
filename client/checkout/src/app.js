@@ -1,10 +1,10 @@
 import React from "react";
 import { Router, Route, Switch } from "react-router-dom";
-import ProductDetails from "./components/productDetails";
-import ProductListing from "./components/productlisting";
-import CartPage from "./components/cartPage";
-import CheckoutPage from "./components/checkoutPage";
-import WishlistPage from "./components/wishlist";
+import ProductDetails from "./components/productDetails.jsx";
+import ProductListing from "./components/productlisting.jsx";
+import CartPage from "./components/cartPage.jsx";
+import CheckoutPage from "./components/checkoutPage.jsx";
+import WishlistPage from "./components/wishlist.jsx";
 
 const App = ({ history }) => {
   
