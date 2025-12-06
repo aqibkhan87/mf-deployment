@@ -22,12 +22,8 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader", "postcss-loader"] // <-- required for Tailwind,
-      },
-      {
-        test: /\.scss$/i,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        test: /\.css|scss$/i,
+        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"] // <-- required for Tailwind,
       },
     ],
   },

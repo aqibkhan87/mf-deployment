@@ -39,7 +39,6 @@ function FlightResults() {
             date: date,
             passengers: parseInt(passengers) || 1,
         };
-        debugger
         try {
             setLoading(true);
             const res = await searchFlights(searchData);

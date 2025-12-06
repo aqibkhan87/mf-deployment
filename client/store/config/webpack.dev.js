@@ -23,9 +23,10 @@ const devConfig = {
       filename: "remoteEntry.js",
       exposes: {
         "./authStore": "./src/store/authStore.js",
-        "./cartStore": "./src/store/cartStore.js",
-        "./orderStore": "./src/store/orderStore.js",
-        "./productStore": "./src/store/productStore.js",
+        "./cartStore": "./src/store/ecommerce/cartStore.js",
+        "./orderStore": "./src/store/ecommerce/orderStore.js",
+        "./productStore": "./src/store/ecommerce/productStore.js",
+        "./bookingStore": "./src/store/flights/bookingStore.js",
       },
       shared: packageDeps,
     }),
