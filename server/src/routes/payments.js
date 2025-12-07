@@ -3,55 +3,73 @@ import express from "express";
 import crypto from "crypto";
 import { razorpay } from "../razorpayService.js";
 import Cart from "../models/ecommerce/e-cart.js";
-import Booking from "../models/flights/booking.js";
+import EcommercePayment from "../models/ecommerce/e-payment.js";
 
 const router = express.Router();
 
 /* ============================
    CREATE RAZORPAY ORDER
 ============================= */
-router.post("/create-order", async (req, res) => {
+router.post("/create", async (req, res) => {
   try {
-    const { type, entityId } = req.body;
-    if (!type || !entityId)
-      return res.status(400).json({ message: "type and entityId required" });
+    const { entityId } = req.body;
+    console.log("Create order called with entityId:", entityId);
+    
+    const cart = await Cart.findOne({ _id: entityId });
+    console.log("cart called with cart:", cart);
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    let amount = 0;
-    let receipt = "";
+    const amount = cart?.totalAmount || 0;
 
-    if (type === "ECOMMERCE") {
-      const cart = await Cart.findById(entityId);
-      if (!cart) return res.status(404).json({ message: "Cart not found" });
-
-      amount = Math.round(cart.summary.total * 100);
-      receipt = `CART_${cart._id}`;
-      await Cart.findByIdAndUpdate(cart._id, {
-        payment: { status: "CREATED" },
+    // ✅ ZERO AMOUNT ORDER
+    if (amount <= 0) {
+      const payment = await EcommercePayment.create({
+        userId: cart?.userId,
+        amount: 0,
+        status: "PAID",
+        paidAt: new Date(),
+        notes: { freeOrder: true },
       });
+
+      cart.paymentId = payment._id;
+      await cart.save();
+
+      return res.json({ skipPayment: true, success: true });
     }
-
-    if (type === "FLIGHT") {
-      const booking = await Booking.findById(entityId);
-      if (!booking) return res.status(404).json({ message: "Booking not found" });
-
-      amount = Math.round(booking.pricing.finalPrice * 100);
-      receipt = `BOOK_${booking.bookingRef}`;
-    }
-
-    const order = await razorpay.orders.create({
+    console.log(
+      "create sssss s s s. s s. s s s s order called for cart:",
+      cart
+    );
+    // ✅ Create payment record
+    const payment = await EcommercePayment.create({
+      userId: cart.userId,
       amount,
       currency: "INR",
-      receipt,
+      status: "CREATED",
+      notes: { cartId: cart._id },
     });
+
+    // ✅ Create Razorpay order
+    const order = await razorpay.orders.create({
+      amount: Math.round(amount * 100),
+      currency: "INR",
+      receipt: `CART_${cart._id}`,
+    });
+
+    payment.razorpay_order_id = order.id;
+    await payment.save();
+
+    cart.paymentId = payment._id;
+    await cart.save();
 
     res.json({
       orderId: order.id,
       amount: order.amount,
-      currency: "INR",
-      key: process.env.RAZORPAY_KEY_ID,
+      currency: order.currency,
+      paymentId: payment._id,
     });
   } catch (err) {
-    console.error(err);
+    console.error("create-order error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

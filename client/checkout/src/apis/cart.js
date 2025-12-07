@@ -28,12 +28,13 @@ export const getCart = async () => {
   const cartId = localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "anonymous";
+  console.log("Fetching cart for cartId:", cartId);
   const response = await httpRequest("get", `/api/ecommerce/cart/${cartId}`);
   if (response?.data && response?.status === 200) {
     useCartStore.setState((state) => ({
       ...state,
       cart: response.data?.cart,
-      cartCount: response.data?.cartCount
+      cartCount: response.data?.cartCount,
     }));
   }
 };

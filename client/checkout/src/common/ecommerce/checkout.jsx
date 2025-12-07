@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Paper,
@@ -15,24 +15,53 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useCartStore } from "store/cartStore";
+import { getCart, updateInCart } from "../../apis/cart";
+import { updateQuantity } from "../../utils/helper";
 // import { addQuantity, subtractQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {
   const { cart } = useCartStore();
+
+  useEffect(() => {
+    getCart();
+  }, []);
 
   const navigateToProduct = (product) => {
     history.push(`/product/${product?.categoryid}/${product?.id}`);
   };
 
   const addItemQuantity = (categoryid, productid) => {
-    // const updatedCart = addQuantity(categoryid, productid, cart);
-    // updateQuantityInCart(updatedCart);
+    const updatedCart = updateQuantity(
+      categoryid,
+      productid,
+      cart?.products,
+      "add"
+    );
+    const existingCartProducts =
+      updatedCart?.map(({ productDetail, quantity }) => ({
+        _id: productDetail?._id,
+        quantity,
+      })) || [];
+    updateInCart(existingCartProducts);
   };
 
   const subtractItemQuantity = (categoryid, productid) => {
-    // const updatedCart = subtractQuantity(categoryid, productid, cart);
-    // updateQuantityInCart(updatedCart);
+    const updatedCart = updateQuantity(
+      categoryid,
+      productid,
+      cart?.products,
+      "subtract"
+    );
+    const existingCartProducts =
+      updatedCart?.map(({ productDetail, quantity }) => ({
+        _id: productDetail?._id,
+        quantity,
+      })) || [];
+    updateInCart(existingCartProducts);
   };
+
+  console.log("checkout cart in.  ss", cart);
+
 
   return (
     <Paper sx={{ p: 2, mt: 2, mb: 2 }}>
@@ -135,7 +164,10 @@ const CheckoutItems = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  subtractItemQuantity(product?.categoryid, product?.id);
+                  subtractItemQuantity(
+                    product?.productDetail?.categoryid,
+                    product?.productDetail?._id
+                  );
                 }}
               >
                 <RemoveIcon />
@@ -150,7 +182,10 @@ const CheckoutItems = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  addItemQuantity(product?.categoryid, product?.id);
+                  addItemQuantity(
+                    product?.productDetail?.categoryid,
+                    product?.productDetail?._id
+                  );
                 }}
               >
                 <AddIcon />

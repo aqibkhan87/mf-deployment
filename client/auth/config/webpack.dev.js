@@ -4,6 +4,15 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const packageDeps = require("../package.json").dependencies;
 const commonConfig = require("./webpack.common");
 const path = require("path");
+const dotenv = require("dotenv");
+const env = dotenv.config({ path: path.resolve(__dirname, "../.env") }).parsed;
+
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
+
+console.log("envKeys", envKeys);
 
 const devConfig = {
   mode: "development",
@@ -24,6 +33,7 @@ const devConfig = {
     },
   },
   plugins: [
+    new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
       name: "auth",
       filename: "remoteEntry.js",

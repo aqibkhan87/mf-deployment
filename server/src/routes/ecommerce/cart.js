@@ -22,6 +22,9 @@ apiRouter.post("/", async (req, res) => {
       console.log("new cart", cart);
       await cart.save();
     }
+    // Initialize totals
+    let totalAmount = 0;
+    let totalActual = 0;
 
     for (const { productDetail, quantity = 1 } of products) {
       // Fetch product details
@@ -41,7 +44,18 @@ apiRouter.post("/", async (req, res) => {
           quantity,
         });
       }
+      const actualPrice = Number(productDetail.actualPrice) || 0;
+
+      // Calculate discounted price depending on your discount field format
+      let discountedPrice = actualPrice;
+      discountedPrice = Number(productDetail.discountedPrice);
+
+      totalActual += actualPrice * quantity;
+      totalAmount += productDetail.price * quantity;
     }
+    cart.totalAmount = totalAmount.toFixed(2);
+    cart.totalActual = totalActual.toFixed(2);
+    cart.savedAmount = (totalActual - totalAmount).toFixed(2);
 
     await cart.save();
 
@@ -120,6 +134,32 @@ apiRouter.put("/update", async (req, res) => {
 
     // Optionally populate products.productDetail before returning
     console.log("cart updated ", cart);
+    res.json({ cart });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+apiRouter.put("/update-userid-in-cart", async (req, res) => {
+  try {
+    const { cartId, userId } = req.body;
+
+    if (!cartId) {
+      return res.status(400).json({ error: "Valid cart Id required." });
+    }
+
+    // Find the cart by ID
+    let cart = await CartModel.findOneAndUpdate(
+      { _id: cartId },
+      { userId },
+      { new: true }
+    );
+    if (cart.userId === userId)
+      return res.json(200).json({ message: "User Id updated." });
+
+    // Optionally populate products.productDetail before returning
+    console.log("user Id updated ", cart);
     res.json({ cart });
   } catch (err) {
     console.error(err);

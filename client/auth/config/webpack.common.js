@@ -5,7 +5,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.m?js|jsx$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -16,8 +16,15 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: "asset/resource",
+        generator: {
+          filename: "assets/images/[name].[contenthash][ext]",
+        },
+      },
+      {
+        test: /\.css|scss$/i,
+        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"], // <-- required for Tailwind,
       },
     ],
   },

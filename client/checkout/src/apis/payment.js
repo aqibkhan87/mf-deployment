@@ -1,10 +1,20 @@
 import axios from "axios";
+import httpRequest from "../helper/httpMethods.js";
 
-export const createBooking = (payload) =>
-  axios.post("/api/flights/bookings/create", payload);
+export const createOrder = async (payload) => {
+  const response = await httpRequest("post", `/api/payment/create`, payload);
+  if (response?.data && response?.status === 200) {
+    return response.data;
+  }
+};
 
-export const createPaymentOrder = (bookingId) =>
-  axios.post("/api/flights/bookings/create-payment-order", { bookingId });
-
-export const verifyPayment = (payload) =>
-  axios.post("/api/flights/bookings/verify-payment", payload);
+export const verifyPayment = async (payload) => {
+  const response = await httpRequest(
+    "post",
+    `/api/payment/verify-payment`,
+    payload
+  );
+  if (response?.data && response?.status === 200) {
+    return response.data;
+  }
+};

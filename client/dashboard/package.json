@@ -13,7 +13,7 @@
     "@mui/material": "^5.18.0",
     "@mui/styles": "^5.18.0",
     "@mui/x-date-pickers": "^8.14.0",
-    "axios": "^1.12.2",
+    "axios": "^1.13.2",
     "dayjs": "^1.11.18",
     "dotenv": "^17.2.3",
     "react": "^18.3.1",

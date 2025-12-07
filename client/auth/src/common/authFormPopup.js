@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useAuthStore } from "store/authStore";
 import { login, signup } from "../apis/auth";
+import { updateUserIdInCart } from "../apis/cart";
 
 const AuthFormPopup = ({ open, onClose, type = "login" }) => {
   const [formType, setFormType] = useState(type);
@@ -32,19 +33,19 @@ export default AuthFormPopup;
 
 const SignupFormPopup = ({ open, onClose, setFormType }) => {
   const [signupData, setSignupData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    mobile: "",
     password: "",
   });
   const [touched, setTouched] = useState({});
 
-  const requiredFields = ["name", "mobile", "email", "password"];
+  const requiredFields = ["firstName", "lastName", "email", "password"];
 
   // Validation
   const errors = {
-    name: !signupData.name,
-    mobile: !signupData.mobile || signupData.mobile.length !== 10,
+    firstName: !signupData.firstName,
+    lastName: !signupData.lastName,
     email: !signupData.email,
     password: !signupData.password,
   };
@@ -61,12 +62,13 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
     setTouched(
       requiredFields.reduce((acc, key) => ({ ...acc, [key]: true }), {})
     );
+
     if (Object.values(errors).every((err) => !err)) {
       // setSaving(true);
       // setTimeout(() => setSaving(false), 1200);
       // Actual save/deliver action here
       const response = await signup(signupData);
-      if (response?.status === 200) {
+      if (response?.data?.status === 200) {
         onClose();
       } else {
       }
@@ -80,21 +82,43 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
         <form onSubmit={handleSignup}>
           <Box sx={{ mt: 1 }}>
             <TextField
-              label="Name"
+              label="First Name"
+              type="text"
+              name="firstName"
               fullWidth
               margin="normal"
               required
-              value={signupData.name}
-              onChange={handleChange}
-              error={errors.name && touched.name}
+              value={signupData.firstName}
+              error={errors.firstName && touched.firstName}
               helperText={
-                errors.name && touched.name ? "Please fill out this field." : ""
+                errors.firstName && touched.firstName
+                  ? "Please fill out this field."
+                  : ""
               }
-              onBlur={() => handleBlur("name")}
+              onBlur={() => handleBlur("firstName")}
+              onChange={handleChange}
+            />
+            <TextField
+              label="Last Name"
+              type="text"
+              name="lastName"
+              fullWidth
+              margin="normal"
+              required
+              value={signupData.lastName}
+              error={errors.lastName && touched.lastName}
+              helperText={
+                errors.lastName && touched.lastName
+                  ? "Please fill out this field."
+                  : ""
+              }
+              onBlur={() => handleBlur("lastName")}
+              onChange={handleChange}
             />
             <TextField
               label="Email"
               type="email"
+              name="email"
               fullWidth
               margin="normal"
               required
@@ -109,25 +133,9 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
               onChange={handleChange}
             />
             <TextField
-              label="Mobile Number"
-              type="tel"
-              fullWidth
-              margin="normal"
-              required
-              value={signupData.mobile}
-              inputProps={{ maxLength: 10, pattern: "[0-9]{10}" }}
-              error={errors.mobile && touched.mobile}
-              helperText={
-                errors.mobile && touched.mobile
-                  ? "Please fill out this field."
-                  : ""
-              }
-              onBlur={() => handleBlur("mobile")}
-              onChange={handleChange}
-            />
-            <TextField
               label="Password"
               type="password"
+              name="password"
               fullWidth
               margin="normal"
               required
@@ -172,7 +180,6 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
   );
 };
 
-
 const LoginFormPopup = ({ open, onClose, setFormType }) => {
   const { setUser } = useAuthStore();
   const [loginData, setLoginData] = useState({
@@ -185,13 +192,15 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
   const isMobile = (str) => /^[0-9]{10}$/.test(str);
 
   // Validate if contact is valid email or mobile
-  const contactValid = isEmail(loginData.contact) || isMobile(loginData.contact);
+  const contactValid =
+    isEmail(loginData.contact) || isMobile(loginData.contact);
   const errors = {
     contact: !contactValid,
     password: !loginData.password,
   };
 
-  const handleBlur = (field) => setTouched((prev) => ({ ...prev, [field]: true }));
+  const handleBlur = (field) =>
+    setTouched((prev) => ({ ...prev, [field]: true }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -215,9 +224,16 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
       // setTimeout(() => setSaving(false), 1200);
       // Actual save/deliver action here
       const userDetails = await login(loginData);
-      console.log("response", userDetails?.user);
-      if (userDetails?.status === 200 && userDetails?.user) {
-        setUser(userDetails?.user)
+      if (userDetails?.data?.user) {
+        localStorage.setItem("user", JSON.stringify(userDetails?.data?.user));
+        localStorage.setItem("token", JSON.stringify(userDetails?.data?.token));
+        if (localStorage.getItem("cartId")) {
+          await updateUserIdInCart(
+            userDetails?.data?.user?._id,
+            JSON.parse(localStorage.getItem("cartId"))
+          );
+        }
+        setUser(userDetails?.data?.user);
         onClose();
       }
     }
@@ -257,10 +273,18 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
               onBlur={() => handleBlur("password")}
               error={errors.password && touched.password}
               helperText={
-                touched.password && errors.password ? "Password is required." : ""
+                touched.password && errors.password
+                  ? "Password is required."
+                  : ""
               }
             />
-            <Button fullWidth type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
+            >
               Login
             </Button>
           </Box>

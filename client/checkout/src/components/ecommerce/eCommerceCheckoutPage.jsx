@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Grid, Button, Chip } from "@mui/material";
+import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import OrderSummary from "../../common/ecommerce/orderSummary.jsx";
 import CheckoutItems from "../../common/ecommerce/checkout.jsx";
 import { eventEmitter } from "../../utils/helper.js";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
+import { createOrder, verifyPayment } from "../../apis/payment.js";
 
 const Checkout = () => {
+  const history = useHistory();
   const { user, address } = useAuthStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
+
+  console.log("Checkout user:", user);
 
   useEffect(() => {
     if (step == "auth" && isEditMode && user?.email && !address) {
@@ -59,7 +64,7 @@ const Checkout = () => {
           </Grid>
           <Grid item xs>
             <Typography sx={{ fontWeight: 600 }}>
-              {user?.name}-{user?.mobile}
+              {user?.firstName} {user?.lastName}-{user?.email}
             </Typography>
           </Grid>
         </Grid>
@@ -154,39 +159,65 @@ const Checkout = () => {
     );
   };
 
-  const handlePayment = async () => {
-    const loaded = await loadRazorpay();
-    if (!loaded) return alert("Razorpay SDK failed");
+  const handleCheckout = async () => {
+    // 1️⃣ Create Order
+    const data = await createOrder({
+      type: "ECOMMERCE", // or FLIGHT
+      entityId: JSON.parse(localStorage.getItem("cartId")) || "",
+    });
+    console.log("order data", data);
 
+    // ✅ ZERO AMOUNT
+    if (data?.skipPayment) {
+      history.push("/dashboard");
+      return;
+    }
+
+    // 2️⃣ Load Razorpay
+    const loaded = await loadRazorpay();
+    if (!loaded) {
+      alert("Payment SDK failed. Try again.");
+      return;
+    }
+    // 3️⃣ Payment Options
     const options = {
       key: process.env.RAZORPAY_KEY_ID,
-      name: "Flight Booking",
-      order_id: data.order.id,
-      amount: data.order.amount,
+      order_id: data.orderId,
+      amount: data.amount,
       currency: "INR",
-      handler: async (response) => {
-        // ✅ Verify payment
-        const verifyRes = await verifyPayment({
-          bookingId,
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-        });
 
-        if (verifyRes.data.success) {
-          setPaymentStatus("PAID");
-          history.push("/success");
-        } else {
-          setPaymentStatus("FAILED");
+      handler: async (res) => {
+        try {
+          const verify = await verifyPayment({
+            type: "ECOMMERCE",
+            entityId,
+            ...res,
+          });
+
+          if (verify.success) {
+            navigate("/dashbaord");
+          }
+        } catch {
           alert("Payment verification failed");
         }
       },
 
-      theme: { color: "#2563eb" },
+      modal: {
+        ondismiss: async () => {
+          alert("Payment cancelled");
+        },
+      },
     };
 
-    new window.Razorpay(options).open();
-  }
+    const rzp = new window.Razorpay(options);
+
+    rzp.on("payment.failed", async () => {
+      alert("Payment failed");
+    });
+
+    rzp.open();
+  };
+
 
 
   return (
@@ -209,7 +240,7 @@ const Checkout = () => {
             color="warning"
             sx={{ float: "right", fontSize: 16, px: 6, mb: 4 }}
             disabled={isContinueDisabled}
-            onClick={handlePayment}
+            onClick={handleCheckout}
           >
             Continue to Payment
           </Button>

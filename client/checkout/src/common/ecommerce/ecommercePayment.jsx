@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { useBookingStore } from "store/bookingStore";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
-import { createPaymentOrder, verifyPayment } from "../../apis/payment.js";
+import { createOrder, verifyPayment } from "../../apis/payment.js";
 
 const PaymentPage = () => {
   const { bookingId, setPaymentStatus } = useBookingStore();
@@ -13,7 +13,7 @@ const PaymentPage = () => {
     if (!loaded) return alert("Razorpay SDK failed");
 
     // ✅ Create Razorpay order
-    const { data } = await createPaymentOrder(bookingId);
+    const { data } = await createOrder(bookingId);
 
     const options = {
       key: process.env.RAZORPAY_KEY_ID,

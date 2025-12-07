@@ -3,8 +3,20 @@ const { merge } = require("webpack-merge");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
 const packageDeps = require("../package.json").dependencies;
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const path = require("path");
+const dotenv = require("dotenv");
+const env = dotenv.config({
+  path: path.resolve(__dirname, "../.env.production"),
+}).parsed;
+
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
+
+console.log("envKeys", envKeys);
 
 const prodConfig = {
   mode: "production",
@@ -14,7 +26,7 @@ const prodConfig = {
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      chunks: "all",
     },
     minimize: true,
     minimizer: [
@@ -27,16 +39,17 @@ const prodConfig = {
     ],
   },
   plugins: [
+    new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
       name: "auth",
       filename: "remoteEntry.js",
       remotes: {
-        store: 'store@https://store.metacook.in/remoteEntry.js',
+        store: "store@https://store.metacook.in/remoteEntry.js",
       },
       exposes: {
         "./AuthApp": "./src/bootstrap",
-        "./loginSummary": './src/common/loginSummary',
-        "./addressForm": './src/common/addressForm',
+        "./loginSummary": "./src/common/loginSummary",
+        "./addressForm": "./src/common/addressForm",
       },
       shared: packageDeps,
     }),
