@@ -35,4 +35,4 @@ jobs:
       - name: Injecting Secrets
         run: |
           touch server/.env
-          echo "${{ secrets.PROD_ENV_SECRETS }}" > server/.env
+          echo "${{ secrets.PROD_BACKEND_ENV_SECRETS }}" > server/.env
