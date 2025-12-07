@@ -40,6 +40,7 @@ const allowedOrigins = [
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
+    console.log("Frontend Origin:", origin);
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
@@ -50,7 +51,6 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
 };
 
 // 🔥 context must be defined HERE, not inside ApolloServer()
@@ -63,7 +63,7 @@ app.use(
       const { authorization } = req.headers;
       if (authorization) {
         try {
-          const userId = jwt.verify(authorization, "SECRET");
+          const userId = jwt.verify(authorization, process.env.JWT_SECRET);
           return { redis, userId };
         } catch (err) {
           console.error("JWT error:", err.message);

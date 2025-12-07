@@ -40,7 +40,7 @@ const UserResolver = {
         if (!isSame) {
           throw new Error("Incorrect Credientials");
         } else {
-          token = jwt.sign({ userId: isUserExist._id }, "SECRET");
+          token = jwt.sign({ userId: isUserExist._id }, process.env.JWT_SECRET);
           return {
             token,
           };
