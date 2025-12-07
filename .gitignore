@@ -7,6 +7,10 @@
 /*/.DS_store
 /.DS_store
 /*/*/yarn.lock
-/server/.env
+/*/*/.env
+*.env
+*.env.production
+**/.env
+**/.env.production
 /metacook.in.key
 /metacook.in.pem
