@@ -5,17 +5,29 @@ const commonConfig = require("./webpack.common");
 const packageDeps = require("../package.json").dependencies;
 const path = require("path");
 const dotenv = require("dotenv");
-// Load .env.production (or .env.prod)
-const env = dotenv.config({
-  path: path.resolve(__dirname, "../.env.production"),
-}).parsed;
 
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next]);
-  return prev;
+// Load .env.production ONLY if it exists (local dev)
+const envFile = path.resolve(__dirname, "../.env.production");
+const fileEnv = dotenv.config({ path: envFile }).parsed || {};
+
+// Merge process.env (CI) + file-based env
+const finalEnv = {
+  ...fileEnv,
+  ...process.env, // ✅ GitHub Actions injects here
+};
+
+// Pick ONLY allowed frontend vars
+const ALLOWED_KEYS = [
+  "API_BASE_URL",
+  "RAZORPAY_KEY_ID",
+];
+
+const envKeys = ALLOWED_KEYS.reduce((acc, key) => {
+  if (finalEnv[key]) {
+    acc[`process.env.${key}`] = JSON.stringify(finalEnv[key]);
+  }
+  return acc;
 }, {});
-
-console.log("envKeys", envKeys);
 
 const prodConfig = {
   mode: "production",

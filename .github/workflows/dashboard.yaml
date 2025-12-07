@@ -18,7 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm install
-      - run: npm run build
+      
+      - name: Build Dashboard MF
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+        run: npm run build
 
       - name: Deploy to S3
         uses: shinyinc/action-aws-cli@v1.2
