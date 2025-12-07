@@ -1,11 +1,11 @@
 import express from "express";
+const router = express.Router();
 import crypto from "crypto";
 import FlightPrice from "../../models/flights/flightPrice.js";
 import Booking from "../../models/flights/booking.js";
 import offersData from "./../offerdata.js";
 import { applyPromoToPrice } from "../../services/flights/pricing.js"
-
-const router = express.Router();
+import { razorpay } from "../../razorpayService.js";
 
 router.get("/", async (req,res) => {
   const { source, destination, date, providerFlightId, passengerName, email, phone, promo, paymentMethod } = req.body;

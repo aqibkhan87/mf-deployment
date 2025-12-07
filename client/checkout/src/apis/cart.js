@@ -14,7 +14,7 @@ export const addToCart = async (products = []) => {
       quantity: product.quantity,
     };
   });
-  const response = await httpRequest("post", `/api/ecommerce/add-to-cart`, {
+  const response = await httpRequest("post", `/api/ecommerce/cart`, {
     products: items,
     userId,
     cartId,
@@ -28,7 +28,7 @@ export const getCart = async () => {
   const cartId = localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "anonymous";
-  const response = await httpRequest("get", `/api/ecommerce/get-cart/${cartId}`);
+  const response = await httpRequest("get", `/api/ecommerce/cart/${cartId}`);
   if (response?.data && response?.status === 200) {
     useCartStore.setState((state) => ({
       ...state,
@@ -42,7 +42,7 @@ export const updateInCart = async (products) => {
   const cartId = localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "anonymous";
-  const response = await httpRequest("put", `/api/ecommerce/update-cart`, {
+  const response = await httpRequest("put", `/api/ecommerce/cart/update`, {
     products,
     cartId,
   });
@@ -50,3 +50,6 @@ export const updateInCart = async (products) => {
     getCart();
   }
 };
+
+export const createBooking = (payload) =>
+  axios.post("/api/ecommerce/bookings/create", payload);

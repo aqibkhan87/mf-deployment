@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Grid, Button, Chip } from "@mui/material";
 import { useAuthStore } from "store/authStore";
-import { useBookingStore } from "store/bookingStore";
-import OrderSummary from "../common/orderSummary.jsx";
-import CheckoutItems from "../common/checkout.jsx";
-import { eventEmitter } from "../utils/helper.js";
+import OrderSummary from "../../common/ecommerce/orderSummary.jsx";
+import CheckoutItems from "../../common/ecommerce/checkout.jsx";
+import { eventEmitter } from "../../utils/helper.js";
+import { loadRazorpay } from "../../utils/loadRazorpay.js";
 
 const Checkout = () => {
   const { user, address } = useAuthStore();
-  const { selectedFlight, setBookingId } = useBookingStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
@@ -156,43 +155,39 @@ const Checkout = () => {
   };
 
   const handlePayment = async () => {
-    const payload = {
-      providerFlightId: selectedFlight.providerOfferId,
-      source: selectedFlight.segments[0].departureAirport,
-      destination: selectedFlight.segments[0].arrivalAirport,
-      travelDate: selectedFlight.segments[0].departureTime,
+    const loaded = await loadRazorpay();
+    if (!loaded) return alert("Razorpay SDK failed");
 
-      contact: {
-        email: "aqib@test.com",
-        phone: "9999999999",
+    const options = {
+      key: process.env.RAZORPAY_KEY_ID,
+      name: "Flight Booking",
+      order_id: data.order.id,
+      amount: data.order.amount,
+      currency: "INR",
+      handler: async (response) => {
+        // ✅ Verify payment
+        const verifyRes = await verifyPayment({
+          bookingId,
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+        });
+
+        if (verifyRes.data.success) {
+          setPaymentStatus("PAID");
+          history.push("/success");
+        } else {
+          setPaymentStatus("FAILED");
+          alert("Payment verification failed");
+        }
       },
 
-      passengers: [
-        {
-          firstName: "Aqib",
-          lastName: "Khan",
-          age: 28,
-          gender: "M",
-        },
-      ],
-
-      pricing: {
-        basePrice: selectedFlight.basePrice,
-        discountApplied: 0,
-        finalPrice: selectedFlight.totalPrice,
-      },
+      theme: { color: "#2563eb" },
     };
 
-    const { data } = await createBooking(payload);
+    new window.Razorpay(options).open();
+  }
 
-    setBookingId(data.bookingId);
-
-    if (!data.paymentRequired) {
-      navigate("/success");
-    } else {
-      navigate("/payment");
-    }
-  };
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>

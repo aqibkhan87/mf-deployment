@@ -9,7 +9,7 @@ const AuthApp = () => {
   console.log("history", history)
 
   // Base paths that child MFs are mounted under
-  const basePaths = ["/auth", "/product", "/cart", "/checkout"];
+  const basePaths = ["/auth", "/product", "/cart", "/ecommerce", "/flight"];
 
   // Function to get subpath by stripping base path prefix
   const getSubPath = (pathname) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
-import CheckoutApp from "./mfs/CheckoutApp";
-import AuthApp from "./mfs/AuthApp";
+import CheckoutMFApp from "./mfs/CheckoutApp";
+import AuthMFApp from "./mfs/AuthApp";
 import OrdersPage from "./components/order/orderHistory";
 import OrderDetails from "./components/order/orderDetails";
 import MainNav from "./components/mainNav.jsx";
@@ -19,18 +19,19 @@ const App = () => {
         <MainNav />
         <main className="">
           <Switch>
-            <Route path="/auth" component={AuthApp} />
+            <Route path="/auth" component={AuthMFApp} />
+            <Route path="/ecommerce/checkout" component={CheckoutMFApp} />
+            <Route path="/product" component={CheckoutMFApp} />
+            <Route path="/cart" component={CheckoutMFApp} />
+            <Route path="/ecommerce-payment" component={CheckoutMFApp} />
+            <Route path="/flight-payment" component={CheckoutMFApp} />
+            <Route path="/passenger-edit" component={CheckoutMFApp} />
+            <Route path="/addons" component={CheckoutMFApp} />
             <Route path="/dashboard" component={DashboardPage} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/order/:orderid" component={OrderDetails} />
-            <Route path="/checkout" component={CheckoutApp} />
-            <Route path="/product" component={CheckoutApp} />
-            <Route path="/cart" component={CheckoutApp} />
-            <Route path="/" component={DashboardPage} />
             <Route path="/flight-search" component={FlightResults} />
-            <Route path="/passenger-edit" component={PassengerEdit} />
-            <Route path="/payment" component={PassengerEdit} />
-            <Route path="/addons" component={AddonsPage} />
+            <Route path="/" component={DashboardPage} />
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
           <AuthComponents />

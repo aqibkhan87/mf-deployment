@@ -1,8 +1,8 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { useBookingStore } from "store/bookingStore";
-import { loadRazorpay } from "../utils/loadRazorpay.js";
-import { createPaymentOrder, verifyPayment } from "../apis/payment.js";
+import { loadRazorpay } from "../../utils/loadRazorpay.js";
+import { createPaymentOrder, verifyPayment } from "../../apis/payment.js";
 
 const PaymentPage = () => {
   const { bookingId, setPaymentStatus } = useBookingStore();

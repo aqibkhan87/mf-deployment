@@ -15,8 +15,8 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
-import { updateQuantity } from "../utils/helper";
-import { getCart, updateInCart } from "../apis/cart";
+import { updateQuantity } from "../../utils/helper";
+import { getCart, updateInCart } from "../../apis/cart";
 
 const Cart = () => {
   const history = useHistory();
@@ -60,6 +60,11 @@ const Cart = () => {
   useEffect(() => {
     getCart();
   }, []);
+
+  const navigateToCheckout = () => {
+
+    history.push("/ecommerce/checkout");
+  }
 
   return (
     <Grid item xs={12} md={7}>
@@ -204,7 +209,7 @@ const Cart = () => {
         variant="contained"
         color="warning"
         sx={{ float: "right", my: 8, fontSize: 18 }}
-        onClick={() => history.push("/checkout")}
+        onClick={navigateToCheckout}
       >
         PLACE ORDER
       </Button>

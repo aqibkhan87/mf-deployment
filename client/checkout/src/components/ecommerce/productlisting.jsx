@@ -16,7 +16,7 @@ import {
   Rating,
 } from "@mui/material";
 import { useProductStore } from "store/productStore";
-import { getProductByCategory } from "../apis/products.js";
+import { getProductByCategory } from "../../apis/products.js";
 
 const ProductListing = () => {
   const { categoryid } = useParams();
@@ -100,7 +100,7 @@ const ProductListing = () => {
         <Grid container spacing={2}>
           {products?.map((p, i) => (
             <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
-              <a onClick={(e) => navigateToProductDetail(e, p)}>
+              <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer">
                 <Card sx={{ height: "100%" }}>
                   <CardMedia
                     component="img"
