@@ -124,7 +124,7 @@ async function fetchTodayFlights() {
   console.log("🔍 Fetching today's flights...", todayUTC);
   await fetchFlightsForDate(todayUTC);
 
-  console.log("✅ All routes processed");
+  console.log("✅ All routes processed now at:->", todayUTC);
 }
 
 export default fetchTodayFlights;
