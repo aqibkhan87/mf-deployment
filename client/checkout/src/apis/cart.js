@@ -52,5 +52,19 @@ export const updateInCart = async (products) => {
   }
 };
 
+export const removeItemFromCart = async (productId) => {
+  const cartId = localStorage.getItem("cartId")
+    ? JSON.parse(localStorage.getItem("cartId"))
+    : "";
+
+  const response = await httpRequest(
+    "delete",
+    `/api/ecommerce/cart/${cartId}/product/${productId}`
+  );
+  if (response?.data && response?.status === 200) {
+    getCart();
+  }
+};
+
 export const createBooking = (payload) =>
   axios.post("/api/ecommerce/bookings/create", payload);

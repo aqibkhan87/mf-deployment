@@ -2,7 +2,7 @@
 import express from "express";
 import crypto from "crypto";
 import { razorpay } from "../razorpayService.js";
-import Cart from "../models/ecommerce/e-cart.js";
+import CartModel from "../models/ecommerce/e-cart.js";
 import EcommercePayment from "../models/ecommerce/e-payment.js";
 
 const router = express.Router();
@@ -15,7 +15,7 @@ router.post("/create", async (req, res) => {
     const { entityId } = req.body;
     console.log("Create order called with entityId:", entityId);
     
-    const cart = await Cart.findOne({ _id: entityId });
+    const cart = await CartModel.findOne({ _id: entityId });
     console.log("cart called with cart:", cart);
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
@@ -115,7 +115,7 @@ router.post("/verify", async (req, res) => {
 ============================= */
 async function markSuccess(type, id, payment) {
   if (type === "ECOMMERCE") {
-    await Cart.findByIdAndUpdate(id, {
+    await CartModel.findByIdAndUpdate(id, {
       "payment.status": "PAID",
       "payment.razorpay_payment_id": payment.razorpay_payment_id,
       "payment.paidAt": new Date(),
@@ -135,7 +135,7 @@ async function markSuccess(type, id, payment) {
 
 async function markFailed(type, id) {
   if (type === "ECOMMERCE") {
-    await Cart.findByIdAndUpdate(id, { "payment.status": "FAILED" });
+    await CartModel.findByIdAndUpdate(id, { "payment.status": "FAILED" });
   }
   if (type === "FLIGHT") {
     await Booking.findByIdAndUpdate(id, {

@@ -16,7 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
 import { updateQuantity } from "../../utils/helper";
-import { getCart, updateInCart } from "../../apis/cart";
+import { getCart, updateInCart, removeItemFromCart } from "../../apis/cart";
 import { addToWishlist } from "../../apis/wishlist";
 
 const Cart = () => {
@@ -71,17 +71,13 @@ const Cart = () => {
   const handleAddToWishlist = (e, product) => {
     e.stopPropagation();
     e.preventDefault();
-    // Implement add to wishlist functionality here
-    console.log("Add to wishlist:", product);
-    debugger
     addToWishlist(product?.productDetail?._id);
   }
 
   const handleRemoveItemFromCart = (e, product) => {
     e.stopPropagation();
     e.preventDefault();
-    // Implement remove from cart functionality here
-    console.log("Remove from cart:", product);
+    removeItemFromCart(product?.productDetail?._id);
   }
   return (
     <Grid item xs={12} md={7}>

@@ -98,6 +98,7 @@ apiRouter.get("/:cartId", async (req, res) => {
         cartCount += item?.quantity;
       });
     }
+    cart = calculateCartSummary(cart);
 
     res.json({
       cart: cart,
@@ -173,6 +174,70 @@ apiRouter.put("/update-userid-in-cart", async (req, res) => {
     // Optionally populate products.productDetail before returning
     console.log("user Id updated ", cart);
     res.json({ cart });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+apiRouter.delete("/:cartId/product/:productId", async (req, res) => {
+  try {
+    const { cartId, productId } = req.params;
+
+    if (!cartId || !productId) {
+      return res.status(400).json({ error: "Invalid cart or product id" });
+    }
+
+    const cart = await CartModel.findById(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    // ✅ Remove product
+    cart.products = cart.products.filter(
+      (item) => item?.productDetail?.toString() !== productId
+    );
+
+    // ✅ Recalculate totals
+    let cartCount = 0;
+    let totalAmount = 0;
+    let totalActual = 0;
+
+    for (const item of cart?.products) {
+      const product = await ProductModel.findById(item.productDetail);
+      if (!product) continue;
+
+      cartCount += item.quantity;
+
+      const actualPrice = Number(product.actualPrice || product.price);
+      const sellingPrice = Number(product.discountedPrice || product.price);
+
+      totalActual += actualPrice * item.quantity;
+      totalAmount += sellingPrice * item.quantity;
+    }
+
+    cart.totalActual = totalActual.toFixed(2);
+    cart.totalAmount = totalAmount.toFixed(2);
+    cart.savedAmount = (totalActual - totalAmount).toFixed(2);
+
+    // ✅ If cart empty → delete cart (recommended)
+    if (cart.products.length === 0) {
+      await CartModel.findByIdAndDelete(cartId);
+      return res.json({
+        success: true,
+        cart: null,
+        cartCount: 0,
+      });
+    }
+
+    await cart.save();
+
+    res.json({
+      success: true,
+      cart,
+      cartCount,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

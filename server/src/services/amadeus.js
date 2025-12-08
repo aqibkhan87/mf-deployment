@@ -106,25 +106,15 @@ async function fetchFlightsForDate(date) {
   }
 }
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-
-function getISTTodayUTC() {
-  const nowUTC = new Date();
-  const nowIST = new Date(nowUTC.getTime() + IST_OFFSET_MS);
-
-  nowIST.setHours(0, 0, 0, 0); // start of IST day
-
-  return new Date(nowIST.getTime());
-}
-
 // Main: fetch today and tomorrow
 async function fetchTodayFlights() {
-  const todayUTC = getISTTodayUTC()
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() + 1);
 
-  console.log("🔍 Fetching today's flights...", todayUTC);
-  await fetchFlightsForDate(todayUTC);
+  console.log("🔍 Fetching today's flights...", date);
+  await fetchFlightsForDate(date);
 
-  console.log("✅ All routes processed now at:->", todayUTC);
+  console.log("✅ All routes processed now at:->", date);
 }
 
 export default fetchTodayFlights;
