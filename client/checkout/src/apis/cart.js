@@ -5,8 +5,8 @@ export const addToCart = async (products = []) => {
   const cartId = localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "";
-  const userId = localStorage.getItem("userId")
-    ? JSON.parse(localStorage.getItem("userId"))
+  const userId = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))?._id
     : "anonymous";
   let items = products?.map((product) => {
     return {

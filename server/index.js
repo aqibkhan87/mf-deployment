@@ -61,7 +61,8 @@ app.use(
   expressMiddleware(server, {
     context: async ({ req }) => {
       const { authorization } = req.headers;
-      if (authorization) {
+      const token = authorization?.split(" ")[1];
+      if (token?.trim() !== "" && token !== undefined && token !== null) {
         try {
           const userId = jwt.verify(authorization, process.env.JWT_SECRET);
           return { redis, userId };

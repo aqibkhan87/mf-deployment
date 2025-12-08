@@ -4,9 +4,11 @@ import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
+import { useWishlistStore } from "store/wishlistStore";
 
 const MainNav = () => {
-  const { cartCount, wishlistCount, setCartId } = useCartStore();
+  const { cartCount, setCartId } = useCartStore();
+  const { wishlistCount } = useWishlistStore();
   const { user, setUser } = useAuthStore();
 
   const handleLogOut = (e) => {
@@ -69,7 +71,7 @@ const MainNav = () => {
             </Link>
           </Button>
           <Button className="text-black">
-            <Link to="/product/wishlist">
+            <Link to="/wishlist">
               <Badge
                 badgeContent={wishlistCount}
                 color="error"

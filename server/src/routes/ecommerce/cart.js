@@ -7,33 +7,48 @@ import { calculateCartSummary } from "../../utils/helper.js";
 
 apiRouter.post("/", async (req, res) => {
   try {
-    const { userId, cartId = "", products } = req.body;
-    if (!Array.isArray(products) || products?.length === 0) {
-      return res.status(400).json({ error: "No products provided." });
+    const { userId = null, cartId = null, products = [] } = req.body;
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ error: "No products provided" });
     }
-    // Find or create cart
+
     let cart = null;
-    if (cartId?.length) {
-      cart = await CartModel.findOne({ _id: cartId, userId });
-      console.log("rexisting cart", cart);
+
+    // 1️⃣ Try finding cart by cartId
+    if (cartId) {
+      cart = await CartModel.findById(cartId);
     }
+
+    // 2️⃣ If cart not found & user logged in → find by userId
+    if (!cart && userId) {
+      cart = await CartModel.findOne({ userId });
+    }
+
+    // 3️⃣ If still not found → create new cart
     if (!cart) {
-      cart = new CartModel({ userId, products });
-      console.log("new cart", cart);
-      await cart.save();
+      cart = new CartModel({
+        userId: userId || "anonymous",
+        products: [],
+      });
     }
+
+    // 4️⃣ If cart was anonymous and user just logged in → attach user
+    if (!cart.userId && userId) {
+      cart.userId = userId;
+    }
+
     // Initialize totals
     let totalAmount = 0;
     let totalActual = 0;
 
+    // 5️⃣ Add / update products
     for (const { _id, quantity = 1 } of products) {
-      // Fetch product details
       const product = await ProductModel.findById(_id);
-      if (!product) continue; // skip missing
+      if (!product) continue;
 
-      // Check if product is already in cart
-      const index = cart?.products?.findIndex((item) =>
-        item?.productDetail?._id?.toString() === _id
+      const index = cart.products.findIndex(
+        (item) => item.productDetail.toString() === _id
       );
       if (index > -1) {
         cart.products[index].quantity = quantity;
@@ -45,10 +60,6 @@ apiRouter.post("/", async (req, res) => {
       }
       const actualPrice = Number(product.actualPrice) || 0;
 
-      // Calculate discounted price depending on your discount field format
-      let discountedPrice = actualPrice;
-      discountedPrice = Number(product.discountedPrice);
-
       totalActual += actualPrice * quantity;
       totalAmount += product.price * quantity;
     }
@@ -59,7 +70,9 @@ apiRouter.post("/", async (req, res) => {
     await cart.save();
 
     res.json({
+      success: true,
       cartId: cart._id,
+      cart,
     });
   } catch (err) {
     console.error(err);

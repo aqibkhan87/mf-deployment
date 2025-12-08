@@ -18,6 +18,7 @@ const prodConfig = {
         "./cartStore": "./src/store/ecommerce/cartStore.js",
         "./orderStore": "./src/store/ecommerce/orderStore.js",
         "./productStore": "./src/store/ecommerce/productStore.js",
+        "./wishlistStore": "./src/store/ecommerce/wishlistStore.js",
         "./bookingStore": "./src/store/flights/bookingStore.js",
       },
       shared: packageDeps,

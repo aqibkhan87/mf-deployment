@@ -3,12 +3,14 @@ const apiRouter = express.Router();
 
 import cartRoutes from "./cart.js";
 import productRoutes from "./product.js";
-import productCategoryRoutes from "./productCategory.js";
+import wishlistRoutes from "./wishlist.js";
 import orderBookingRoutes from "./orderBooking.js";
+import productCategoryRoutes from "./productCategory.js";
 
 apiRouter.use("/cart", cartRoutes);
 apiRouter.use("/product", productRoutes);
-apiRouter.use("/product-category", productCategoryRoutes);
+apiRouter.use("/wishlist", wishlistRoutes);
 apiRouter.use("/order-booking", orderBookingRoutes);
+apiRouter.use("/product-category", productCategoryRoutes);
 
 export default apiRouter;

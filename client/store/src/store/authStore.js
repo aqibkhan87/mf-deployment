@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
 export const useAuthStore = create((set, get) => ({
-  user: JSON.parse(localStorage.getItem("user")) || {},
-  token: JSON.parse(localStorage.getItem("token")) || "",
-  address: JSON.parse(localStorage.getItem("address")) || "",
+  user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {},
+  token: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : "",
+  address: localStorage.getItem("address") ? JSON.parse(localStorage.getItem("address")) : "",
   theme: "light",
   settings: {},
 

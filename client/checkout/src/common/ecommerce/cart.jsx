@@ -17,6 +17,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
 import { updateQuantity } from "../../utils/helper";
 import { getCart, updateInCart } from "../../apis/cart";
+import { addToWishlist } from "../../apis/wishlist";
 
 const Cart = () => {
   const history = useHistory();
@@ -72,6 +73,8 @@ const Cart = () => {
     e.preventDefault();
     // Implement add to wishlist functionality here
     console.log("Add to wishlist:", product);
+    debugger
+    addToWishlist(product?.productDetail?._id);
   }
 
   const handleRemoveItemFromCart = (e, product) => {

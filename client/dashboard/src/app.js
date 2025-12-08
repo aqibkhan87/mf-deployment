@@ -4,10 +4,9 @@ import CheckoutMFApp from "./mfs/CheckoutApp";
 import AuthMFApp from "./mfs/AuthApp";
 import OrdersPage from "./components/order/orderHistory";
 import OrderDetails from "./components/order/orderDetails";
+import ProductWishlisting from "./components/wishlist/wishlistPage.jsx";
 import MainNav from "./components/mainNav.jsx";
-import AddonsPage from "./booking/addons.jsx";
 import FlightResults from "./booking/flightSearch.jsx";
-import PassengerEdit from "./booking/passenger-edit.jsx";
 import DashboardPage from "./components/dashboard/dashboard.jsx";
 import AuthComponents from "./components/common-mfs-components/auth/index.jsx";
 import CheckoutComponents from "./components/common-mfs-components/checkout/index.jsx";
@@ -28,6 +27,7 @@ const App = () => {
             <Route path="/passenger-edit" component={CheckoutMFApp} />
             <Route path="/addons" component={CheckoutMFApp} />
             <Route path="/dashboard" component={DashboardPage} />
+            <Route path="/wishlist" component={ProductWishlisting} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/order/:orderid" component={OrderDetails} />
             <Route path="/flight-search" component={FlightResults} />
