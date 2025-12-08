@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -8,7 +9,6 @@ import {
   Button,
   IconButton,
   Chip,
-  Card,
   CardMedia,
 } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -17,9 +17,9 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useCartStore } from "store/cartStore";
 import { getCart, updateInCart } from "../../apis/cart";
 import { updateQuantity } from "../../utils/helper";
-// import { addQuantity, subtractQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {
+  const history = useHistory();
   const { cart } = useCartStore();
 
   useEffect(() => {
@@ -27,7 +27,9 @@ const CheckoutItems = () => {
   }, []);
 
   const navigateToProduct = (product) => {
-    history.push(`/product/${product?.categoryid}/${product?.id}`);
+    const productId = product?.productDetail?._id;
+    const categoryId = product?.productDetail?.categoryid;
+    history.push(`/product/${categoryId}/${productId}`);
   };
 
   const addItemQuantity = (categoryid, productid) => {
@@ -84,7 +86,6 @@ const CheckoutItems = () => {
           container
           spacing={2}
           key={ind}
-          onClick={() => navigateToProduct(product)}
         >
           <Grid item xs={2.2}>
             <CardMedia
@@ -98,10 +99,17 @@ const CheckoutItems = () => {
               }}
               image={product?.productDetail?.productImage}
               alt={product?.productDetail?.name}
+              onClick={() => navigateToProduct(product)}
+              className="cursor-pointer"
             />
           </Grid>
           <Grid item xs={9.8}>
-            <Typography sx={{ fontWeight: 600 }}>{product?.productDetail?.name}</Typography>
+            <Typography sx={{ fontWeight: 600 }}
+              onClick={() => navigateToProduct(product)}
+              className="cursor-pointer"
+            >
+              {product?.productDetail?.name}
+            </Typography>
             <Typography variant="body2" color="text.secondary">
               Size: {product?.productDetail?.size}, {product?.productDetail?.color}
             </Typography>

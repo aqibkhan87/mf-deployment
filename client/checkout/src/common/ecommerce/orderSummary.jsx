@@ -5,7 +5,6 @@ import { useCartStore } from "store/cartStore";
 const OrderSummary = () => {
   const { cart } = useCartStore();
 
-  // console.log("cart in order Summary", cart)
   return (
     <Grid item xs={12} md={4}>
       <Paper sx={{ p: 3 }}>

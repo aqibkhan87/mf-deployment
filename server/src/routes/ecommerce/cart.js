@@ -12,9 +12,9 @@ apiRouter.post("/", async (req, res) => {
       return res.status(400).json({ error: "No products provided." });
     }
     // Find or create cart
-    let cart = "";
+    let cart = null;
     if (cartId?.length) {
-      cart = await CartModel.findOne({ cartId, userId }).populate("products");
+      cart = await CartModel.findOne({ _id: cartId, userId });
       console.log("rexisting cart", cart);
     }
     if (!cart) {
@@ -26,32 +26,31 @@ apiRouter.post("/", async (req, res) => {
     let totalAmount = 0;
     let totalActual = 0;
 
-    for (const { productDetail, quantity = 1 } of products) {
+    for (const { _id, quantity = 1 } of products) {
       // Fetch product details
-      const product = await ProductModel.findById(productDetail?._id);
-      console.log("product product", product);
+      const product = await ProductModel.findById(_id);
       if (!product) continue; // skip missing
 
       // Check if product is already in cart
       const index = cart?.products?.findIndex((item) =>
-        item?._id?.equals(product?.productDetail?._id)
+        item?.productDetail?._id?.toString() === _id
       );
       if (index > -1) {
-        cart.products[index].quantity += quantity;
+        cart.products[index].quantity = quantity;
       } else {
         cart.products.push({
-          productId: product._id,
+          productDetail: product._id,
           quantity,
         });
       }
-      const actualPrice = Number(productDetail.actualPrice) || 0;
+      const actualPrice = Number(product.actualPrice) || 0;
 
       // Calculate discounted price depending on your discount field format
       let discountedPrice = actualPrice;
-      discountedPrice = Number(productDetail.discountedPrice);
+      discountedPrice = Number(product.discountedPrice);
 
       totalActual += actualPrice * quantity;
-      totalAmount += productDetail.price * quantity;
+      totalAmount += product.price * quantity;
     }
     cart.totalAmount = totalAmount.toFixed(2);
     cart.totalActual = totalActual.toFixed(2);
@@ -75,7 +74,7 @@ apiRouter.get("/:cartId", async (req, res) => {
     // console.log("carttttt", cartId);
     let cart = {};
     let cartCount = 0;
-    if (cartId === "anonymous") {
+    if (cartId === "") {
       throw new Error("Invalid cart Id provided.");
     } else if (cartId) {
       cart = await CartModel.findOne({ _id: cartId }).populate(
@@ -101,7 +100,7 @@ apiRouter.put("/update", async (req, res) => {
   try {
     const { cartId, products } = req.body;
 
-    if (!cartId || cartId === "anonymous") {
+    if (!cartId || cartId === "") {
       return res.status(400).json({ error: "Valid cart Id required." });
     }
 

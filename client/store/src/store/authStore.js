@@ -1,9 +1,8 @@
-// Zustand singleton store for auth/theme/settings
 import { create } from "zustand";
 
-console.log("Inside Store");
 export const useAuthStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem("user")) || {},
+  token: JSON.parse(localStorage.getItem("token")) || "",
   address: JSON.parse(localStorage.getItem("address")) || "",
   theme: "light",
   settings: {},
@@ -21,7 +20,8 @@ export const useAuthStore = create((set, get) => ({
     let updatedAddress = `${name}, ${addressField}, ${locality}, ${city}, ${pincode}, ${mobile}`;
     set(updatedAddress);
   },
-  logout: () => set({ user: null }),
+  logout: () => set({ user: null, }),
+  setToken: (token) => set({ token }),
   // toggleTheme: () =>
   //   set((s) => ({ theme: s.theme === "light" ? "dark" : "light" })),
 

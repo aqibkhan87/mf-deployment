@@ -24,7 +24,9 @@ const Cart = () => {
 
   // console.log("cartrtttrtr in cart", cart);
   const navigateToProduct = (product) => {
-    history.push(`/product/${product?.categoryid}/${product?._id}`);
+    const productId = product?.productDetail?._id;
+    const categoryId = product?.productDetail?.categoryid;
+    history.push(`/product/${categoryId}/${productId}`);
   };
 
   const addItemQuantity = (categoryid, productid) => {
@@ -62,10 +64,22 @@ const Cart = () => {
   }, []);
 
   const navigateToCheckout = () => {
-
     history.push("/ecommerce/checkout");
   }
 
+  const handleAddToWishlist = (e, product) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // Implement add to wishlist functionality here
+    console.log("Add to wishlist:", product);
+  }
+
+  const handleRemoveItemFromCart = (e, product) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // Implement remove from cart functionality here
+    console.log("Remove from cart:", product);
+  }
   return (
     <Grid item xs={12} md={7}>
       <Typography variant="h5" gutterBottom>
@@ -117,7 +131,6 @@ const Cart = () => {
           <Box
             key={i}
             sx={{ display: "flex", mb: 2 }}
-            onClick={() => navigateToProduct(product)}
           >
             <CardMedia
               component="img"
@@ -130,6 +143,8 @@ const Cart = () => {
               }}
               image={product?.productDetail?.productImage}
               alt={product?.productDetail?.name}
+              onClick={() => navigateToProduct(product)}
+              className="cursor-pointer"
             />
             <Box
               sx={{
@@ -139,7 +154,9 @@ const Cart = () => {
               }}
             >
               <CardContent sx={{ pb: 1 }}>
-                <Typography variant="h6" noWrap>
+                <Typography variant="h6" noWrap
+                  onClick={() => navigateToProduct(product)}
+                  className="cursor-pointer">
                   {product?.productDetail?.name}
                 </Typography>
                 <Typography color="text.secondary">
@@ -191,11 +208,19 @@ const Cart = () => {
                 >
                   <AddIcon />
                 </IconButton>
-                <Button sx={{ ml: 2 }} size="small">
-                  SAVE FOR LATER
+                <Button
+                  sx={{ ml: 2 }}
+                  size="small"
+                  onClick={(e) => handleAddToWishlist(e, product)}>
+                  Add To Wishlist
                 </Button>
-                <Button sx={{ ml: 2 }} color="error" size="small">
-                  REMOVE
+                <Button
+                  sx={{ ml: 2 }}
+                  color="error"
+                  size="small"
+                  onClick={(e) => handleRemoveItemFromCart(e, product)}
+                >
+                  Remove
                 </Button>
               </Box>
             </Box>

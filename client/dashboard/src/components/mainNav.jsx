@@ -6,13 +6,17 @@ import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 
 const MainNav = () => {
-  const { cartCount, wishlistCount } = useCartStore();
+  const { cartCount, wishlistCount, setCartId } = useCartStore();
   const { user, setUser } = useAuthStore();
 
   const handleLogOut = (e) => {
     e.preventDefault();
     localStorage.setItem("user", JSON.stringify({}));
+    localStorage.setItem("cartId", "");
+    localStorage.setItem("token", "");
+    localStorage.setItem("address", "");
     setUser({});
+    setCartId("");
   };
 
   return (
