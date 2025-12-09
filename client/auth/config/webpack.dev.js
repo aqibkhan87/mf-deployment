@@ -38,7 +38,7 @@ const devConfig = {
       name: "auth",
       filename: "remoteEntry.js",
       remotes: {
-        store: "store@http://localhost:8083/remoteEntry.js",
+        store: `store@http://localhost:8083/remoteEntry.js?v=${Date.now()}`,
       },
       exposes: {
         "./AuthApp": "./src/bootstrap",

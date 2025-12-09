@@ -31,9 +31,9 @@ const devConfig = {
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
       remotes: {
-        auth: "auth@http://localhost:8081/remoteEntry.js",
-        checkout: "checkout@http://localhost:8082/remoteEntry.js",
-        store: "store@http://localhost:8083/remoteEntry.js",
+        auth: `auth@http://localhost:8081/remoteEntry.js?v=${Date.now()}`,
+        checkout: `checkout@http://localhost:8082/remoteEntry.js?v=${Date.now()}`,
+        store: `store@http://localhost:8083/remoteEntry.js?v=${Date.now()}`,
       },
       shared: packageDeps,
     }),

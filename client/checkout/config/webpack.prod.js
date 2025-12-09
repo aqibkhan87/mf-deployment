@@ -41,7 +41,7 @@ const prodConfig = {
       name: "checkout",
       filename: "remoteEntry.js",
       remotes: {
-        store: "store@https://store.metacook.in/remoteEntry.js",
+        store: `store@https://store.metacook.in/remoteEntry.jsv=${Date.now()}`,
       },
       exposes: {
         "./CheckoutApp": "./src/bootstrap",
