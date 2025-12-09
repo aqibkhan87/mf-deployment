@@ -27,7 +27,6 @@ router.get("/", async (req, res) => {
   const [year, month, day] = date.split("-");
   const startDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
   const endDate = new Date(`${year}-${month}-${day}T23:59:59.999Z`);
-  console.log("req.query;req.query;redis", req.query, "redis", redis, day, month, year);
   let record = await FlightPrice.findOne({
     origin: from.toUpperCase(),
     destination: to.toUpperCase(),

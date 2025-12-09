@@ -109,8 +109,6 @@ export default function PassengerDetailsPage() {
     };
 
     const handleSubmit = () => {
-        console.log("Final Passenger Data:", passengers);
-        // TODO: send to backend → /api/bookings/create
         history.push("/addons");
     };
 

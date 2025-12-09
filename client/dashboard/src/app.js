@@ -10,6 +10,7 @@ import FlightResults from "./booking/flightSearch.jsx";
 import DashboardPage from "./components/dashboard/dashboard.jsx";
 import AuthComponents from "./components/common-mfs-components/auth/index.jsx";
 import CheckoutComponents from "./components/common-mfs-components/checkout/index.jsx";
+import AddressList from "./components/address/addressList.jsx";
 
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/addons" component={CheckoutMFApp} />
             <Route path="/dashboard" component={DashboardPage} />
             <Route path="/wishlist" component={ProductWishlisting} />
+            <Route path="/addresses" component={AddressList} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/order/:orderid" component={OrderDetails} />
             <Route path="/flight-search" component={FlightResults} />

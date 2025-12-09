@@ -28,7 +28,6 @@ export const getCart = async () => {
   const cartId = localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "";
-  console.log("Fetching cart for cartId:", cartId);
   const response = await httpRequest("get", `/api/ecommerce/cart/${cartId}`);
   if (response?.data && response?.status === 200) {
     useCartStore.setState((state) => ({

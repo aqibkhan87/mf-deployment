@@ -13,10 +13,7 @@ const router = express.Router();
 router.post("/create", async (req, res) => {
   try {
     const { entityId } = req.body;
-    console.log("Create order called with entityId:", entityId);
-    
     const cart = await CartModel.findOne({ _id: entityId });
-    console.log("cart called with cart:", cart);
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const amount = cart?.totalAmount || 0;
@@ -36,10 +33,7 @@ router.post("/create", async (req, res) => {
 
       return res.json({ skipPayment: true, success: true });
     }
-    console.log(
-      "create sssss s s s. s s. s s s s order called for cart:",
-      cart
-    );
+   
     // ✅ Create payment record
     const payment = await EcommercePayment.create({
       userId: cart.userId,

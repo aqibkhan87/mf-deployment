@@ -9,7 +9,6 @@ import FlightPayment from "./common/flights/flightPayment.jsx";
 
 const App = ({ history }) => {
   
-  console.log("history in Checkout MF APP", history)
   return (
     <Router history={history}>
       <Switch>

@@ -84,7 +84,6 @@ apiRouter.get("/:cartId", async (req, res) => {
   try {
     const { cartId } = req.params;
 
-    // console.log("carttttt", cartId);
     let cart = {};
     let cartCount = 0;
     if (cartId === "") {
@@ -94,7 +93,6 @@ apiRouter.get("/:cartId", async (req, res) => {
         "products.productDetail"
       );
       cart?.products?.forEach((item) => {
-        // console.log("new cart item", item);
         cartCount += item?.quantity;
       });
     }
@@ -130,23 +128,17 @@ apiRouter.put("/update", async (req, res) => {
 
     // Update quantities of specific products
     for (const { _id, quantity } of products) {
-      console.log(quantity, "cart", cart, "_id", _id);
       if (quantity < 1) continue; // optionally skip invalid quantities
       const index = cart?.products?.findIndex(
         (item) => item?.productDetail?._id?.toString() === _id // Depending on your schema
       );
-      console.log("indexindex", index);
       if (index > -1) {
         cart.products[index].quantity = quantity;
       }
     }
 
     cart = calculateCartSummary(cart);
-    console.log("summary saved cart", cart);
     await cart.save();
-
-    // Optionally populate products.productDetail before returning
-    console.log("cart updated ", cart);
     res.json({ cart });
   } catch (err) {
     console.error(err);
@@ -172,7 +164,6 @@ apiRouter.put("/update-userid-in-cart", async (req, res) => {
       return res.json(200).json({ message: "User Id updated." });
 
     // Optionally populate products.productDetail before returning
-    console.log("user Id updated ", cart);
     res.json({ cart });
   } catch (err) {
     console.error(err);

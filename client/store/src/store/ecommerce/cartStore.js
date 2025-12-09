@@ -1,8 +1,6 @@
 // Zustand singleton store for auth/theme/settings
 import { create } from "zustand";
 
-console.log("Inside Cart Store");
-
 export const useCartStore = create((set, get) => ({
   cart: localStorage.getItem("cart")
     ? JSON.parse(localStorage.getItem("cart"))

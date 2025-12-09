@@ -42,7 +42,6 @@ function FlightResults() {
         try {
             setLoading(true);
             const res = await searchFlights(searchData);
-            console.log("Flight search results:", res);
             setFlights(res?.flights || {});
         } catch (err) {
             console.error("Search failed:", err);

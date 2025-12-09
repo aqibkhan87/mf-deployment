@@ -22,7 +22,6 @@ import bannerImage from "../../assets/images/booking-banner.png";
 export default function DashboardPage() {
   const { allCategories } = useProductStore();
   const history = useHistory();
-  console.log("allCategories 123", allCategories);
 
   const navigateToProductCategory = (e, sec) => {
     e.preventDefault();
@@ -35,32 +34,7 @@ export default function DashboardPage() {
 
   return (
     <Box className="dashboard-page">
-      {/* 🔹 Banner Carousel */}
-      {/* <Box sx={{ mt: 2 }}>
-        <Swiper
-          navigation={true}
-          modules={[Navigation]}
-          spaceBetween={10}
-          slidesPerView={1}
-          loop={true}
-          style={{ height: "300px" }}
-        >
-          <SwiperSlide>
-            <img
-              src="https://picsum.photos/id/1015/1200/300"
-              alt="banner1"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <img
-              src="https://picsum.photos/id/1074/1200/300"
-              alt="banner2"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </SwiperSlide>
-        </Swiper>
-      </Box> */}
+      
       <Box>
         <img src={bannerImage} alt="banner1" className="banner-image" />
         <BookingWidget />

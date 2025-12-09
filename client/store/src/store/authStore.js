@@ -4,6 +4,7 @@ export const useAuthStore = create((set, get) => ({
   user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {},
   token: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : "",
   address: localStorage.getItem("address") ? JSON.parse(localStorage.getItem("address")) : "",
+  addresses: [],
   theme: "light",
   settings: {},
 
@@ -22,9 +23,5 @@ export const useAuthStore = create((set, get) => ({
   },
   logout: () => set({ user: null, }),
   setToken: (token) => set({ token }),
-  // toggleTheme: () =>
-  //   set((s) => ({ theme: s.theme === "light" ? "dark" : "light" })),
-
-  // setSetting: (key, value) =>
-  //   set({ settings: { ...get().settings, [key]: value } }),
+  setAddresses: (addresses) => set({ addresses }),
 }));

@@ -62,9 +62,6 @@ const CheckoutItems = () => {
     updateInCart(existingCartProducts);
   };
 
-  console.log("checkout cart in.  ss", cart);
-
-
   return (
     <Paper sx={{ p: 2, mt: 2, mb: 2 }}>
       {/* ITEMS SUMMARY */}

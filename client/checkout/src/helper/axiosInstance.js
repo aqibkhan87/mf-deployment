@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-console.log("process.env.API_BASE_URL", process.env.API_BASE_URL)
 // Create an Axios instance with base config
 const axiosInstance = axios.create({
   timeout: 10000, // 10 seconds timeout

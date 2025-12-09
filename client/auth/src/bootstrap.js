@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
 import App from "./app";
 
-console.info("Hi Auth MF");
 
 const roots = new Map();
 let history = null;
@@ -12,12 +11,7 @@ const mount = (
   el,
   { updateParentHistory, defaultHistory, initialPath = "/" }
 ) => {
-  console.log(
-    "initialPath - mount",
-    initialPath,
-    "defaultHistory",
-    defaultHistory
-  );
+  
   history =
     defaultHistory ||
     createMemoryHistory({
