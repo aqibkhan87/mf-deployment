@@ -2,8 +2,7 @@ import React from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import CheckoutMFApp from "./mfs/CheckoutApp";
 import AuthMFApp from "./mfs/AuthApp";
-import OrdersPage from "./components/order/orderHistory";
-import OrderDetails from "./components/order/orderDetails";
+import OrdersPage from "./components/order/orderHistory.jsx";
 import ProductWishlisting from "./components/wishlist/wishlistPage.jsx";
 import MainNav from "./components/mainNav.jsx";
 import FlightResults from "./booking/flightSearch.jsx";
@@ -31,7 +30,6 @@ const App = () => {
             <Route path="/wishlist" component={ProductWishlisting} />
             <Route path="/addresses" component={AddressList} />
             <Route path="/order-history" component={OrdersPage} />
-            <Route path="/order/:orderid" component={OrderDetails} />
             <Route path="/flight-search" component={FlightResults} />
             <Route path="/" component={DashboardPage} />
             <Route component={() => <h1>404 Not Found</h1>} />

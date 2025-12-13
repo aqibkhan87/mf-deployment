@@ -34,7 +34,12 @@ const MainNav = () => {
   
   const handleAddress = () => {
     handleCloseMenu();
-    history.push("addresses");
+    history.push("/addresses");
+  };
+  
+  const handleOrder = () => {
+    handleCloseMenu();
+    history.push("/order-history");
   };
 
   const handleLogOut = (e) => {
@@ -137,6 +142,7 @@ const MainNav = () => {
                   <Divider />
 
                   <MenuItem onClick={handleCloseMenu}>User Profile</MenuItem>
+                  <MenuItem onClick={handleOrder}>Orders</MenuItem>
                   <MenuItem onClick={handleAddress}>Addresses</MenuItem>
                   <MenuItem onClick={handleLogOut}>Logout</MenuItem>
                 </Menu>

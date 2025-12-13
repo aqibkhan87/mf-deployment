@@ -7,6 +7,6 @@ export const useAuthStore = () => ({
   settings: {},
 
   setUser: jest.fn(),
-  setNewAddress: jest.fn(),
+  setAddress: jest.fn(),
   logout: jest.fn(),
 });

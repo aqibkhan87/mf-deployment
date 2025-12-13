@@ -4,9 +4,13 @@ import { create } from "zustand";
 console.log("Inside Order Store");
 
 export const useOrderStore = create((set, get) => ({
-  orders: [],
+  orderHistory: [],
+  orderDetails: {},
 
-  addAllOrders: (items) => {
+  getAllOrders: (items) => {
     set({ orders: [...items] });
+  },
+  setOrderDetails: (details) => {
+    set({ orderDetails: { ...details } });
   },
 }));

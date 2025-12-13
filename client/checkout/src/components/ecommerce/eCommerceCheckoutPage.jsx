@@ -7,10 +7,11 @@ import CheckoutItems from "../../common/ecommerce/checkout.jsx";
 import { eventEmitter } from "../../utils/helper.js";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
+import { getAllAddresses } from "../../apis/address.js";
 
 const Checkout = () => {
   const history = useHistory();
-  const { user, address } = useAuthStore();
+  const { user, address, addresses, setAddress } = useAuthStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
@@ -27,6 +28,23 @@ const Checkout = () => {
       setIsEditMode(false);
     }
   }, [isEditMode, user, address]);
+  
+  useEffect(() => {
+    setDefaultAddress();
+  }, [addresses]);
+
+  useEffect(() => {
+      getAllAddresses();
+  }, []);
+
+  const setDefaultAddress = () => {
+    if (addresses?.length) {
+      const defaultAddr = addresses?.find((addr) => addr?.isDefault) || addresses[0];
+      setAddress(defaultAddr)
+    };
+  }
+  console.log("Selected address:", address);
+  console.log("Selected user:", user);
 
   const handleUserInfo = () => {
     const eventData = { openPopup: true, popupType: "login" };

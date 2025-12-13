@@ -1,0 +1,59 @@
+.order-card {
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .order-summary {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    cursor: pointer;
+    background: #fafafa;
+  }
+
+  .order-details {
+    padding: 12px;
+    background: #fff;
+  }
+
+  .product-row {
+    display: flex;
+    gap: 12px;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+  }
+
+  .product-row img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+
+  .price .mrp {
+    text-decoration: line-through;
+    color: #999;
+  }
+
+  .saved {
+    color: green;
+  }
+
+  .order-total {
+    margin-top: 12px;
+  }
+
+  .order-total div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .payable {
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  .status.created {
+    color: orange;
+  }
+}

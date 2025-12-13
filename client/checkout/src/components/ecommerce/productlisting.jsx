@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import {
   Box,
@@ -7,8 +7,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Checkbox,
-  FormControlLabel,
   Slider,
   Divider,
   Button,
@@ -17,12 +15,16 @@ import {
 } from "@mui/material";
 import { useProductStore } from "store/productStore";
 import { getProductByCategory } from "../../apis/products.js";
+import useDebounce from "../../helper/useDebounce.jsx";
 
 const ProductListing = () => {
   const { categoryid } = useParams();
   const history = useHistory();
   const { productsByCategory } = useProductStore();
-  const products = productsByCategory?.products || [];
+  const [ratingFilter, setRatingFilter] = useState(null);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [sortBy, setSortBy] = useState("newest");
+  const debouncedPrice = useDebounce(priceRange, 500);
 
   const navigateToProductDetail = (e, p) => {
     e.preventDefault();
@@ -30,8 +32,23 @@ const ProductListing = () => {
   };
 
   useEffect(() => {
-    if (categoryid) getProductByCategory(categoryid);
+    if (categoryid) getProductByCategory(categoryid, { sortBy });
   }, []);
+
+  useEffect(() => {
+    if (categoryid) {
+      getProductByCategory(categoryid, {
+        minPrice: debouncedPrice[0],
+        maxPrice: debouncedPrice[1],
+        rating: ratingFilter,
+        sortBy,
+      });
+    }
+  }, [debouncedPrice, ratingFilter, sortBy]);
+
+  const handleRatingFilterChange = (value) => {
+    setRatingFilter(value)
+  }
 
   return (
     <Grid container spacing={2} p={2}>
@@ -44,19 +61,29 @@ const ProductListing = () => {
 
           {/* Rating Filter */}
           <Box mb={2}>
-            <Chip label="3★ & above" color="primary" sx={{ mr: 1 }} />
-            <Chip label="4★ & above" color="primary" />
-          </Box>
-
-          {/* Bluetooth & True Wireless */}
-          <Box mb={2}>
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="Bluetooth"
+            <Chip
+              label="1★ & above"
+              sx={{ mr: 1 }}
+              color={ratingFilter === 1 ? "primary" : "default"}
+              onClick={() => handleRatingFilterChange(ratingFilter === 1 ? null : 1)}
             />
-            <FormControlLabel
-              control={<Checkbox defaultChecked />}
-              label="True Wireless"
+            <Chip
+              label="2★ & above"
+              sx={{ mr: 1 }}
+              color={ratingFilter === 2 ? "primary" : "default"}
+              onClick={() => handleRatingFilterChange(ratingFilter === 2 ? null : 2)}
+            />
+            <Box mb={2} />
+            <Chip
+              label="3★ & above"
+              sx={{ mr: 1 }}
+              color={ratingFilter === 3 ? "primary" : "default"}
+              onClick={() => handleRatingFilterChange(ratingFilter === 3 ? null : 3)}
+            />
+            <Chip
+              label="4★ & above"
+              color={ratingFilter === 4 ? "primary" : "default"}
+              onClick={() => handleRatingFilterChange(ratingFilter === 4 ? null : 4)}
             />
           </Box>
 
@@ -64,43 +91,50 @@ const ProductListing = () => {
           <Box mb={2}>
             <Typography gutterBottom>Price</Typography>
             <Slider
-              defaultValue={[500, 10000]}
+              defaultValue={[priceRange[0], priceRange[1]]}
               valueLabelDisplay="auto"
-              min={0}
-              max={10000}
+              min={priceRange[0]}
+              max={priceRange[1]}
+              value={priceRange}
+              onChange={(e, v) => setPriceRange(v)}
             />
           </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          {/* Headphone Type */}
-          <Typography gutterBottom>Headphone Type</Typography>
-          <FormControlLabel
-            control={<Checkbox defaultChecked />}
-            label="True Wireless"
-          />
-          <FormControlLabel control={<Checkbox />} label="In the Ear" />
-          <FormControlLabel control={<Checkbox />} label="On the Ear" />
         </Box>
       </Grid>
 
       {/* Product Grid */}
       <Grid item xs={12} md={9}>
         <Typography variant="h6" gutterBottom>
-          Headset (Showing 1–{products?.length})
+          (Showing {productsByCategory?.length > 1 ? 1 : 0}–{productsByCategory?.length})
         </Typography>
         <Box display="flex" gap={2} mb={2}>
-          <Button variant="outlined">Popularity</Button>
-          <Button>Price -- Low to High</Button>
-          <Button>Price -- High to Low</Button>
-          <Button>Newest First</Button>
-          <Button>Discount</Button>
+          <Button
+            onClick={() => setSortBy("newest")}
+            variant={sortBy === "newest" ? "contained" : "outlined"}
+          >
+            Newest First
+          </Button>
+          <Button
+            onClick={() => setSortBy("price_low")}
+            variant={sortBy === "price_low" ? "contained" : "outlined"}
+          >
+            Price -- Low to High
+          </Button>
+          <Button
+            onClick={() => setSortBy("price_high")}
+            variant={sortBy === "price_high" ? "contained" : "outlined"}
+          >
+            Price -- High to Low
+          </Button>
         </Box>
 
         <Grid container spacing={2}>
-          {products?.map((p, i) => (
+          {productsByCategory?.map((p, i) => (
             <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
-              <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer">
+              <a
+                onClick={(e) => navigateToProductDetail(e, p)}
+                className="cursor-pointer"
+              >
                 <Card sx={{ height: "100%" }}>
                   <CardMedia
                     component="img"

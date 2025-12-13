@@ -1,10 +1,11 @@
 import httpRequest from "../helper/httpMethods";
 import { useProductStore } from "store/productStore";
 
-export const getProductByCategory = async (categoryid) => {
+export const getProductByCategory = async (categoryid, filters = {}) => {
   const response = await httpRequest(
     "get",
-    `/api/ecommerce/product-category/${categoryid}`
+    `/api/ecommerce/product-category/${categoryid}`,
+    filters
   );
   if (response?.data && response?.status === 200) {
     useProductStore.setState((state) => ({

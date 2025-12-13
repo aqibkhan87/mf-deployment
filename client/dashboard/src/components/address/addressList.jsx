@@ -56,7 +56,7 @@ const AddressList = () => {
                     pb: 2
                 }}
             >
-                {addresses.map((addr) => (
+                {addresses?.map((addr) => (
                     <Card
                         key={addr._id}
                         sx={{
