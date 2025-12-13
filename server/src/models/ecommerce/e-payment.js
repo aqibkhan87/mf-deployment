@@ -36,13 +36,15 @@ const EcommercePaymentSchema = new mongoose.Schema(
 
     // 🔹 Metadata
     retries: { type: Number, default: 0 },
-    notes: Object,
-
+    cartId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "cart",
+    },
     // 🔹 Timeline
     paidAt: Date,
     failedAt: Date,
   },
-  { timestamps: true, collection: "EcommercePayment" }
+  { collection: "EcommercePayment" }
 );
 
 export default mongoose.model("EcommercePayment", EcommercePaymentSchema);

@@ -81,7 +81,7 @@ async function fetchFlightsForDate(date) {
   const dateStr = date.toISOString().split("T")[0];
 
   for (const [origin, destination] of ROUTES) {
-    console.log("origin, destination", origin, destination)
+    console.log("origin, destination", origin, destination, dateStr)
     try {
       const response = await amadeus.shopping.flightOffersSearch.get({
         originLocationCode: origin,

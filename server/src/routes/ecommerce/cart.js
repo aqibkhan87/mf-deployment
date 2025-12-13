@@ -128,12 +128,17 @@ apiRouter.put("/update", async (req, res) => {
 
     // Update quantities of specific products
     for (const { _id, quantity } of products) {
-      if (quantity < 1) continue; // optionally skip invalid quantities
       const index = cart?.products?.findIndex(
         (item) => item?.productDetail?._id?.toString() === _id // Depending on your schema
       );
       if (index > -1) {
-        cart.products[index].quantity = quantity;
+        if (quantity <= 0) {
+          // ⛔ REMOVE item if quantity is 0
+          cart.products.splice(index, 1);
+        } else {
+          // ✔ Update quantity
+          cart.products[index].quantity = quantity;
+        }
       }
     }
 
