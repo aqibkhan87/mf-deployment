@@ -8,11 +8,13 @@ import {
     CardContent,
     CardMedia,
     Rating,
+    IconButton
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useWishlistStore } from "store/wishlistStore";
-import { getWishlistProducts } from "../../apis/wishlist.js";
+import { getWishlistProducts, deleteItemFromWishlist } from "../../apis/wishlist.js";
 
-const ProductWishlisting = () => {
+const ProductWishlist = () => {
     const history = useHistory();
     const { wishlist } = useWishlistStore();
 
@@ -25,6 +27,12 @@ const ProductWishlisting = () => {
         getWishlistProducts();
     }, []);
 
+    const handleOnDelete = async (e, p) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        await deleteItemFromWishlist(p?.product?._id)
+    }
+
     return (
         <Grid item xs={12} md={9} p={{ md: 2, xs: 0 }} >
             <Typography variant="h6" gutterBottom>
@@ -34,7 +42,22 @@ const ProductWishlisting = () => {
             <Grid container spacing={2}>
                 {wishlist?.map((p, i) => (
                     <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
-                        <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer">
+                        <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer relative">
+                            <IconButton
+                                onClick={(e) => handleOnDelete(e, p)}
+                                className="!absolute"
+                                sx={{
+                                    top: 8,
+                                    right: 8,
+                                    backgroundColor: "rgba(0,0,0,0.6)",
+                                    color: "#fff",
+                                    "&:hover": {
+                                        backgroundColor: "rgba(0,0,0,0.8)",
+                                    },
+                                }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
                             <Card sx={{ height: "100%" }}>
                                 <CardMedia
                                     component="img"
@@ -84,4 +107,4 @@ const ProductWishlisting = () => {
     );
 };
 
-export default ProductWishlisting;
+export default ProductWishlist;

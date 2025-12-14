@@ -22,7 +22,7 @@ const CheckoutApp = () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
       const { mount } = await loadRemoteMF(
-        `${process.env.CHECKOUT_MF_ENDPOINT}/remoteEntry.js`,
+        `${process.env.CHECKOUT_MF_ENDPOINT}/remoteEntry.js?${Date.now()}`,
         "checkout",
         "./CheckoutApp"
       );

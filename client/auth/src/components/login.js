@@ -3,32 +3,72 @@ import {
   Box,
   Button,
   Container,
-  Divider,
   Link,
   TextField,
   Typography,
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useHistory } from "react-router-dom";
+import { useAuthStore } from "store/authStore";
+import { login } from "../apis/auth";
+import { updateUserIdInCart } from "../apis/cart";
 
 const Login = () => {
-  
-  const [formdata, setFormData] = useState({
-    password: "",
-    username: "",
-  });
-
   const history = useHistory();
+  const { setUser } = useAuthStore();
+  const [formdata, setFormData] = useState({
+    contact: "",
+    password: "",
+  });
+  const [touched, setTouched] = useState({});
+  // Validation helpers
+  const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
+  const isMobile = (str) => /^[0-9]{10}$/.test(str);
+
+  // Validate if usernameValue is valid email or mobile
+  const usernameValue = isEmail(formdata.contact) || isMobile(formdata.contact);
+
+  const errors = {
+    contact: !usernameValue,
+    password: !formdata.password,
+  };
+
+  const handleBlur = (field) =>
+    setTouched((prev) => ({ ...prev, [field]: true }));
 
   const handleFormData = (key, value) => {
     setFormData({ ...formdata, [key]: value });
   };
-  
-  const handleFormSubmit = () => {
-    history.push("/")
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!usernameValue) {
+      setTouched((prev) => ({ ...prev, contact: true }));
+      return;
+    }
+    if (!formdata.password) {
+      setTouched((prev) => ({ ...prev, password: true }));
+      return;
+    }
+
+    if (Object.values(errors).every((err) => !err)) {
+      const userDetails = await login(formdata);
+      if (userDetails?.data?.user) {
+        localStorage.setItem("user", JSON.stringify(userDetails?.data?.user));
+        localStorage.setItem("token", JSON.stringify(userDetails?.data?.token));
+        if (localStorage.getItem("cartId")) {
+          await updateUserIdInCart(
+            userDetails?.data?.user?._id,
+            JSON.parse(localStorage.getItem("cartId"))
+          );
+        }
+        setUser(userDetails?.data?.user);
+        history.push("/");
+      }
+    }
   };
 
-  const { password, username } = formdata;
+  const { password, contact } = formdata;
   return (
     <Box
       sx={{
@@ -38,7 +78,6 @@ const Login = () => {
         bgcolor: "#f6f8fa",
       }}
     >
-      {/* Main Content */}
       <Container
         maxWidth="xs"
         sx={{
@@ -49,7 +88,6 @@ const Login = () => {
           alignItems: "center",
         }}
       >
-        {/* Form */}
         <Box
           sx={{
             width: "100%",
@@ -68,9 +106,17 @@ const Login = () => {
             size="small"
             variant="outlined"
             sx={{ mb: 2, bgcolor: "white" }}
-            name="Email Address or UserName"
-            value={username}
-            onChange={(e) => handleFormData("username", e?.target?.value)}
+            label="Email Address or UserName"
+            name="contact"
+            value={contact}
+            onChange={(e) => handleFormData("contact", e?.target?.value)}
+            onBlur={() => handleBlur("contact")}
+            error={errors.contact && touched.contact}
+            helperText={
+              touched.contact && errors.contact
+                ? "Enter valid email or 10-digit mobile number."
+                : ""
+            }
           />
 
           {/* Password */}
@@ -93,6 +139,11 @@ const Login = () => {
             placeholder="Enter Password"
             value={password}
             onChange={(e) => handleFormData("password", e?.target?.value)}
+            onBlur={() => handleBlur("password")}
+            error={errors.password && touched.password}
+            helperText={
+              touched.password && errors.password ? "Password is required." : ""
+            }
           />
 
           {/* Sign In Button */}
@@ -105,73 +156,19 @@ const Login = () => {
               fontWeight: "bold",
               "&:hover": { bgcolor: "#218838" },
             }}
-            onClick={() => handleFormSubmit}
-
+            onClick={handleFormSubmit}
           >
             Sign in
           </Button>
-        </Box>
-
-        {/* Divider */}
-        <Divider sx={{ my: 3, width: "100%" }}>or</Divider>
-
-        {/* Continue with Google */}
-        <Button
-          fullWidth
-          variant="outlined"
-          startIcon={<GoogleIcon />}
-          sx={{
-            textTransform: "none",
-            bgcolor: "white",
-            borderColor: "#d0d7de",
-            "&:hover": { bgcolor: "#f6f8fa" },
-          }}
-        >
-          Continue with Google
-        </Button>
-
-        {/* Links */}
-        <Typography variant="body2" sx={{ mt: 3 }}>
-          New to GitHub?{" "}
-          <Link href="#" underline="hover">
-            Create an account
+          <Link
+            href="/auth/signup"
+            underline="hover"
+            sx={{ fontSize: 14 }}
+          >
+            Create an account!
           </Link>
-        </Typography>
-
-        <Link href="#" underline="hover" sx={{ mt: 1, fontSize: 14 }}>
-          Sign in with a passkey
-        </Link>
+        </Box>
       </Container>
-
-      {/* Footer */}
-      <Box
-        sx={{
-          py: 2,
-          borderTop: "1px solid #d0d7de",
-          textAlign: "center",
-          fontSize: 14,
-          color: "text.secondary",
-        }}
-      >
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Terms
-        </Link>
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Privacy
-        </Link>
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Docs
-        </Link>
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Contact GitHub Support
-        </Link>
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Manage cookies
-        </Link>
-        <Link href="#" sx={{ mx: 1 }} underline="hover">
-          Do not share my personal information
-        </Link>
-      </Box>
     </Box>
   );
 };

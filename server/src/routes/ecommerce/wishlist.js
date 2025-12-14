@@ -49,7 +49,7 @@ apiRouter.post("/add", async (req, res) => {
 apiRouter.delete("/:productId", async (req, res) => {
   try {
     const userId = req.query.userId;
-    const { productId } = req.params;
+    const productId = req.params.productId;
 
     await Wishlist.deleteOne({ userId, product: productId });
 

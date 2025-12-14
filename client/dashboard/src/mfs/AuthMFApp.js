@@ -22,7 +22,7 @@ const AuthApp = () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
       const { mount } = await loadRemoteMF(
-        `${process.env.AUTH_MF_ENDPOINT}/remoteEntry.js`,
+        `${process.env.AUTH_MF_ENDPOINT}/remoteEntry.js?${Date.now()}`,
         "auth",
         "./AuthApp"
       );

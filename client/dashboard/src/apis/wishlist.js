@@ -34,3 +34,16 @@ export const deleteFromWishlist = async (productId) => {
     return response.data;
   }
 };
+
+
+export const deleteItemFromWishlist = async (productId) => {
+  const userId = JSON.parse(localStorage.getItem("user"))?._id || "";
+
+  const response = await httpRequest(
+    "delete",
+    `/api/ecommerce/wishlist/${productId}?userId=${userId}`,
+  );
+  if (response?.data?.success) {
+    await getWishlistProducts();
+  }
+};

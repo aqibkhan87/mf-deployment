@@ -68,16 +68,16 @@ const Cart = () => {
     history.push("/ecommerce/checkout");
   }
 
-  const handleAddToWishlist = (e, product) => {
+  const handleAddToWishlist = async (e, product) => {
     e.stopPropagation();
     e.preventDefault();
-    addToWishlist(product?.productDetail?._id);
+    await addToWishlist(product?.productDetail?._id);
   }
 
-  const handleRemoveItemFromCart = (e, product) => {
+  const handleRemoveItemFromCart = async (e, product) => {
     e.stopPropagation();
     e.preventDefault();
-    removeItemFromCart(product?.productDetail?._id);
+    await removeItemFromCart(product?.productDetail?._id);
   }
   return (
     <Grid item xs={12} md={7}>
