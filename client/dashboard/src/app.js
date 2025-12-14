@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
-const AuthMFApp = lazy(() => import("./mfs/AuthApp"));
-const CheckoutMFApp = lazy(() => import("./mfs/checkoutApp"));
+const AuthMFApp = lazy(() => import("./mfs/AuthMFApp"));
+const CheckoutMFApp = lazy(() => import("./mfs/CheckoutMFApp"));
 import OrdersPage from "./components/order/orderHistory.jsx";
 import ProductWishlist from "./components/wishlist/wishlistPage.jsx";
 import MainNav from "./components/mainNav.jsx";
