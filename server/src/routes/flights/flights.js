@@ -57,7 +57,7 @@ router.get("/", async (req, res) => {
   // });
 
    // Map fares to include airline info + logo
-  const fares = record.fares.map((f) => {
+  const fares = record?.fares?.map((f) => {
     const airline = AirlinesMapping[f?.validatingAirline] || {
       name: f.validatingAirline,
       code: f.validatingAirline,

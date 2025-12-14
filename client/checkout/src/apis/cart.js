@@ -32,8 +32,8 @@ export const getCart = async () => {
   if (response?.data && response?.status === 200) {
     useCartStore.setState((state) => ({
       ...state,
-      cart: response.data?.cart,
-      cartCount: response.data?.cartCount,
+      cart: response?.data?.cart,
+      cartCount: response?.data?.cartCount,
     }));
   }
 };

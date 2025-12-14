@@ -3,7 +3,7 @@ import React from "react";
 const OrderDetails = ({ order, cart }) => {
   return (
     <div className="order-details">
-      {cart?.products.map((item) => {
+      {cart?.products?.map((item) => {
         const p = item.productDetail;
         const actual = Number(p.actualPrice);
         const selling = Number(p.price);

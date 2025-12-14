@@ -41,7 +41,7 @@ const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
 // Save Amadeus data in MongoDB
 async function saveAmadeusData(origin, destination, date, amadeusData) {
-  const fares = amadeusData.map((offer) => {
+  const fares = amadeusData?.map((offer) => {
     const firstItinerary = offer.itineraries[0];
     const traveler = offer.travelerPricings?.[0]?.fareDetailsBySegment?.[0];
 

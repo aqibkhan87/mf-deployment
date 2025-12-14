@@ -32,10 +32,6 @@ const ProductListing = () => {
   };
 
   useEffect(() => {
-    if (categoryid) getProductByCategory(categoryid, { sortBy });
-  }, []);
-
-  useEffect(() => {
     if (categoryid) {
       getProductByCategory(categoryid, {
         minPrice: debouncedPrice[0],

@@ -1,7 +1,12 @@
 import httpRequest from "../helper/httpMethods";
 import { useProductStore } from "store/productStore";
 
-export const getProductByCategory = async (categoryid, filters = {}) => {
+export const getProductByCategory = async (
+  categoryid,
+  filters = {
+    sortBy: "newest",
+  }
+) => {
   const response = await httpRequest(
     "get",
     `/api/ecommerce/product-category/${categoryid}`,
