@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useOrderStore } from "store/orderStore";
 import { getAllOrders } from "../../apis/orders";
-import OrderCard from "./orderCard.jsx";
+import OrderCard from "./orderCard";
 import "./order.scss";
 
 const OrderHistory = () => {

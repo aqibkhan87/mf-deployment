@@ -1,11 +1,11 @@
 import React from "react";
 import { Router, Route, Switch } from "react-router-dom";
-import ProductDetails from "./components/ecommerce/productDetails.jsx";
-import ProductListing from "./components/ecommerce/productlisting.jsx";
-import CartPage from "./components/ecommerce/cartPage.jsx";
-import CheckoutPage from "./components/ecommerce/eCommerceCheckoutPage.jsx";
-import EcommercePayment from "./common/ecommerce/ecommercePayment.jsx";
-import FlightPayment from "./common/flights/flightPayment.jsx";
+import ProductDetails from "./components/ecommerce/productDetailsPage";
+import ProductListing from "./components/ecommerce/productListingPage";
+import CartPage from "./components/ecommerce/cartPage";
+import CheckoutPage from "./components/ecommerce/eCommerceCheckoutPage";
+import EcommercePayment from "./common/ecommerce/ecommercePayment";
+import FlightPayment from "./common/flights/flightPayment";
 
 const App = ({ history }) => {
   

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import OrderDetails from "./orderDetails.jsx";
+import OrderDetails from "./orderDetails";
 import "./order.scss";
 
 const OrderCard = ({ order }) => {

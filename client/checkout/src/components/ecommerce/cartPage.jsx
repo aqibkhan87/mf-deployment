@@ -1,18 +1,21 @@
 import React from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useCartStore } from "store/cartStore";
-import OrderSummary from "../../common/ecommerce/orderSummary.jsx";
-import Cart from "../../common/ecommerce/cart.jsx";
+import OrderSummary from "../../common/ecommerce/orderSummary";
+import Cart from "../../common/ecommerce/cart";
 
 const CartPage = () => {
   const { cart } = useCartStore();
 
+
   return (
-    <div className="p-4">
-      {cart?.products?.length === 0 ? (
-        <p>No items in cart</p>
+    <div className="">
+      {!cart?.products?.length ? (
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6">No items in cart</Typography>
+        </Box>
       ) : (
-        <Box sx={{ p: 3, background: "#f7fbff", minHeight: "100vh" }}>
+        <Box sx={{ p: 3 }}>
           <Grid container spacing={2} justifyContent="center">
             <Cart />
             <OrderSummary />

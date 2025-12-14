@@ -34,13 +34,13 @@ const ProductWishlist = () => {
     }
 
     return (
-        <Grid item xs={12} md={9} p={{ md: 2, xs: 0 }} >
-            <Typography variant="h6" gutterBottom>
+        <Box item xs={12} md={9} p={{ md: 2, xs: 0 }} >
+            {wishlist?.length ? <Typography variant="h6" gutterBottom>
                 Headset (Showing 1–{wishlist?.length})
-            </Typography>
+            </Typography> : <></>}
+            <Box container spacing={2} >
 
-            <Grid container spacing={2}>
-                {wishlist?.map((p, i) => (
+                {wishlist?.length > 0 ? wishlist?.map((p, i) => (
                     <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
                         <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer relative">
                             <IconButton
@@ -101,9 +101,9 @@ const ProductWishlist = () => {
                             </Card>
                         </a>
                     </Grid>
-                ))}
-            </Grid>
-        </Grid>
+                )) : <Typography className="m-8" variant="h6" gutterBottom>No wishlist Items</Typography>}
+            </Box>
+        </Box>
     );
 };
 

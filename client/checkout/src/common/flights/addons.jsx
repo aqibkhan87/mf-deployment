@@ -1,4 +1,3 @@
-// pages/AddonsPage.jsx
 import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useBookingStore } from "store/bookingStore"; 

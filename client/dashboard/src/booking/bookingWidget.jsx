@@ -5,9 +5,6 @@ import {
   Grid,
   Paper,
   TextField,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
   Button,
   MenuItem,
   Select,
@@ -29,11 +26,9 @@ const debounce = (fn, delay) => {
 
 const BookingWidget = () => {
   const history = useHistory();
-  const [tripType, setTripType] = useState("oneway");
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
   const [departDate, setDepartDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
   const [passengers, setPassengers] = useState(1);
   const [loadingAirports, setLoadingAirports] = useState(false);
   const [fromOptions, setFromOptions] = useState([]);
@@ -41,8 +36,6 @@ const BookingWidget = () => {
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
   const [loading, setLoading] = useState(false);
-
-  console.log("fromOptionsfromOptions", fromOptions);
 
   useEffect(() => {
     fetchAirports()
@@ -61,7 +54,6 @@ const BookingWidget = () => {
     setLoadingAirports(true);
     try {
       const results = await searchAirports(q);
-      console.log("resultsresultsresults", results, q);
       if (type === "from") setFromOptions(results?.queryResults || []);
       else setToOptions(results?.queryResults || []);
     } catch (err) {
@@ -80,38 +72,14 @@ const BookingWidget = () => {
       return;
     }
     history.push(
-      `/flight-search?from=${from.iata || from.name}&to=${
-        to.iata || to.name
+      `/flight-search?from=${from.iata || from.name}&to=${to.iata || to.name
       }&date=${departDate}&passengers=${passengers}`
     );
   };
 
   return (
     <Paper elevation={0} className="booking-widget">
-      <Box sx={{ p: 2 }}>
-        {/* Trip Type */}
-        <RadioGroup
-          row
-          value={tripType}
-          onChange={(e) => setTripType(e.target.value)}
-          className="trip-type"
-        >
-          <FormControlLabel
-            value="oneway"
-            control={<Radio />}
-            label="One Way"
-          />
-          <FormControlLabel
-            value="round"
-            control={<Radio />}
-            label="Round Trip"
-          />
-          <FormControlLabel
-            value="multi"
-            control={<Radio />}
-            label="Multi City"
-          />
-        </RadioGroup>
+      <Box sx={{ py: 8, px: 3 }}>
 
         {/* Inputs Row */}
         <Grid container spacing={2} alignItems="center" className="inputs-row">
@@ -261,19 +229,6 @@ const BookingWidget = () => {
             />
           </Grid>
 
-          {tripType === "round" && (
-            <Grid item xs={12} md={2}>
-              <TextField
-                fullWidth
-                label="Return"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={returnDate}
-                onChange={(e) => setReturnDate(e.target.value)}
-              />
-            </Grid>
-          )}
-
           {/* Passengers */}
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
@@ -291,19 +246,19 @@ const BookingWidget = () => {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} md={2}>
+            <div className="bottom-row">
+              <Button
+                variant="contained"
+                className="search-btn"
+                onClick={handleSearch}
+                disabled={loading}
+              >
+                {loading ? "Searching..." : "Search"}
+              </Button>
+            </div>
+          </Grid>
         </Grid>
-
-        {/* Search */}
-        <div className="bottom-row">
-          <Button
-            variant="contained"
-            className="search-btn"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? "Searching..." : "Search"}
-          </Button>
-        </div>
       </Box>
     </Paper>
   );

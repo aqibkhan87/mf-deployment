@@ -14,20 +14,20 @@ import { useCartStore } from "store/cartStore";
 import { useProductStore } from "store/productStore";
 import { getProductById, getProductByCategory } from "../../apis/products.js";
 import { getCart, addToCart } from "../../apis/cart.js";
-import Recommendations from "./recommendations.jsx";
+import Recommendations from "../../common/ecommerce/recommendations";
 
 
 const ProductDetail = () => {
   const history = useHistory();
   const { categoryid, productid } = useParams();
-  const { cart } = useCartStore();
+  const { cart, cartId } = useCartStore();
   const { product, productsByCategory } = useProductStore();
   const [mainImg, setMainImg] = useState("");
 
   useEffect(() => {
     if (productid) getProductById(productid);
     if (categoryid) getProductByCategory(categoryid);
-    getCart();
+    if (cartId) getCart();
   }, []);
 
   const handleNavigateToAddToCart = async (e) => {

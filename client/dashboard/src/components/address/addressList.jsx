@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
-import AddressFormDialog from "./addressDialogForm.jsx";
+import AddressFormDialog from "./addressDialogForm";
 import { addNewAddress, getAllAddresses, editAddress, markDefaultAddress } from "../../apis/address";
 
 const brown = "#7B4A12";
@@ -20,7 +20,7 @@ const AddressList = () => {
     const [current, setCurrent] = useState(null);
 
     useEffect(() => {
-        if(user?.email) getAllAddresses();
+        if (user?.email) getAllAddresses();
     }, []);
 
     const handleEdit = (address) => {
@@ -42,21 +42,15 @@ const AddressList = () => {
     };
 
     return (
-        <Box sx={{
-            overflowX: "auto",
-            gap: 2,
-            pb: 2
-        }}>
+        <Box className="h-full p-8">
             <Box
                 sx={{
-                    display: "flex",
-                    flexWrap: "nowrap",
-                    overflowX: "auto",
                     gap: 2,
                     pb: 2
                 }}
+                className="flex flex-nowrap"
             >
-                {addresses?.map((addr) => (
+                {addresses?.length ? addresses?.map((addr) => (
                     <Card
                         key={addr._id}
                         sx={{
@@ -93,14 +87,17 @@ const AddressList = () => {
                             </Button>
                         </CardContent>
                     </Card>
-                ))}
+                )) : (
+                    <Box className="">
+                        <Typography>No Address Found</Typography>
+                    </Box>
+                )}
             </Box>
 
-            {/* Add New Address Button */}
             <Button
                 variant="outlined"
                 onClick={() => {
-                    setCurrent({});
+                    setCurrent(null);
                     setOpen(true);
                 }}
                 sx={{

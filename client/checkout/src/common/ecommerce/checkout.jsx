@@ -20,10 +20,10 @@ import { updateQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {
   const history = useHistory();
-  const { cart } = useCartStore();
+  const { cart, cartId } = useCartStore();
 
   useEffect(() => {
-    getCart();
+    if(cartId) getCart();
   }, []);
 
   const navigateToProduct = (product) => {
@@ -129,38 +129,6 @@ const CheckoutItems = () => {
               <Typography variant="caption" color="text.secondary">
                 Delivery by <b>Thu Sep 4</b>
               </Typography>
-              <Box
-                sx={{
-                  background: "#fffde7",
-                  color: "#fbc02d",
-                  py: 0.5,
-                  px: 1.1,
-                  borderRadius: 1,
-                  ml: 2,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <b>Open Box Delivery is eligible for this item.</b>&nbsp;
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontWeight: 400 }}
-                >
-                  You will receive a confirmation post payment.
-                  <a
-                    href="#"
-                    style={{
-                      marginLeft: 4,
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      color: "#2672f2",
-                    }}
-                  >
-                    Know More
-                  </a>
-                </Typography>
-              </Box>
             </Box>
 
             {/* Quantity controls & Remove */}

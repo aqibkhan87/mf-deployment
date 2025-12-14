@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { loadRemoteMF } from "./../loadRemoteMF";
+import { loadRemoteMF } from "../loadRemoteMF";
 
 const CheckoutApp = () => {
   const ref = useRef(null);

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Grid, Button, Chip } from "@mui/material";
 import { useAuthStore } from "store/authStore";
 import { useBookingStore } from "store/bookingStore";
-import OrderSummary from "../../common/ecommerce/orderSummary.jsx";
-import CheckoutItems from "../../common/ecommerce/checkout.jsx";
+import OrderSummary from "../../common/ecommerce/orderSummary";
+import CheckoutItems from "../../common/ecommerce/checkout";
 import { eventEmitter } from "../../utils/helper.js";
 
 const Checkout = () => {

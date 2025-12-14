@@ -1,6 +1,9 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
+  resolve: {
+    extensions: [".js", ".jsx"], // ✅ IMPORTANT
+  },
   module: {
     rules: [
       {
@@ -23,7 +26,7 @@ module.exports = {
       },
       {
         test: /\.css|scss$/i,
-        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"] // <-- required for Tailwind,
+        use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"], // <-- required for Tailwind,
       },
     ],
   },

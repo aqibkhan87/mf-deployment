@@ -2,6 +2,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
+  resolve: {
+    extensions: [".js", ".jsx"], // ✅ IMPORTANT
+  },
   module: {
     rules: [
       {

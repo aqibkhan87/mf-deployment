@@ -15,13 +15,15 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
+import { useAuthStore } from "store/authStore";
 import { updateQuantity } from "../../utils/helper";
 import { getCart, updateInCart, removeItemFromCart } from "../../apis/cart";
 import { addToWishlist } from "../../apis/wishlist";
 
 const Cart = () => {
   const history = useHistory();
-  const { cart } = useCartStore();
+  const { cart, cartId, cartCount } = useCartStore();
+  const { user } = useAuthStore();
 
   // console.log("cartrtttrtr in cart", cart);
   const navigateToProduct = (product) => {
@@ -61,7 +63,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    getCart();
+    if(cartId) getCart();
   }, []);
 
   const navigateToCheckout = () => {
@@ -79,52 +81,13 @@ const Cart = () => {
     e.preventDefault();
     await removeItemFromCart(product?.productDetail?._id);
   }
+  
   return (
     <Grid item xs={12} md={7}>
       <Typography variant="h5" gutterBottom>
-        Flipkart (1)
+        Items in Cart: {cartCount ? (cartCount) : ""}
       </Typography>
-      <Box sx={{ mb: 2 }}>
-        <Paper
-          elevation={1}
-          sx={{
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography>
-            Deliver to: <b>Firozabad - 283203</b>
-          </Typography>
-          <Button variant="outlined" size="small">
-            Change
-          </Button>
-        </Paper>
-      </Box>
-      {/* DELIVERY ADDRESS */}
-      {history.location.pathname.includes("checkout") && (
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item>
-              <Chip
-                icon={<CheckCircleIcon color="primary" />}
-                label="2"
-                sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2 }}
-              />
-            </Grid>
-            <Grid item xs>
-              <Typography sx={{ fontWeight: 600 }}>DELIVERY ADDRESS</Typography>
-              <Typography>{address}</Typography>
-            </Grid>
-            <Grid item>
-              <Button variant="outlined" size="small">
-                CHANGE
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-      )}
+      
       <Card>
         {cart?.products?.map((product, i) => (
           <Box
@@ -210,6 +173,7 @@ const Cart = () => {
                 <Button
                   sx={{ ml: 2 }}
                   size="small"
+                  disabled={!user.email}
                   onClick={(e) => handleAddToWishlist(e, product)}>
                   Add To Wishlist
                 </Button>
