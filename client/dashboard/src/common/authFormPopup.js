@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from "store/authStore";
 import { login, signup } from "../apis/auth";
 import { updateUserIdInCart } from "../apis/cart";
+import { getAllAddresses } from "../apis/address";
 
 const AuthFormPopup = ({ open, onClose, type = "login" }) => {
   const [formType, setFormType] = useState(type);
@@ -232,6 +233,7 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
             userDetails?.data?.user?._id,
             JSON.parse(localStorage.getItem("cartId"))
           );
+          await getAllAddresses();
         }
         setUser(userDetails?.data?.user);
         onClose();

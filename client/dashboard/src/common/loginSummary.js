@@ -3,7 +3,7 @@ import { Paper } from "@mui/material";
 import AuthFormPopup from "./authFormPopup";
 
 const LoginSummary = () => {
-  const [openPopup, setPopup] = useState(open);
+  const [openPopup, setPopup] = useState(false);
   const [popupType, setPopupType] = useState("login");
 
   useEffect(() => {

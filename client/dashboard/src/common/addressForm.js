@@ -57,6 +57,7 @@ const AddressForm = () => {
     const handler = (event) => {
       const payload = event.detail;
       setOpenAddressForm(payload.openAddressForm);
+      setFields(payload.address)
     };
     window.addEventListener("openAddressForm", handler);
     return () => {

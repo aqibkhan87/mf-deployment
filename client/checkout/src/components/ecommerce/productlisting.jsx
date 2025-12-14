@@ -8,7 +8,6 @@ import {
   CardContent,
   CardMedia,
   Slider,
-  Divider,
   Button,
   Chip,
   Rating,

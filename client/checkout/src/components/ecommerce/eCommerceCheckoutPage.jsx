@@ -16,8 +16,6 @@ const Checkout = () => {
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
 
-  console.log("Checkout user:", user);
-
   useEffect(() => {
     if (step == "auth" && isEditMode && user?.email && !address) {
       setStep("address");
@@ -43,8 +41,6 @@ const Checkout = () => {
       setAddress(defaultAddr)
     };
   }
-  console.log("Selected address:", address);
-  console.log("Selected user:", user);
 
   const handleUserInfo = () => {
     const eventData = { openPopup: true, popupType: "login" };
@@ -58,8 +54,8 @@ const Checkout = () => {
     setStep("address");
   };
 
-  const editAddress = () => {
-    const eventData = { openAddressForm: true, address: address };
+  const editAddress = (editAdd) => {
+    const eventData = { openAddressForm: true, address: editAdd };
     eventEmitter("openAddressForm", eventData);
     setIsEditMode(true);
   };
@@ -168,7 +164,7 @@ const Checkout = () => {
             <Button
               variant="outlined"
               size="small"
-              onClick={(e) => editAddress()}
+              onClick={(e) => editAddress(addresses[0])}
             >
               Edit Address
             </Button>
