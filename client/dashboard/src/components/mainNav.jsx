@@ -31,12 +31,12 @@ const MainNav = () => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
-  
+
   const handleAddress = () => {
     handleCloseMenu();
     history.push("/addresses");
   };
-  
+
   const handleOrder = () => {
     handleCloseMenu();
     history.push("/order-history");
@@ -90,7 +90,7 @@ const MainNav = () => {
               </Badge>
             </Link>
           </Button>
-          <Button className="text-black">
+          {user?.email ? <Button className="text-black">
             <Link to="/wishlist">
               <Badge
                 badgeContent={wishlistCount}
@@ -106,48 +106,48 @@ const MainNav = () => {
                 Wishlist
               </Badge>
             </Link>
-          </Button>
-            {!user?.email ? (
-              <Button className="text-black">
-                <Link to="/auth/login" style={{ textDecoration: "none" }}>
-                  Login
-                </Link>
-              </Button>
-            ) : (
-              <>
-                <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user?.firstName} />
-                </IconButton>
+          </Button> : null}
+          {!user?.email ? (
+            <Button className="text-black">
+              <Link to="/auth/login" style={{ textDecoration: "none" }}>
+                Login
+              </Link>
+            </Button>
+          ) : (
+            <>
+              <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
+                <Avatar alt={user?.firstName} />
+              </IconButton>
 
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleCloseMenu}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                >
-                  <Box sx={{ px: 2, py: 1 }}>
-                    <Typography variant="subtitle1">{user?.firstName}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {user?.email}
-                    </Typography>
-                  </Box>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+              >
+                <Box sx={{ px: 2, py: 1 }}>
+                  <Typography variant="subtitle1">{user?.firstName}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                </Box>
 
-                  <Divider />
+                <Divider />
 
-                  <MenuItem onClick={handleCloseMenu}>User Profile</MenuItem>
-                  <MenuItem onClick={handleOrder}>Orders</MenuItem>
-                  <MenuItem onClick={handleAddress}>Addresses</MenuItem>
-                  <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-                </Menu>
-              </>
-            )}
+                <MenuItem onClick={handleCloseMenu}>User Profile</MenuItem>
+                <MenuItem onClick={handleOrder}>Orders</MenuItem>
+                <MenuItem onClick={handleAddress}>Addresses</MenuItem>
+                <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+              </Menu>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

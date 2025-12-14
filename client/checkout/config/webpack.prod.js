@@ -2,7 +2,6 @@ const webpack = require("webpack");
 const { merge } = require("webpack-merge");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
-const packageDeps = require("../package.json").dependencies;
 const path = require("path");
 const dotenv = require("dotenv");
 
@@ -46,7 +45,10 @@ const prodConfig = {
       exposes: {
         "./CheckoutApp": "./src/bootstrap",
       },
-      shared: packageDeps,
+      shared: {
+        react: { singleton: true, eager: false, requiredVersion: false },
+        "react-dom": { singleton: true, eager: false, requiredVersion: false },
+      },
     }),
   ],
 };

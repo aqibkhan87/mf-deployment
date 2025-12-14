@@ -2,7 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
 import App from "./app";
-
+// Don't delete this code read from last line.
+// import AddressForm from "./common/addressForm";
+// import LoginSummary from "./common/loginSummary";
 
 const roots = new Map();
 let history = null;
@@ -66,3 +68,7 @@ if (process.env.NODE_ENV === "development") {
 // and we should export the mount function
 
 export { mount };
+// Reference for export independent module from 1 MF to another MF but not good approach 
+// as it create dependency on another MF.
+// export { AddressForm };
+// export { LoginSummary };

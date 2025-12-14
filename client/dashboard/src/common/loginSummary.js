@@ -3,12 +3,11 @@ import { Paper } from "@mui/material";
 import AuthFormPopup from "./authFormPopup";
 
 const LoginSummary = () => {
-  const [openPopup, setPopup] = useState(false);
+  const [openPopup, setPopup] = useState(open);
   const [popupType, setPopupType] = useState("login");
 
   useEffect(() => {
     const handler = (event) => {
-      // Listen for event and extract payload
       const payload = event.detail;
       setPopup(payload.openPopup);
       setPopupType(payload.popupType);
@@ -27,11 +26,7 @@ const LoginSummary = () => {
     return (
       <Paper sx={{ p: 2, mb: 2 }}>
         {/* LOGIN and SIGNUP PopUp */}
-        <AuthFormPopup
-          open={openPopup}
-          onClose={closeLoginUp}
-          type={popupType}
-        />
+        <AuthFormPopup open={openPopup} onClose={closeLoginUp} type={popupType} />
       </Paper>
     );
   }

@@ -2,7 +2,6 @@ const webpack = require("webpack");
 const { merge } = require("webpack-merge");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const commonConfig = require("./webpack.common");
-const packageDeps = require("../package.json").dependencies;
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
@@ -61,10 +60,11 @@ const prodConfig = {
       },
       exposes: {
         "./AuthApp": "./src/bootstrap",
-        "./loginSummary": "./src/common/loginSummary",
-        "./addressForm": "./src/common/addressForm",
       },
-      shared: packageDeps,
+      shared: {
+        react: { singleton: true, eager: false, requiredVersion: false },
+        "react-dom": { singleton: true, eager: false, requiredVersion: false },
+      },
     }),
   ],
 };

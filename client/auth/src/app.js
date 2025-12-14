@@ -9,8 +9,8 @@ const App = ({ history }) => {
   return (
     <Router history={history}>
       <Switch>
-        <Route exact path="/signup" component={Signup} />
-        <Route exact path="/login" component={Login} />
+        <Route exact path="/auth/signup" component={Signup} />
+        <Route exact path="/auth/login" component={Login} />
       </Switch>
     </Router>
   );

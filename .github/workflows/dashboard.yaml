@@ -23,6 +23,9 @@ jobs:
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           RAZORPAY_KEY_ID: ${{ secrets.RAZORPAY_KEY_ID }}
+          AUTH_MF_ENDPOINT: ${{ secrets.AUTH_MF_ENDPOINT }}
+          CHECKOUT_MF_ENDPOINT: ${{ secrets.CHECKOUT_MF_ENDPOINT }}
+          STORE_MF_ENDPOINT: ${{ secrets.STORE_MF_ENDPOINT }}
         run: npm run build
 
       - name: Deploy to S3

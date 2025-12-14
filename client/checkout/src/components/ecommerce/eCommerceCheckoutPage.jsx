@@ -8,7 +8,7 @@ import { eventEmitter } from "../../utils/helper.js";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
 import { getAllAddresses } from "../../apis/address.js";
-
+ 
 const Checkout = () => {
   const history = useHistory();
   const { user, address, addresses, setAddress } = useAuthStore();
@@ -34,7 +34,7 @@ const Checkout = () => {
   }, [addresses]);
 
   useEffect(() => {
-      getAllAddresses();
+      if(user?.email) getAllAddresses();
   }, []);
 
   const setDefaultAddress = () => {
@@ -140,6 +140,7 @@ const Checkout = () => {
             <Button
               variant="outlined"
               size="small"
+              disabled={!address}
               onClick={(e) => selectAddress(true)}
             >
               Select Address

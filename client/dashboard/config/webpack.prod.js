@@ -20,6 +20,9 @@ const finalEnv = {
 const ALLOWED_KEYS = [
   "API_BASE_URL",
   "RAZORPAY_KEY_ID",
+  "AUTH_MF_ENDPOINT",
+  "CHECKOUT_MF_ENDPOINT",
+  "STORE_MF_ENDPOINT",
 ];
 
 const envKeys = ALLOWED_KEYS.reduce((acc, key) => {
@@ -43,7 +46,18 @@ const prodConfig = {
         checkout: `checkout@https://checkout.metacook.in/remoteEntry.js?v=${Date.now()}`,
         store: `store@https://store.metacook.in/remoteEntry.js?v=${Date.now()}`,
       },
-      shared: packageDeps,
+      shared: {
+        react: {
+          singleton: true,
+          eager: false,
+          requiredVersion: false,
+        },
+        "react-dom": {
+          singleton: true,
+          eager: false,
+          requiredVersion: false,
+        },
+      },
     }),
   ],
 };

@@ -1,15 +1,17 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
-import CheckoutMFApp from "./mfs/CheckoutApp";
-import AuthMFApp from "./mfs/AuthApp";
+const AuthMFApp = lazy(() => import("./mfs/AuthApp"));
+const CheckoutMFApp = lazy(() => import("./mfs/checkoutApp"));
 import OrdersPage from "./components/order/orderHistory.jsx";
-import ProductWishlisting from "./components/wishlist/wishlistPage.jsx";
+import ProductWishlist from "./components/wishlist/wishlistPage.jsx";
 import MainNav from "./components/mainNav.jsx";
 import FlightResults from "./booking/flightSearch.jsx";
 import DashboardPage from "./components/dashboard/dashboard.jsx";
-import AuthComponents from "./components/common-mfs-components/auth/index.jsx";
-import CheckoutComponents from "./components/common-mfs-components/checkout/index.jsx";
 import AddressList from "./components/address/addressList.jsx";
+// import LoginSummary from "./mfs/authComponent/loginSummary.jsx";
+// import AddressForm from "./mfs/authComponent/addressForm.jsx";
+import LoginSummary from "./common/loginSummary.js";
+import AddressForm from "./common/addressForm.js";
 
 const App = () => {
   return (
@@ -18,24 +20,80 @@ const App = () => {
         <MainNav />
         <main className="">
           <Switch>
-            <Route path="/auth" component={AuthMFApp} />
-            <Route path="/ecommerce/checkout" component={CheckoutMFApp} />
-            <Route path="/product" component={CheckoutMFApp} />
-            <Route path="/cart" component={CheckoutMFApp} />
-            <Route path="/ecommerce-payment" component={CheckoutMFApp} />
-            <Route path="/flight-payment" component={CheckoutMFApp} />
-            <Route path="/passenger-edit" component={CheckoutMFApp} />
-            <Route path="/addons" component={CheckoutMFApp} />
+            <Route
+              path="/auth"
+              render={() => (
+                <Suspense fallback={<div>Loading Auth...</div>}>
+                  <AuthMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/ecommerce/checkout"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                  <LoginSummary />
+                  <AddressForm />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/product"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/cart"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/ecommerce-payment"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/flight-payment"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/passenger-edit"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/addons"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
             <Route path="/dashboard" component={DashboardPage} />
-            <Route path="/wishlist" component={ProductWishlisting} />
+            <Route path="/wishlist" component={ProductWishlist} />
             <Route path="/addresses" component={AddressList} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/flight-search" component={FlightResults} />
             <Route path="/" component={DashboardPage} />
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
-          <AuthComponents />
-          <CheckoutComponents />
         </main>
       </BrowserRouter>
       <footer className="border-t py-6 text-center text-xs text-muted-foreground">

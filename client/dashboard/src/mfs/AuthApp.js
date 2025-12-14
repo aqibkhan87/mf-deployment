@@ -1,59 +1,49 @@
 import React, { useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { mount } from "auth/AuthApp";
+import { loadRemoteMF } from "./../loadRemoteMF";
 
 const AuthApp = () => {
   const ref = useRef(null);
+  const isMountedRef = useRef(false);
   const history = useHistory();
 
-  console.log("history", history)
-
-  // Base paths that child MFs are mounted under
-  const basePaths = ["/auth", "/product", "/cart", "/ecommerce", "/flight"];
-
-  // Function to get subpath by stripping base path prefix
-  const getSubPath = (pathname) => {
-    for (const basePath of basePaths) {
-      if (pathname.startsWith(basePath)) {
-        return pathname.slice(basePath.length) || "/";
-      }
-    }
-    return pathname; // no base path matched (unlikely)
-  };
-
-  const subPath = getSubPath(history.location.pathname);
-
-  const handleChildNavigate = (childLocation) => {
+  // 🔹 Child → Parent
+  const updateParentHistory = (childLocation) => {
     const { pathname: childPath } = childLocation?.location ?? childLocation;
-    // Prepend the matching base path before pushing to parent history
-    for (const basePath of basePaths) {
-      if (childPath.startsWith(basePath)) {
-        // Already has basePath
-        if (childPath !== history?.location.pathname) {
-          history.push(childPath);
-        }
-        return;
-      }
-    }
-    // If child path did not include base path, prepend based on current location
-    const parentBasePath = basePaths.find((base) =>
-      history?.location.pathname.startsWith(base)
-    );
-    const newParentPath = (parentBasePath || "") + childPath;
-    if (newParentPath !== history?.location.pathname) {
-      history.push(newParentPath);
+    if (childPath !== history.location.pathname) {
+      history.push(childPath);
     }
   };
 
   useEffect(() => {
-    const { updateChildHistory } = mount(ref.current, {
-      initialPath: subPath,
-      updateParentHistory: handleChildNavigate,
-    });
-    // Sync child when parent navigates
-    const unlisten = history.listen(updateChildHistory);
-    return () => unlisten();
-  }, [history.location.pathname, history]);
+    let unlisten;
+    
+    const loadAuthApp = async () => {
+      if (isMountedRef.current) return;
+      isMountedRef.current = true;
+      const { mount } = await loadRemoteMF(
+        `${process.env.AUTH_MF_ENDPOINT}/remoteEntry.js`,
+        "auth",
+        "./AuthApp"
+      );
+      const { updateChildHistory } = mount(ref.current, {
+        updateParentHistory,
+        initialPath: history.location.pathname, // ✅ full path
+      });
+
+      // 🔹 Parent → Child
+      unlisten = history.listen((location) => {
+        updateChildHistory(location);
+      });
+    };
+
+    loadAuthApp();
+
+    return () => {
+      if (unlisten) unlisten();
+      isMountedRef.current = false;
+    };
+  }, [history.location]);
 
   return <div ref={ref} />;
 };

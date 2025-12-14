@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuthStore } from "store/authStore";
-import { statesOfIndia, countriesList } from "../../utils/constants";
+import { statesOfIndia, countriesList } from "../utils/constants";
 import { addNewAddress } from "../apis/address";
 
 const initialFields = {
@@ -32,7 +32,7 @@ const initialFields = {
 };
 
 const AddressForm = () => {
-  const { setAddress } = useAuthStore();
+  const { setAddress, user } = useAuthStore();
   const [fields, setFields] = useState(initialFields);
   const [touched, setTouched] = useState({});
   const [saving, setSaving] = useState(true);
@@ -46,7 +46,8 @@ const AddressForm = () => {
       fields.city?.length &&
       fields.state?.length &&
       fields.country?.length &&
-      fields.pincode?.length
+      fields.pincode?.length &&
+      user?.email
     )
       setSaving(false);
     else setSaving(true);

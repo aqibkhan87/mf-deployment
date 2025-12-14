@@ -15,12 +15,12 @@ const brown = "#7B4A12";
 
 const AddressList = () => {
     const history = useHistory();
-    const { addresses } = useAuthStore();
+    const { user, addresses } = useAuthStore();
     const [open, setOpen] = useState(false);
     const [current, setCurrent] = useState(null);
 
     useEffect(() => {
-        getAllAddresses();
+        if(user?.email) getAllAddresses();
     }, []);
 
     const handleEdit = (address) => {
