@@ -5,11 +5,14 @@ import {
     CardContent,
     Typography,
     Button,
+    IconButton,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import AddressFormDialog from "./addressDialogForm";
-import { addNewAddress, getAllAddresses, editAddress, markDefaultAddress } from "../../apis/address";
+import { addNewAddress, getAllAddresses, editAddress, markDefaultAddress, deleteAddress } from "../../apis/address";
 
 const brown = "#7B4A12";
 
@@ -30,6 +33,10 @@ const AddressList = () => {
 
     const handleMarkDefault = async (address) => {
         await markDefaultAddress(address?._id);
+    };
+
+    const handleDelete = async (address) => {
+        await deleteAddress(address?._id);
     };
 
     const handleSave = async () => {
@@ -71,20 +78,29 @@ const AddressList = () => {
                                 {addr.state}, {addr.country}
                             </Typography>
 
-                            {addr?.isDefault ?
-                                <></> :
-                                <Button
-                                    onClick={() => handleMarkDefault(addr)}
-                                    sx={{ mt: 1, color: brown, textTransform: "none" }}
+                            <Box className="flex justify-end">
+                                {addr?.isDefault ?
+                                    <></> :
+                                    <Button
+                                        onClick={() => handleMarkDefault(addr)}
+                                        sx={{ pr: 1, color: brown, textTransform: "none" }}
+                                    >
+                                        Mark as Default
+                                    </Button>}
+                                <IconButton
+                                    onClick={() => handleEdit(addr)}
+                                    className=""
                                 >
-                                    Mark as Default
-                                </Button>}
-                            <Button
-                                onClick={() => handleEdit(addr)}
-                                sx={{ mt: 1, color: brown, textTransform: "none" }}
-                            >
-                                Edit Address
-                            </Button>
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+
+                                <IconButton
+                                    onClick={(e) => handleDelete(addr)}
+                                    className=""
+                                >
+                                    <DeleteIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
                         </CardContent>
                     </Card>
                 )) : (

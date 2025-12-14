@@ -60,7 +60,7 @@ apiRouter.post("/add", async (req, res) => {
 
 // Update address
 apiRouter.put("/edit", async (req, res) => {
-  await AddressModel.findByIdAndUpdate(req.query.userId, req.body, {
+  await AddressModel.findByIdAndUpdate(req.body._id, req.body, {
     new: true,
   });
   res.json({ success: true });

@@ -6,23 +6,23 @@ const OrderCard = ({ order }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="order-card" key={order?.createdAt}>
+    <div className="order-card" key={`"${order?._id}-key"`}>
       <div className="order-summary" onClick={() => setOpen(!open)}>
         <div>
-          <strong>Order ID:</strong> #{order._id.slice(-6)}
+          <strong>Order ID:</strong> #{order?._id.slice(-6)}
         </div>
 
         <div>
           <strong>Date:</strong>{" "}
-          {new Date(order.createdAt).toLocaleDateString()}
+          {new Date(order?.createdAt).toLocaleDateString()}
         </div>
 
         <div>
-          <strong>Total:</strong> ₹{order.amount}
+          <strong>Total:</strong> ₹{order?.amount}
         </div>
 
-        <div className={`status ${order.status.toLowerCase()}`}>
-          {order.status}
+        <div className={`status ${order?.status.toLowerCase()}`}>
+          {order?.status}
         </div>
       </div>
 

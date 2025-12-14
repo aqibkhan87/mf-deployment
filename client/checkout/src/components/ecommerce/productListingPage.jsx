@@ -14,14 +14,17 @@ import {
 } from "@mui/material";
 import { useProductStore } from "store/productStore";
 import { getProductByCategory } from "../../apis/products.js";
-import useDebounce from "../../helper/useDebounce.jsx";
+import useDebounce from "../../helper/useDebounce";
 
 const ProductListing = () => {
+  const MIN = 0;
+  const MAX = 100000;
+  const STEP = 100; 
   const { categoryid } = useParams();
   const history = useHistory();
   const { productsByCategory } = useProductStore();
   const [ratingFilter, setRatingFilter] = useState(null);
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([MIN, MAX]);
   const [sortBy, setSortBy] = useState("newest");
   const debouncedPrice = useDebounce(priceRange, 500);
 
@@ -85,11 +88,15 @@ const ProductListing = () => {
           {/* Price Range */}
           <Box mb={2}>
             <Typography gutterBottom>Price</Typography>
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="body2">₹{priceRange[0]}</Typography>
+              <Typography variant="body2">₹{priceRange[1]}</Typography>
+            </Box>
             <Slider
-              defaultValue={[priceRange[0], priceRange[1]]}
               valueLabelDisplay="auto"
-              min={priceRange[0]}
-              max={priceRange[1]}
+              min={MIN}
+              max={MAX}
+              step={STEP}
               value={priceRange}
               onChange={(e, v) => setPriceRange(v)}
             />

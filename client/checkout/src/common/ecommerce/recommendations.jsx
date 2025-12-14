@@ -25,7 +25,7 @@ const Recommendations = () => {
   };
 
   return (
-    <div className="p-4 border rounded recommendation">
+    <div className="p-4 recommendation">
       <h3 className="font-bold mb-2">Recommended for you</h3>
       <div className="flex gap-2">
         <Swiper

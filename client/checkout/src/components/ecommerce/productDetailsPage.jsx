@@ -13,21 +13,20 @@ import {
 import { useCartStore } from "store/cartStore";
 import { useProductStore } from "store/productStore";
 import { getProductById, getProductByCategory } from "../../apis/products.js";
-import { getCart, addToCart } from "../../apis/cart.js";
+import { addToCart } from "../../apis/cart.js";
 import Recommendations from "../../common/ecommerce/recommendations";
 
 
 const ProductDetail = () => {
   const history = useHistory();
   const { categoryid, productid } = useParams();
-  const { cart, cartId } = useCartStore();
+  const { cart } = useCartStore();
   const { product, productsByCategory } = useProductStore();
   const [mainImg, setMainImg] = useState("");
 
   useEffect(() => {
     if (productid) getProductById(productid);
     if (categoryid) getProductByCategory(categoryid);
-    if (cartId) getCart();
   }, []);
 
   const handleNavigateToAddToCart = async (e) => {

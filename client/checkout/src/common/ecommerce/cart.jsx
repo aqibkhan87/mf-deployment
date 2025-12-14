@@ -10,19 +10,18 @@ import {
   IconButton,
   Divider,
   Grid,
-  Paper,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 import { updateQuantity } from "../../utils/helper";
-import { getCart, updateInCart, removeItemFromCart } from "../../apis/cart";
+import { updateInCart, removeItemFromCart } from "../../apis/cart";
 import { addToWishlist } from "../../apis/wishlist";
 
 const Cart = () => {
   const history = useHistory();
-  const { cart, cartId, cartCount } = useCartStore();
+  const { cart, cartCount } = useCartStore();
   const { user } = useAuthStore();
 
   // console.log("cartrtttrtr in cart", cart);
@@ -62,10 +61,6 @@ const Cart = () => {
     updateInCart(existingCartProducts);
   };
 
-  useEffect(() => {
-    if(cartId) getCart();
-  }, []);
-
   const navigateToCheckout = () => {
     history.push("/ecommerce/checkout");
   }
@@ -81,13 +76,13 @@ const Cart = () => {
     e.preventDefault();
     await removeItemFromCart(product?.productDetail?._id);
   }
-  
+
   return (
     <Grid item xs={12} md={7}>
       <Typography variant="h5" gutterBottom>
         Items in Cart: {cartCount ? (cartCount) : ""}
       </Typography>
-      
+
       <Card>
         {cart?.products?.map((product, i) => (
           <Box
@@ -195,11 +190,12 @@ const Cart = () => {
       </Card>
       <Button
         variant="contained"
-        color="warning"
+        type="submit"
+        color="primary"
         sx={{ float: "right", my: 8, fontSize: 18 }}
         onClick={navigateToCheckout}
       >
-        PLACE ORDER
+        Proceed To Checkout
       </Button>
     </Grid>
   );

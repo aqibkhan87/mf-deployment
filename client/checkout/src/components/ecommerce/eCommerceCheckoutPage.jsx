@@ -8,7 +8,7 @@ import { eventEmitter } from "../../utils/helper.js";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
 import { getAllAddresses } from "../../apis/address.js";
- 
+
 const Checkout = () => {
   const history = useHistory();
   const { user, address, addresses, setAddress } = useAuthStore();
@@ -26,13 +26,13 @@ const Checkout = () => {
       setIsEditMode(false);
     }
   }, [isEditMode, user, address]);
-  
+
   useEffect(() => {
     setDefaultAddress();
   }, [addresses]);
 
   useEffect(() => {
-      if(user?.email) getAllAddresses();
+    if (user?.email) getAllAddresses();
   }, []);
 
   const setDefaultAddress = () => {
@@ -78,7 +78,7 @@ const Checkout = () => {
           </Grid>
           <Grid item xs>
             <Typography sx={{ fontWeight: 600 }}>
-              {user?.firstName} {user?.lastName}-{user?.email}
+              {user?.firstName} {user?.lastName}
             </Typography>
           </Grid>
         </Grid>
@@ -236,9 +236,12 @@ const Checkout = () => {
 
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", py: 3, px: 0 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
+          <Typography variant="h5" gutterBottom>
+            Checkout
+          </Typography>
           {user?.email ? <LoginUserDetails /> : <UserNotLoggedIn />}
           {address ? <DisplayAddress /> : <AddressNotSelected />}
           <CheckoutItems />
@@ -252,7 +255,7 @@ const Checkout = () => {
           )}
           <Button
             variant="contained"
-            color="warning"
+            color="primary"
             sx={{ float: "right", fontSize: 16, px: 6, mb: 4 }}
             disabled={isContinueDisabled}
             onClick={handleCheckout}

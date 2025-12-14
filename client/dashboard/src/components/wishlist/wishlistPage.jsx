@@ -8,15 +8,17 @@ import {
     CardContent,
     CardMedia,
     Rating,
-    IconButton
+    IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useWishlistStore } from "store/wishlistStore";
+import { useAuthStore } from "store/authStore";
 import { getWishlistProducts, deleteItemFromWishlist } from "../../apis/wishlist.js";
 
 const ProductWishlist = () => {
     const history = useHistory();
     const { wishlist } = useWishlistStore();
+    const { user } = useAuthStore();
 
     const navigateToProductDetail = (e, p) => {
         e.preventDefault();
@@ -24,7 +26,7 @@ const ProductWishlist = () => {
     };
 
     useEffect(() => {
-        getWishlistProducts();
+        if (user?.email) getWishlistProducts();
     }, []);
 
     const handleOnDelete = async (e, p) => {
@@ -34,12 +36,11 @@ const ProductWishlist = () => {
     }
 
     return (
-        <Box item xs={12} md={9} p={{ md: 2, xs: 0 }} >
+        <Box xs={12} md={9} p={{ md: 2, xs: 0 }} >
             {wishlist?.length ? <Typography variant="h6" gutterBottom>
                 Headset (Showing 1–{wishlist?.length})
             </Typography> : <></>}
-            <Box container spacing={2} >
-
+            <Grid container spacing={2} >
                 {wishlist?.length > 0 ? wishlist?.map((p, i) => (
                     <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
                         <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer relative">
@@ -102,7 +103,7 @@ const ProductWishlist = () => {
                         </a>
                     </Grid>
                 )) : <Typography className="m-8" variant="h6" gutterBottom>No wishlist Items</Typography>}
-            </Box>
+            </Grid>
         </Box>
     );
 };

@@ -8,6 +8,7 @@ const CartPage = () => {
   const { cart } = useCartStore();
 
 
+
   return (
     <div className="">
       {!cart?.products?.length ? (

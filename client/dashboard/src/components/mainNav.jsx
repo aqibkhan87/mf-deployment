@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import {
   AppBar,
@@ -11,18 +11,27 @@ import {
   Avatar,
   Menu,
   MenuItem,
+  Badge
 } from "@mui/material";
-import Badge from "@mui/material/Badge";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 import { useWishlistStore } from "store/wishlistStore";
+import { getCart } from "../apis/cart";
+import { getWishlistProducts } from "../apis/wishlist.js";
 
 const MainNav = () => {
   const history = useHistory();
-  const { cartCount, setCartId } = useCartStore();
+  const { cartId, cartCount, setCartId } = useCartStore();
   const { wishlistCount } = useWishlistStore();
   const { user, setUser } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState(null);
+
+  useEffect(() => {
+    if (cartId) getCart();
+    if (user?.email) getWishlistProducts();
+  }, []);
 
   const handleOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
@@ -73,8 +82,8 @@ const MainNav = () => {
           </Link>
         </Box>
         <Box>
-          <Button className="text-black">
-            <Link to="/cart/view">
+          <Link to="/cart/view" className="p-2">
+            <IconButton>
               <Badge
                 badgeContent={cartCount}
                 color="error"
@@ -86,36 +95,37 @@ const MainNav = () => {
                   },
                 }}
               >
-                Cart
+                <ShoppingCartIcon />
               </Badge>
-            </Link>
-          </Button>
-          {user?.email ? <Button className="text-black">
-            <Link to="/wishlist">
-              <Badge
-                badgeContent={wishlistCount}
-                color="error"
-                max={1000}
-                sx={{
-                  // Use transform to shift badge position
-                  "& .MuiBadge-badge": {
-                    transform: "translate(15px, -15px)",
-                  },
-                }}
-              >
-                Wishlist
-              </Badge>
-            </Link>
-          </Button> : null}
+            </IconButton>
+          </Link>
+          {user?.email ?
+            <Link to="/wishlist" className="p-2">
+              <IconButton>
+                <Badge
+                  badgeContent={wishlistCount}
+                  color="error"
+                  max={1000}
+                  sx={{
+                    // Use transform to shift badge position
+                    "& .MuiBadge-badge": {
+                      transform: "translate(15px, -15px)",
+                    },
+                  }}
+                >
+                  <FavoriteIcon />
+                </Badge>
+              </IconButton>
+            </Link> : null}
           {!user?.email ? (
-            <Button className="text-black">
+            <Button className="p-2" >
               <Link to="/auth/login" style={{ textDecoration: "none" }}>
                 Login
               </Link>
             </Button>
           ) : (
             <>
-              <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
+              <IconButton onClick={handleOpenMenu} sx={{ p: 0, mx: 2 }}>
                 <Avatar alt={user?.firstName} />
               </IconButton>
 

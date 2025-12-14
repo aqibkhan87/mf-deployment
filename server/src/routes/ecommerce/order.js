@@ -8,13 +8,15 @@ apiRouter.get("/", async (req, res) => {
   try {
     const userId = req.query.userId;
 
-    const orders = await PaymentModel.find({ userId }).populate({
-      path: "cartId",
-      populate: {
-        path: "products.productDetail",
-        model: "product",
-      },
-    });
+    const orders = await PaymentModel.find({ userId })
+      .populate({
+        path: "cartId",
+        populate: {
+          path: "products.productDetail",
+          model: "product",
+        },
+      })
+      .sort({ createdAt: -1 });
     console.log("Fetched Orders:", orders);
 
     res.json({

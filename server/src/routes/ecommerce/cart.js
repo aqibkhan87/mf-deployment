@@ -166,8 +166,7 @@ apiRouter.put("/update-userid-in-cart", async (req, res) => {
       { new: true }
     );
     if (cart.userId === userId)
-      return res.json(200).json({ message: "User Id updated." });
-
+      return res.json({ message: "User Id updated." });
     // Optionally populate products.productDetail before returning
     res.json({ cart });
   } catch (err) {

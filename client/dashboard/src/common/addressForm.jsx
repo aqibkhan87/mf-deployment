@@ -19,7 +19,7 @@ import {
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useAuthStore } from "store/authStore";
 import { statesOfIndia, countriesList } from "../utils/constants";
-import { addNewAddress } from "../apis/address";
+import { addNewAddress, editAddress } from "../apis/address";
 
 const initialFields = {
   name: "",
@@ -34,6 +34,7 @@ const initialFields = {
 const AddressForm = () => {
   const { setAddress, user } = useAuthStore();
   const [fields, setFields] = useState(initialFields);
+  const [current, setCurrent] = useState(null);
   const [touched, setTouched] = useState({});
   const [saving, setSaving] = useState(true);
   const [openAddressForm, setOpenAddressForm] = useState(false);
@@ -58,6 +59,7 @@ const AddressForm = () => {
       const payload = event.detail;
       setOpenAddressForm(payload.openAddressForm);
       setFields(payload.address)
+      if (payload.address) setCurrent(payload.address)
     };
     window.addEventListener("openAddressForm", handler);
     return () => {
@@ -83,7 +85,7 @@ const AddressForm = () => {
     city: !fields.city,
     state: !fields.state,
     country: !fields.country,
-    pincode: !fields.pincode || fields.pincode.length !== 6,
+    pincode: !fields.pincode,
   };
 
   const handleBlur = (field) => setTouched({ ...touched, [field]: true });
@@ -105,8 +107,12 @@ const AddressForm = () => {
       setSaving(true);
       setTimeout(() => setSaving(false), 1200);
       setOpenAddressForm(false);
-      const newAddressRes = await addNewAddress(fields);
-      
+      let newAddressRes = {};
+      if (current?._id) {
+        newAddressRes = await editAddress(fields);
+      } else {
+        newAddressRes = await addNewAddress(fields);
+      }
       if (newAddressRes?.status === 200 && newAddressRes?.data) {
         setAddress(newAddressRes?.data);
         onClose();
@@ -121,206 +127,204 @@ const AddressForm = () => {
   if (openAddressForm) {
     return (
       <Dialog open={openAddressForm} onClose={onClose} sx={{ p: 2 }}>
-        <DialogTitle>Add Address</DialogTitle>
+        <DialogTitle>{current ? "Edit Addres" : "Add Address"}</DialogTitle>
         <DialogContent sx={{ mt: 1 }}>
-          <Grid container spacing={2} justifyContent="center" sx={{ pl: 2 }}>
-            <Paper elevation={0} sx={{ p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Name"
-                    name="name"
-                    value={fields.name}
-                    error={errors.name && touched.name}
-                    helperText={
-                      errors.name && touched.name
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("name")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Locality"
-                    name="locality"
-                    value={fields.locality}
-                    error={errors.locality && touched.locality}
-                    helperText={
-                      errors.locality && touched.locality
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("locality")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="(Area and Street)"
-                    name="line1"
-                    value={fields.line1}
-                    error={errors.line1 && touched.line1}
-                    helperText={
-                      errors.line1 && touched.line1
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("line1")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="(Area and Street)"
-                    name="line2"
-                    value={fields.line2}
-                    error={errors.line2 && touched.line2}
-                    helperText={
-                      errors.line2 && touched.line2
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("line2")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Pincode"
-                    name="pincode"
-                    value={fields.pincode}
-                    error={errors.pincode && touched.pincode}
-                    helperText={
-                      errors.pincode && touched.pincode
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("pincode")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="City/District/Town"
-                    name="city"
-                    value={fields.city}
-                    error={errors.city && touched.city}
-                    helperText={
-                      errors.city && touched.city
-                        ? "Please fill out this field."
-                        : ""
-                    }
-                    onBlur={() => handleBlur("city")}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>State</InputLabel>
-                    <Select
-                      label="State"
-                      name="state"
-                      value={fields.state}
-                      onChange={handleChange}
-                    >
-                      {statesOfIndia.map((s) => (
-                        <MenuItem key={s} value={s}>
-                          {s}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Country</InputLabel>
-                    <Select
-                      label="Country"
-                      name="country"
-                      value={fields.country}
-                      onChange={handleChange}
-                    >
-                      {countriesList?.map((c) => (
-                        <MenuItem key={c.name} value={c.name}>
-                          {c.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Landmark (Optional)"
-                    name="landmark"
-                    value={fields.landmark}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Alternate Phone (Optional)"
-                    name="alternatePhone"
-                    value={fields.alternatePhone}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl>
-                    <RadioGroup
-                      row
-                      value={fields.addressType}
-                      onChange={handleAddressTypeChange}
-                    >
-                      <FormControlLabel
-                        value="home"
-                        control={<Radio />}
-                        label="Home (All day delivery)"
-                      />
-                      <FormControlLabel
-                        value="work"
-                        control={<Radio />}
-                        label="Work (Delivery between 10 AM - 5 PM)"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
+          <Paper elevation={0} sx={{ p: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Name"
+                  name="name"
+                  value={fields.name}
+                  error={errors.name && touched.name}
+                  helperText={
+                    errors.name && touched.name
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("name")}
+                  onChange={handleChange}
+                />
               </Grid>
-              <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="warning"
-                    disabled={saving}
-                    onClick={handleSubmit}
-                  >
-                    Save And Deliver Here
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<CancelIcon />}
-                    onClick={onClose}
-                  >
-                    Cancel
-                  </Button>
-                </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Locality"
+                  name="locality"
+                  value={fields.locality}
+                  error={errors.locality && touched.locality}
+                  helperText={
+                    errors.locality && touched.locality
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("locality")}
+                  onChange={handleChange}
+                />
               </Grid>
-            </Paper>
-          </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="(Area and Street)"
+                  name="line1"
+                  value={fields.line1}
+                  error={errors.line1 && touched.line1}
+                  helperText={
+                    errors.line1 && touched.line1
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("line1")}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="(Area and Street)"
+                  name="line2"
+                  value={fields.line2}
+                  error={errors.line2 && touched.line2}
+                  helperText={
+                    errors.line2 && touched.line2
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("line2")}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Pincode"
+                  name="pincode"
+                  value={fields.pincode}
+                  error={errors.pincode && touched.pincode}
+                  helperText={
+                    errors.pincode && touched.pincode
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("pincode")}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="City/District/Town"
+                  name="city"
+                  value={fields.city}
+                  error={errors.city && touched.city}
+                  helperText={
+                    errors.city && touched.city
+                      ? "Please fill out this field."
+                      : ""
+                  }
+                  onBlur={() => handleBlur("city")}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>State</InputLabel>
+                  <Select
+                    label="State"
+                    name="state"
+                    value={fields.state}
+                    onChange={handleChange}
+                  >
+                    {statesOfIndia.map((s) => (
+                      <MenuItem key={s} value={s}>
+                        {s}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Country</InputLabel>
+                  <Select
+                    label="Country"
+                    name="country"
+                    value={fields.country}
+                    onChange={handleChange}
+                  >
+                    {countriesList?.map((c) => (
+                      <MenuItem key={c.name} value={c.name}>
+                        {c.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Landmark (Optional)"
+                  name="landmark"
+                  value={fields.landmark}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  label="Alternate Phone (Optional)"
+                  name="alternatePhone"
+                  value={fields.alternatePhone}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl>
+                  <RadioGroup
+                    row
+                    value={fields.addressType}
+                    onChange={handleAddressTypeChange}
+                  >
+                    <FormControlLabel
+                      value="home"
+                      control={<Radio />}
+                      label="Home (All day delivery)"
+                    />
+                    <FormControlLabel
+                      value="work"
+                      control={<Radio />}
+                      label="Work (Delivery between 10 AM - 5 PM)"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="warning"
+                  disabled={saving}
+                  onClick={handleSubmit}
+                >
+                  Save And Deliver Here
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<CancelIcon />}
+                  onClick={onClose}
+                >
+                  Cancel
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
         </DialogContent>
       </Dialog>
     );
