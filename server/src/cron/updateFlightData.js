@@ -2,7 +2,7 @@ import cron from "node-cron";
 import fetchTodayFlights from "../services/amadeus.js";
 
 cron.schedule(
-  "31 19 * * *",
+  "59 23 * * *",
   async () => {
     console.log("🛫 Fetching flights for Today.....");
     await fetchTodayFlights();

@@ -68,7 +68,7 @@ async function saveAmadeusData(origin, destination, date, amadeusData) {
   });
 
   await FlightPrice.updateOne(
-    { origin, destination, date },
+    { origin, destination },
     { origin, destination, date, fares },
     { upsert: true }
   );
@@ -109,7 +109,6 @@ async function fetchFlightsForDate(date) {
 // Main: fetch today and tomorrow
 async function fetchTodayFlights() {
   const date = new Date();
-  date.setUTCDate(date.getUTCDate() + 1);
 
   console.log("🔍 Fetching today's flights...", date);
   await fetchFlightsForDate(date);

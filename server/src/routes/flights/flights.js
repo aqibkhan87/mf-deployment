@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
   }
 
   const [year, month, day] = date.split("-");
-  const startDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
+  const startDate = new Date(date);
   const endDate = new Date(`${year}-${month}-${day}T23:59:59.999Z`);
   let record = await FlightPrice.findOne({
     origin: from.toUpperCase(),
@@ -36,25 +36,6 @@ router.get("/", async (req, res) => {
     },
   });
   if (!record) return res.json({ flights: [] });
-
-  // const promoObj = promo
-  //   ? offersData.find((o) => o.code.toUpperCase() === promo.toUpperCase())
-  //   : null;
-  // const flights = record.fares.map((f) => {
-  //   const { final, discount } = applyPromoToPrice(f.basePrice, promoObj);
-  //   return {
-  //     providerFlightId: f.providerFlightId,
-  //     airline: f.airline,
-  //     depart: f.departureTime,
-  //     arrive: f.arrivalTime,
-  //     duration: f.duration,
-  //     basePrice: f.basePrice,
-  //     finalPrice: final,
-  //     discount,
-  //     cabin: f.cabin,
-  //     availableSeats: f.availableSeats,
-  //   };
-  // });
 
    // Map fares to include airline info + logo
   const fares = record?.fares?.map((f) => {

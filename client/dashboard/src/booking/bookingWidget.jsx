@@ -80,8 +80,6 @@ const BookingWidget = () => {
   return (
     <Paper elevation={0} className="booking-widget">
       <Box sx={{ py: 8, px: 3 }}>
-
-        {/* Inputs Row */}
         <Grid container spacing={2} alignItems="center" className="inputs-row">
           {/* From */}
           <Grid item xs={12} md={3}>
@@ -226,6 +224,10 @@ const BookingWidget = () => {
               InputLabelProps={{ shrink: true }}
               value={departDate}
               onChange={(e) => setDepartDate(e.target.value)}
+              inputProps={{
+                min: new Date().toISOString().split("T")[0],
+                max: new Date().toISOString().split("T")[0],
+              }}
             />
           </Grid>
 

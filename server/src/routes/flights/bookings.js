@@ -43,46 +43,32 @@ router.get("/", async (req,res) => {
   res.json({ success: true, bookingId: booking._id, finalPrice: final });
 });
 
-router.post("/create", async (req, res) => {
+router.post("/", async (req, res) => {
   const {
-    flightRef,
-    providerFlightId,
-    source,
-    destination,
-    travelDate,
-    contact,
-    passengers,
-    pricing,
+    flightId,
+    providerId,
+    from,
+    to,
+    departDate,
+    passengerCount,
   } = req.body;
 
-  if (!contact?.email || !passengers?.length)
+  if (!passengerCount)
     return res.status(400).json({ message: "Missing details" });
 
-  const paymentRequired = pricing.finalPrice > 0;
-
   const booking = await Booking.create({
-    flightRef,
-    providerFlightId,
-    source,
-    destination,
-    travelDate,
-    contact,
-    passengers,
-    pricing,
-    paymentRequired,
-    bookingStatus: paymentRequired
-      ? "PENDING_PAYMENT"
-      : "CONFIRMED",
-    payment: paymentRequired
-      ? { amount: pricing.finalPrice }
-      : { status: "NOT_REQUIRED", amount: 0 },
+    flightId,
+    providerId,
+    from,
+    to,
+    departDate,
+    passengerCount,
   });
 
   res.json({
     success: true,
     bookingId: booking._id,
     bookingRef: booking.bookingRef,
-    paymentRequired,
   });
 });
 

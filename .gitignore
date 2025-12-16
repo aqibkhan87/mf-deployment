@@ -3,6 +3,7 @@
 /*/*/dist/
 *.log
 /client/*/package-lock.json
+/server/package-lock.json
 /*/*/.DS_store
 /*/.DS_store
 /.DS_store

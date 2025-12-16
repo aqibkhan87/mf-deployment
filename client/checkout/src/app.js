@@ -4,8 +4,8 @@ import ProductDetails from "./components/ecommerce/productDetailsPage";
 import ProductListing from "./components/ecommerce/productListingPage";
 import CartPage from "./components/ecommerce/cartPage";
 import CheckoutPage from "./components/ecommerce/eCommerceCheckoutPage";
-import EcommercePayment from "./common/ecommerce/ecommercePayment";
-import FlightPayment from "./common/flights/flightPayment";
+import PassengerEditPage from "./components/flights/passengerEditPage";
+import Addons from "./common/flights/addons";
 
 const App = ({ history }) => {
   
@@ -16,8 +16,8 @@ const App = ({ history }) => {
         <Route exact path="/product/:categoryid/:productid" component={ProductDetails} />
         <Route exact path="/product/:categoryid" component={ProductListing} />
         <Route exact path="/ecommerce/checkout" component={CheckoutPage} />
-        <Route exact path="/ecommerce-payment" component={EcommercePayment} />
-        <Route exact path="/flight-payment" component={FlightPayment} />
+        <Route exact path="/passenger-edit" component={PassengerEditPage} />
+        <Route exact path="/addons" component={Addons} />
       </Switch>
     </Router>
   );

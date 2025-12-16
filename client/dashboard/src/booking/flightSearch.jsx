@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
+import { Button } from "@mui/material";
 import {
     searchFlights,
     createBooking
@@ -19,6 +20,7 @@ const formatDuration = (duration) => {
 };
 
 function FlightResults() {
+    const history = useHistory();
     const searchQuery = new URLSearchParams(window.location.search);
     const from = searchQuery.get("from");
     const to = searchQuery.get("to");
@@ -50,24 +52,26 @@ function FlightResults() {
         }
     }
 
-    const handleBooking = async (flight) => {
+    const handleFlightSearch = async (e, flight) => {
+        e?.preventDefault();
         const payload = {
-            flightId: flight.id,
+            flightId: flights._id,
+            providerId: flight.providerOfferId,
             from,
             to,
-            departDate,
-            returnDate: tripType === "round" ? returnDate : null,
-            passengers,
+            departDate: date,
+            passengerCount: passengers,
         };
 
         try {
             const res = await createBooking(payload);
             alert(`✅ Booking confirmed! ID: ${res.bookingId}`);
+            history.push("/passenger-edit")
         } catch (err) {
             console.error("Booking failed:", err);
             alert("❌ Booking failed. Try again later.");
         }
-    };
+    }
 
     return (
         <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
@@ -130,9 +134,11 @@ function FlightResults() {
                         {/* Price & Button */}
                         <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
                             <p className="text-2xl font-semibold">₹ {fare.totalPrice}</p>
-                            <button className="mt-2 px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+                            <Button className="mt-2 px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
+                                onClick={(e) => handleFlightSearch(e, fare)}
+                            >
                                 Select Flight
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 ))}

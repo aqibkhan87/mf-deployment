@@ -4,11 +4,12 @@ import mongoose from "mongoose";
    Passenger Schema
 ========================= */
 const PassengerSchema = new mongoose.Schema({
-  title: String,
   firstName: String,
   lastName: String,
   age: Number,
   gender: String,
+  isAdult: { type: Boolean, default: true },
+  isInfant: { type: Boolean, default: false },
 });
 
 /* =========================
@@ -35,12 +36,13 @@ const PaymentSchema = new mongoose.Schema({
 const BookingSchema = new mongoose.Schema(
   {
     // ---- Flight info ----
-    flightRef: { type: mongoose.Schema.Types.ObjectId, ref: "FlightPrice" },
-    providerFlightId: String,
+    flightId: { type: mongoose.Schema.Types.ObjectId, ref: "FlightPrice" },
+    providerId: String,
 
     source: String,
     destination: String,
     travelDate: String,
+    passengerCount: Number,
 
     // ---- User ----
     contact: {
@@ -51,7 +53,7 @@ const BookingSchema = new mongoose.Schema(
     passengers: [PassengerSchema],
 
     // ---- Pricing ----
-    pricing: {
+    priceBreakdown: {
       basePrice: Number,
       taxes: Number,
       discountApplied: Number,
