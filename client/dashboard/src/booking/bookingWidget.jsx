@@ -9,12 +9,19 @@ import {
   MenuItem,
   Select,
   InputLabel,
+  IconButton,
   FormControl,
   CircularProgress,
+  Typography,
   Autocomplete,
 } from "@mui/material";
-import { fetchAirports, searchAirports } from "./apis";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { fetchAirports, searchAirports } from "./../apis/flights/booking";
 import "./bookingWidget.scss";
+
+const MAX_ADULTS = 9;
+const MAX_INFANTS = 2;
 
 const debounce = (fn, delay) => {
   let timer;
@@ -28,8 +35,11 @@ const BookingWidget = () => {
   const history = useHistory();
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
-  const [departDate, setDepartDate] = useState("");
-  const [passengers, setPassengers] = useState(1);
+  const [departDate, setDepartDate] = useState(new Date().toISOString().split("T")[0]);
+  const [passengers, setPassengers] = useState({
+    adults: 1,
+    infant: 0
+  });
   const [loadingAirports, setLoadingAirports] = useState(false);
   const [fromOptions, setFromOptions] = useState([]);
   const [toOptions, setToOptions] = useState([]);
@@ -40,6 +50,7 @@ const BookingWidget = () => {
   useEffect(() => {
     fetchAirports()
       .then((res) => {
+        debugger
         setFromOptions(res);
         setToOptions(res);
       })
@@ -71,10 +82,11 @@ const BookingWidget = () => {
       alert("Please select From, To, and Departure date.");
       return;
     }
-    history.push(
-      `/flight-search?from=${from.iata || from.name}&to=${to.iata || to.name
-      }&date=${departDate}&passengers=${passengers}`
-    );
+    localStorage.setItem("search-info", JSON.stringify({
+      from: from.iata, to: to.iata, date: departDate,
+      passengers: { adult: passengers.adults, infant: passengers.infant }
+    }))
+    history.push(`/flight-search`);
   };
 
   return (
@@ -226,7 +238,6 @@ const BookingWidget = () => {
               onChange={(e) => setDepartDate(e.target.value)}
               inputProps={{
                 min: new Date().toISOString().split("T")[0],
-                max: new Date().toISOString().split("T")[0],
               }}
             />
           </Grid>
@@ -234,17 +245,120 @@ const BookingWidget = () => {
           {/* Passengers */}
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Passengers</InputLabel>
+              <InputLabel id="passengers-label">Passengers</InputLabel>
+
               <Select
-                value={passengers}
+                labelId="passengers-label"
                 label="Passengers"
-                onChange={(e) => setPassengers(e.target.value)}
+                value="passengers"
+                displayEmpty
+                renderValue={() =>
+                  `${passengers.adults} Adult${passengers.adults > 1 ? "s" : ""}, 
+                  ${passengers.infant} Infant${passengers.infant > 1 ? "s" : ""}`
+                }
               >
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <MenuItem key={n} value={n}>
-                    {n} Passenger{n > 1 ? "s" : ""}
-                  </MenuItem>
-                ))}
+                {/* ADULT */}
+                <MenuItem disableRipple disableTouchRipple>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                  >
+                    <Box>
+                      <Typography fontWeight={600}>Adult</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Age 12+
+                      </Typography>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPassengers((p) => ({
+                            ...p,
+                            adults: Math.max(1, p.adults - 1),
+                            infant: Math.min(p.infant, Math.max(0, p.adults - 1)),
+                          }));
+                        }}
+                        disabled={passengers.adults <= 1}
+                      >
+                        <RemoveIcon />
+                      </IconButton>
+
+                      <Typography width={20} textAlign="center">
+                        {passengers.adults}
+                      </Typography>
+
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPassengers((p) => ({
+                            ...p,
+                            adults: Math.min(MAX_ADULTS, p.adults + 1),
+                          }));
+                        }}
+                        disabled={passengers.adults >= MAX_ADULTS}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </MenuItem>
+
+                {/* INFANT */}
+                <MenuItem disableRipple disableTouchRipple>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width="100%"
+                  >
+                    <Box>
+                      <Typography fontWeight={600}>Infant</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Below 2 years
+                      </Typography>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPassengers((p) => ({
+                            ...p,
+                            infant: Math.max(0, p.infant - 1),
+                          }));
+                        }}
+                        disabled={passengers.infant <= 0}
+                      >
+                        <RemoveIcon />
+                      </IconButton>
+
+                      <Typography width={20} textAlign="center">
+                        {passengers.infant}
+                      </Typography>
+
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPassengers((p) => ({
+                            ...p,
+                            infant: Math.min(p.adults, p.infant + 1),
+                          }));
+                        }}
+                        disabled={passengers.infant >= passengers.adults}
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>

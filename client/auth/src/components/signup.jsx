@@ -133,6 +133,9 @@ const Signup = () => {
               variant="contained"
               color="primary"
               sx={{ mt: 2 }}
+              aria-label="Signup"
+              tabIndex={0}
+              role="button"
             >
               Signup
             </Button>

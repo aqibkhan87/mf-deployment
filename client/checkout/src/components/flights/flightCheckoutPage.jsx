@@ -8,7 +8,7 @@ import { eventEmitter } from "../../utils/helper.js";
 
 const Checkout = () => {
   const { user, address } = useAuthStore();
-  const { selectedFlight, setBookingId } = useBookingStore();
+  const { selectedFlight, setBookingRef } = useBookingStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address

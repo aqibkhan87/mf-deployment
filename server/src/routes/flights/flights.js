@@ -3,69 +3,128 @@ import FlightPrice from "../../models/flights/flightPrice.js";
 import { applyPromoToPrice } from "../../services/flights/pricing.js";
 import offersData from "./../offerdata.js"; // small helper, or call /api/offers
 import AirlinesMapping from "./airlinesMapping.js";
-const router = express.Router();
+const apiRouter = express.Router();
 
 /**
  * GET /api/flights/search?from=DEL&to=BOM&date=2025-10-08&promo=HDFCFLY
  * Reads from FlightPrice collection (populated by daily cron job).
  */
-router.get("/", async (req, res) => {
-  const { from, to, date, promo } = req.query;
+apiRouter.get("/", async (req, res) => {
+  try {
+    const { from, to, date, promo, providerId, flightId } = req.query;
 
-  if (!from || !to || !date)
-    return res.status(400).json({ message: "Missing from/to/date" });
+    if (providerId && flightId) {
+      const record = await FlightPrice.findOne({
+        _id: flightId,
+        "fares.providerOfferId": providerId,
+      });
 
-  // First try Redis cache if present
-  const redis = req.app.get("redis");
-  
-  const cacheKey = `search:${from}-${to}:${date}:${promo || ""}`;
-  if (redis) {
-    const cached = await redis.get(cacheKey);
-    if (cached) return res.json(JSON.parse(cached));
-  }
+      if (!record) {
+        return res.status(404).json({ message: "Flight not found" });
+      }
 
-  const [year, month, day] = date.split("-");
-  const startDate = new Date(date);
-  const endDate = new Date(`${year}-${month}-${day}T23:59:59.999Z`);
-  let record = await FlightPrice.findOne({
-    origin: from.toUpperCase(),
-    destination: to.toUpperCase(),
-    date: {
-      $gte: startDate,
-      $lte: endDate,
-    },
-  });
-  if (!record) return res.json({ flights: [] });
+      const fare = record.fares.find(
+        (f) => f.providerOfferId === providerId
+      );
 
-   // Map fares to include airline info + logo
-  const fares = record?.fares?.map((f) => {
-    const airline = AirlinesMapping[f?.validatingAirline] || {
-      name: f.validatingAirline,
-      code: f.validatingAirline,
-      logo: "https://via.placeholder.com/48?text=?",
-    };
+      if (!fare) {
+        return res.status(404).json({ message: "Fare not found" });
+      }
 
-    return {
-      providerOfferId: f.providerOfferId,
-      airline: {
-        name: airline.name,
-        code: airline.code,
-        logo: airline.logo,
+      const airline = AirlinesMapping[fare.validatingAirline] || {
+        name: fare.validatingAirline,
+        code: fare.validatingAirline,
+        logo: "https://via.placeholder.com/48?text=?",
+      };
+
+      return res.json({
+        flights: {
+          _id: record._id,
+          origin: record.origin,
+          destination: record.destination,
+          date: record.date,
+          fare: {
+            providerOfferId: fare.providerOfferId,
+            airline: {
+              name: airline.name,
+              code: airline.code,
+              logo: airline.logo,
+            },
+            totalPrice: fare.totalPrice,
+            basePrice: fare.basePrice,
+            currency: fare.currency,
+            duration: fare.duration,
+            segments: fare.segments,
+          },
+        },
+      });
+    }
+
+    // ==================================
+    // 2️⃣ CASE: Normal search (fallback)
+    // ==================================
+    if (!from || !to || !date) {
+      return res.status(400).json({ message: "Missing from/to/date" });
+    }
+
+    const redis = req.app.get("redis");
+    const cacheKey = `search:${from}-${to}:${date}:${promo || ""}`;
+
+    if (redis) {
+      const cached = await redis.get(cacheKey);
+      if (cached) return res.json(JSON.parse(cached));
+    }
+
+    const startDate = new Date(`${date}T00:00:00.000Z`);
+    const endDate = new Date(`${date}T23:59:59.999Z`);
+
+    const record = await FlightPrice.findOne({
+      origin: from.toUpperCase(),
+      destination: to.toUpperCase(),
+      date: { $gte: startDate, $lte: endDate },
+    });
+
+    if (!record) return res.json({ flights: [] });
+
+    const fares = record.fares.map((f) => {
+      const airline = AirlinesMapping[f.validatingAirline] || {
+        name: f.validatingAirline,
+        code: f.validatingAirline,
+        logo: "https://via.placeholder.com/48?text=?",
+      };
+
+      return {
+        providerOfferId: f.providerOfferId,
+        airline: {
+          name: airline.name,
+          code: airline.code,
+          logo: airline.logo,
+        },
+        totalPrice: f.totalPrice,
+        basePrice: f.basePrice,
+        currency: f.currency,
+        duration: f.duration,
+        segments: f.segments,
+      };
+    });
+
+    const payload = {
+      flights: {
+        ...record.toObject(),
+        fares,
       },
-      totalPrice: f.totalPrice,
-      basePrice: f.basePrice,
-      currency: f.currency,
-      duration: f.duration,
-      segments: f.segments,
     };
-  });
 
-  record = { ...record.toObject(), fares }; // make sure Mongoose doc to plain object
+    if (redis) {
+      await redis.set(cacheKey, JSON.stringify(payload), "EX", 60 * 60);
+    }
 
-  const payload = { flights: record };
-  if (redis) await redis.set(cacheKey, JSON.stringify(payload), "EX", 60 * 60); // cache 1h
+    return res.json(payload);
 
-  res.json(payload);
+  } catch (err) {
+    console.error("Flight search error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
-export default router;
+export default apiRouter;

@@ -50,8 +50,17 @@ apiRouter.post("/login", async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    delete user.password; // Remove password before sending user data
-    res.json({ success: true, token, user });
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        _id: user._id,
+      },
+    });
   } catch (err) {
     console.error("login error", err);
     res.status(500).json({ message: "Server error" });

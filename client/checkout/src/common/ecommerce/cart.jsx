@@ -169,7 +169,11 @@ const Cart = () => {
                   sx={{ ml: 2 }}
                   size="small"
                   disabled={!user.email}
-                  onClick={(e) => handleAddToWishlist(e, product)}>
+                  onClick={(e) => handleAddToWishlist(e, product)}
+                  aria-label="Add To Wishlist"
+                  tabIndex={0}
+                  role="button"
+                >
                   Add To Wishlist
                 </Button>
                 <Button
@@ -177,6 +181,9 @@ const Cart = () => {
                   color="error"
                   size="small"
                   onClick={(e) => handleRemoveItemFromCart(e, product)}
+                  aria-label="Remove Item From Cart"
+                  tabIndex={0}
+                  role="button"
                 >
                   Remove
                 </Button>
@@ -194,6 +201,9 @@ const Cart = () => {
         color="primary"
         sx={{ float: "right", my: 8, fontSize: 18 }}
         onClick={navigateToCheckout}
+        aria-label="Proceed To Checkout"
+        tabIndex={0}
+        role="button"
       >
         Proceed To Checkout
       </Button>

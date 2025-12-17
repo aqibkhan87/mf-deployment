@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
     Box,
     Grid,
@@ -13,53 +13,67 @@ import {
     useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-
-const MEALS = [
-    { id: "m-veg", title: "6E Eats (Veg)", desc: "Choice of the day + Beverage", price: 400, tag: "Veg" },
-    { id: "m-nv", title: "6E Eats (Non-Veg)", desc: "Chicken Junglee Sandwich + Beverage", price: 500, tag: "Non Veg" },
-];
-
-const BAGGAGE = [
-    { id: "bag-0", label: "No excess baggage", price: 0 },
-    { id: "bag-3", label: "3 Kg", price: 1950 },
-    { id: "bag-5", label: "5 Kg", price: 3150 },
-];
-
-const EXTRAS = [
-    { id: "extra-piece", title: "Additional Piece", desc: "Extra baggage", price: 2500 },
-    { id: "sports", title: "Sports Equipment", desc: "Sports handling", price: 1800 },
-];
-
-const PASSENGERS = [
-    { id: "p1", name: "Aqib Khan", type: "adult" },
-    { id: "p2", name: "Passenger 2", type: "adult" },
-    { id: "p3", name: "Infant 1", type: "infant" },
-];
+import { useBookingStore } from "store/bookingStore";
+import { getAddons } from "../../apis/flights/addons";
+import { getBookingDetails } from "../../apis/flights/booking";
 
 const BASE_FARE = 25000;
 
 export default function AddonsPage() {
     const theme = useTheme();
+    const { addons, bookingDetails } = useBookingStore();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const [selectedAddons, setSelectedAddons] = useState({});
 
-    const [addons, setAddons] = useState(
-        PASSENGERS.reduce((acc, p) => {
-            acc[p.id] = { meals: [], baggage: null, extras: [] };
-            return acc;
-        }, {})
+    const meals = useMemo(
+        () => addons?.filter((a) => a.type === "meal") || [],
+        [addons]
     );
+
+    const baggage = useMemo(
+        () => addons?.filter((a) => a.type === "baggage") || [],
+        [addons]
+    );
+
+    const passengers = bookingDetails?.passengers || [];
+    const baseFare = bookingDetails?.baseFare || 0;
+
+
+    useEffect(() => {
+        if (!passengers.length) return;
+
+        const init = {};
+        passengers.forEach((p) => {
+            init[p._id] = { meals: [], baggage: null, extras: [] };
+        });
+
+        setSelectedAddons(init);
+    }, [passengers]);
+
+    useEffect(() => {
+        fetchAddons();
+        fetchBooking();
+    }, [])
+
+    const fetchAddons = async () => {
+        await getAddons();
+    }
+
+    const fetchBooking = async () => {
+        await getBookingDetails();
+    }
 
     /* ------------------ HANDLERS ------------------ */
 
     const toggleMeal = (pid, meal) => {
-        setAddons((prev) => {
-            const exists = prev[pid].meals.find((m) => m.id === meal.id);
+        setSelectedAddons((prev) => {
+            const exists = prev[pid]?.meals?.find((m) => m._id === meal._id);
             return {
                 ...prev,
                 [pid]: {
                     ...prev[pid],
                     meals: exists
-                        ? prev[pid].meals.filter((m) => m.id !== meal.id)
+                        ? prev[pid]?.meals?.filter((m) => m._id !== meal._id)
                         : [...prev[pid].meals, meal],
                 },
             };
@@ -67,37 +81,23 @@ export default function AddonsPage() {
     };
 
     const setBaggage = (pid, bag) => {
-        setAddons((prev) => ({
+        setSelectedAddons((prev) => ({
             ...prev,
             [pid]: { ...prev[pid], baggage: bag },
         }));
     };
 
-    const toggleExtra = (pid, extra) => {
-        setAddons((prev) => {
-            const exists = prev[pid].extras.find((e) => e.id === extra.id);
-            return {
-                ...prev,
-                [pid]: {
-                    ...prev[pid],
-                    extras: exists
-                        ? prev[pid].extras.filter((e) => e.id !== extra.id)
-                        : [...prev[pid].extras, extra],
-                },
-            };
-        });
-    };
-
     /* ------------------ TOTALS ------------------ */
 
-    const addonsTotal = Object.values(addons).reduce((sum, p) => {
-        const meals = p.meals.reduce((s, m) => s + m.price, 0);
-        const extras = p.extras.reduce((s, e) => s + e.price, 0);
-        const baggage = p.baggage?.price || 0;
-        return sum + meals + extras + baggage;
-    }, 0);
+    const addonsTotal = useMemo(() => {
+        return Object.values(selectedAddons).reduce((sum, p) => {
+            const mealTotal = p?.meals.reduce((s, m) => s + m.price, 0);
+            const baggageTotal = p?.baggage?.price || 0;
+            return sum + mealTotal + baggageTotal;
+        }, 0);
+    }, [selectedAddons]);
 
-    const grandTotal = BASE_FARE + addonsTotal;
+    const grandTotal = baseFare + addonsTotal;
 
     /* ------------------ UI ------------------ */
 
@@ -140,11 +140,11 @@ export default function AddonsPage() {
                     if (verify.success) {
                         navigate("/dashbaord");
                     }
-                } catch(err) {
+                } catch (err) {
                     console.log("errrrrrr", err);
                     debugger
                     alert("Payment verification failed");
-                } 
+                }
             },
 
             modal: {
@@ -174,39 +174,38 @@ export default function AddonsPage() {
                     </Typography>
 
                     <Stack spacing={3}>
-                        {PASSENGERS.map((p) => {
-                            const selected = addons[p.id];
+                        {passengers?.map((p) => {
+                            const selected = selectedAddons[p?._id];
 
                             return (
-                                <Card key={p.id} variant="outlined">
+                                <Grid key={p.id}>
                                     <CardContent>
-                                        <Typography fontWeight={600}>{p.name}</Typography>
+                                        <Typography fontWeight={600}>{p.firstName} {p.lastName}</Typography>
                                         <Typography variant="caption" color="text.secondary">
                                             {p.type}
                                         </Typography>
-
-                                        {/* MEALS */}
                                         <Box mt={3}>
                                             <Typography fontWeight={600} mb={1}>
                                                 Meals
                                             </Typography>
                                             <Grid container spacing={2}>
-                                                {MEALS.map((m) => {
-                                                    const added = selected.meals.some((x) => x.id === m.id);
+                                                {meals?.map((m) => {
+                                                    const added = selected?.meals?.some((x) => x._id === m._id);
+                                                    console.log("mmmmm", m)
                                                     return (
-                                                        <Grid item xs={12} sm={6} key={m.id}>
+                                                        <Grid item xs={12} sm={6} key={m._id}>
                                                             <Card variant="outlined">
                                                                 <CardContent>
                                                                     <Typography fontWeight={600}>
                                                                         {m.title}
                                                                         <Chip size="small" label={m.tag} sx={{ ml: 1 }} />
                                                                     </Typography>
-                                                                    <Typography variant="caption">{m.desc}</Typography>
+                                                                    <Typography variant="caption">{m.description}</Typography>
                                                                     <Typography fontWeight={600}>₹{m.price}</Typography>
                                                                     <Button
                                                                         fullWidth
                                                                         variant={added ? "contained" : "outlined"}
-                                                                        onClick={() => toggleMeal(p.id, m)}
+                                                                        onClick={() => toggleMeal(p._id, m)}
                                                                         sx={{ mt: 1 }}
                                                                     >
                                                                         {added ? "Added" : "Add"}
@@ -219,28 +218,29 @@ export default function AddonsPage() {
                                             </Grid>
                                         </Box>
 
-                                        {/* BAGGAGE */}
                                         <Box mt={4}>
                                             <Typography fontWeight={600} mb={1}>
                                                 Baggage
                                             </Typography>
                                             <Grid container spacing={2}>
-                                                {BAGGAGE.map((b) => (
-                                                    <Grid item xs={6} sm={4} key={b.id}>
+                                                {baggage?.map((b) => (
+                                                    <Grid item xs={6} sm={4} key={b._id}>
                                                         <Card
                                                             variant="outlined"
                                                             sx={{
                                                                 cursor: "pointer",
                                                                 borderColor:
-                                                                    selected.baggage?.id === b.id
+                                                                    selected?.baggage?._id === b._id
                                                                         ? "primary.main"
                                                                         : "divider",
                                                             }}
-                                                            onClick={() => setBaggage(p.id, b)}
+                                                            onClick={() => setBaggage(p._id, b)}
                                                         >
                                                             <CardContent>
-                                                                <Radio checked={selected.baggage?.id === b.id} />
-                                                                <Typography>{b.label}</Typography>
+                                                                <Box display="flex" alignItems="center" >
+                                                                    <Radio checked={selected?.baggage?._id === b._id} sx={{pl: 0}}/>
+                                                                    <Typography>{b.title}</Typography>
+                                                                </Box>
                                                                 <Typography variant="caption">₹{b.price}</Typography>
                                                             </CardContent>
                                                         </Card>
@@ -248,39 +248,8 @@ export default function AddonsPage() {
                                                 ))}
                                             </Grid>
                                         </Box>
-
-                                        {/* EXTRAS */}
-                                        <Box mt={4}>
-                                            <Typography fontWeight={600} mb={1}>
-                                                Extras
-                                            </Typography>
-                                            <Grid container spacing={2}>
-                                                {EXTRAS.map((ex) => {
-                                                    const added = selected.extras.some((e) => e.id === ex.id);
-                                                    return (
-                                                        <Grid item xs={12} sm={6} key={ex.id}>
-                                                            <Card variant="outlined">
-                                                                <CardContent>
-                                                                    <Typography fontWeight={600}>{ex.title}</Typography>
-                                                                    <Typography variant="caption">{ex.desc}</Typography>
-                                                                    <Typography fontWeight={600}>₹{ex.price}</Typography>
-                                                                    <Button
-                                                                        fullWidth
-                                                                        variant={added ? "contained" : "outlined"}
-                                                                        onClick={() => toggleExtra(p.id, ex)}
-                                                                        sx={{ mt: 1 }}
-                                                                    >
-                                                                        {added ? "Added" : "Add"}
-                                                                    </Button>
-                                                                </CardContent>
-                                                            </Card>
-                                                        </Grid>
-                                                    );
-                                                })}
-                                            </Grid>
-                                        </Box>
                                     </CardContent>
-                                </Card>
+                                </Grid>
                             );
                         })}
                     </Stack>

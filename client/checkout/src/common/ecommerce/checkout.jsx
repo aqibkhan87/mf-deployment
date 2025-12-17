@@ -23,7 +23,7 @@ const CheckoutItems = () => {
   const { cart, cartId } = useCartStore();
 
   useEffect(() => {
-    if(cartId) getCart();
+    if (cartId) getCart();
   }, []);
 
   const navigateToProduct = (product) => {
@@ -163,7 +163,11 @@ const CheckoutItems = () => {
               >
                 <AddIcon />
               </IconButton>
-              <Button color="error" size="small" sx={{ ml: 2 }}>
+              <Button color="error" size="small" sx={{ ml: 2 }}
+                aria-label="Remove Item"
+                tabIndex={0}
+                role="button"
+              >
                 REMOVE
               </Button>
             </Box>

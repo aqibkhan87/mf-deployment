@@ -37,8 +37,7 @@ const flightPriceSchema = new mongoose.Schema(
     fares: [fareSchema],
   },
   {
-    timestamps: true, // adds createdAt, updatedAt
-    collection: "flightPrices",
+    collection: "flightPrice",
   }
 );
 
@@ -48,4 +47,4 @@ flightPriceSchema.index({ origin: 1, destination: 1, date: 1 }, { unique: true }
 // Optional auto-expiration: delete old records (after 2 days)
 flightPriceSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2 * 24 * 60 * 60 }); // 2 days
 
-export default mongoose.model("FlightPrice", flightPriceSchema);
+export default mongoose.model("flightPrice", flightPriceSchema);

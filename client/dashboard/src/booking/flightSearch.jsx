@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Button } from "@mui/material";
-import {
-    searchFlights,
-    createBooking
-} from "./apis";
+import { useBookingStore } from "store/bookingStore";
+import { searchFlights } from "../apis/flights/booking";
 
 // Helper to convert ISO time to HH:MM
 const formatTime = (iso) => {
@@ -20,13 +18,13 @@ const formatDuration = (duration) => {
 };
 
 function FlightResults() {
+    const { selectedFlight } = useBookingStore();
     const history = useHistory();
-    const searchQuery = new URLSearchParams(window.location.search);
-    const from = searchQuery.get("from");
-    const to = searchQuery.get("to");
-    const date = searchQuery.get("date");
-    const passengers = searchQuery.get("passengers");
-    const [flights, setFlights] = useState({});
+    const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
+    const from = searchInfo.from;
+    const to = searchInfo.to;
+    const date = searchInfo.date;
+    const passengers = searchInfo.passengers;
     const [loading, setLoading] = useState(false);
     const formattedDate = new Date(date).toLocaleDateString();
 
@@ -39,12 +37,11 @@ function FlightResults() {
             from: from,
             to: to,
             date: date,
-            passengers: parseInt(passengers) || 1,
+            passengers: passengers
         };
         try {
             setLoading(true);
-            const res = await searchFlights(searchData);
-            setFlights(res?.flights || {});
+            await searchFlights(searchData);
         } catch (err) {
             console.error("Search failed:", err);
         } finally {
@@ -52,25 +49,23 @@ function FlightResults() {
         }
     }
 
+
     const handleFlightSearch = async (e, flight) => {
         e?.preventDefault();
         const payload = {
-            flightId: flights._id,
+            flightId: selectedFlight._id,
             providerId: flight.providerOfferId,
             from,
             to,
             departDate: date,
-            passengerCount: passengers,
+            passengers,
         };
 
-        try {
-            const res = await createBooking(payload);
-            alert(`✅ Booking confirmed! ID: ${res.bookingId}`);
-            history.push("/passenger-edit")
-        } catch (err) {
-            console.error("Booking failed:", err);
-            alert("❌ Booking failed. Try again later.");
-        }
+        sessionStorage.setItem(
+            "selectedFlight",
+            JSON.stringify(payload)
+        );
+        history.push(`/passenger-edit`)
     }
 
     return (
@@ -79,12 +74,12 @@ function FlightResults() {
             <div className="bg-white rounded-2xl shadow p-4 border">
                 <h1 className="text-2xl font-semibold">Flights from {from} → {to}</h1>
                 <p className="text-gray-600">{formattedDate}</p>
-                <p className="mt-2 text-gray-800 font-medium">{flights?.fares?.length || 0} flights found</p>
+                <p className="mt-2 text-gray-800 font-medium">{selectedFlight?.fares?.length || 0} flights found</p>
             </div>
 
             {/* Flight List */}
             <div className="space-y-4">
-                {flights?.fares?.map((fare) => (
+                {selectedFlight?.fares?.map((fare) => (
                     <div
                         key={fare.providerOfferId}
                         className="bg-white rounded-2xl shadow border p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
@@ -134,7 +129,9 @@ function FlightResults() {
                         {/* Price & Button */}
                         <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
                             <p className="text-2xl font-semibold">₹ {fare.totalPrice}</p>
-                            <Button className="mt-2 px-5 py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
+                            <Button
+                                variant="contained"
+                                className="mt-2 px-5 py-2 transition"
                                 onClick={(e) => handleFlightSearch(e, fare)}
                             >
                                 Select Flight

@@ -132,6 +132,9 @@ const Login = () => {
           variant="contained"
           color="primary"
           onClick={handleFormSubmit}
+          aria-label="Sign In"
+          role="button"
+          tabIndex={0}
         >
           Sign in
         </Button>
@@ -140,6 +143,8 @@ const Login = () => {
             href="/auth/signup"
             underline="hover"
             sx={{ fontSize: 14 }}
+            aria-label="Create an account"
+            role="link"
           >
             Create an account!
           </Link>
