@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Card, CardContent, Button } from "@mui/material";
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
+
+const BASE_FARE = 25000;
 
 const LEFT = [1, 2, 3, 4, 5, 6, 7];
 const MIDDLE = [9, 10, 11, 12, 13];
@@ -155,68 +157,65 @@ function SeatSelection() {
     }
 
     return (
-        <Box>
-            <Box>
-                <SeatLegend />
-                <Box
-                    sx={{
-                        overflow: "hidden",
-                        position: "relative",
-                        height: 350,
-                        display: "flex",
-                        overflowX: "auto",
-                        overflowY: "hidden",
-                        /* Firefox */
-                        scrollbarWidth: "none",
-                        /* IE / Edge */
-                        msOverflowStyle: "none",
-                        /* Chrome / Safari */
-                        "&::-webkit-scrollbar": {
-                            display: "none",
-                        },
-                    }}
-                >
-                    <PlaneNoseComponent />
-                    <Box display="flex" alignItems="center"
-                        style={{
-                            paddingLeft: 60,
-                            paddingRight: 30,
-                            height: 300,
-                            border: "2px solid #8ec5ff",
-                            borderBottomRightRadius: 10,
-                            borderTopRightRadius: 10,
-                            backgroundColor: "#eef7ff",
-                        }}
-                    >
-                        <Box display="flex">
-                            <SeatBlock columns={LEFT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
-                            <ExitGap />
-                            <SeatBlock columns={MIDDLE} seatState={seatStatusMap} onSelect={handleSeatSelect} />
-                            <ExitGap />
-                            <SeatBlock columns={RIGHT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+        <Box maxWidth="lg" mx="auto" p={2}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={8}>
+                    <Box>
+                        <SeatLegend />
+                        <Box
+                            sx={{
+                                overflow: "hidden",
+                                position: "relative",
+                                height: 350,
+                                display: "flex",
+                                overflowX: "auto",
+                                overflowY: "hidden",
+                                /* Firefox */
+                                scrollbarWidth: "none",
+                                /* IE / Edge */
+                                msOverflowStyle: "none",
+                                /* Chrome / Safari */
+                                "&::-webkit-scrollbar": {
+                                    display: "none",
+                                },
+                            }}
+                        >
+                            <PlaneNoseComponent />
+                            <Box display="flex" alignItems="center"
+                                style={{
+                                    paddingLeft: 60,
+                                    paddingRight: 30,
+                                    height: 300,
+                                    border: "2px solid #8ec5ff",
+                                    borderBottomRightRadius: 10,
+                                    borderTopRightRadius: 10,
+                                    backgroundColor: "#eef7ff",
+                                }}
+                            >
+                                <Box display="flex">
+                                    <SeatBlock columns={LEFT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <ExitGap />
+                                    <SeatBlock columns={MIDDLE} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <ExitGap />
+                                    <SeatBlock columns={RIGHT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                </Box>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
+                </Grid>
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>
                     <Card>
                         <CardContent>
                             <Typography fontWeight={600}>Trip Summary</Typography>
                             <Typography mt={2}>Base Fare: ₹{BASE_FARE}</Typography>
-                            <Typography>Add-ons: ₹{addonsTotal}</Typography>
-                            <Typography fontWeight={600} mt={1}>
-                                Total: ₹{grandTotal}
-                            </Typography>
-
-                            {!isMobile && (
-                                <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
-                                    Continue to Payment
-                                </Button>
-                            )}
+                            <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
+                                Continue to Payment
+                            </Button>
                         </CardContent>
                     </Card>
                 </Grid>
-            </Box>
+            </Grid>
         </Box>
     );
 }
