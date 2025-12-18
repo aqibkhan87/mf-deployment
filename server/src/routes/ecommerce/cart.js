@@ -15,17 +15,14 @@ apiRouter.post("/", async (req, res) => {
 
     let cart = null;
 
-    // 1️⃣ Try finding cart by cartId
     if (cartId) {
       cart = await CartModel.findById(cartId);
     }
 
-    // 2️⃣ If cart not found & user logged in → find by userId
     if (!cart && userId) {
       cart = await CartModel.findOne({ userId });
     }
 
-    // 3️⃣ If still not found → create new cart
     if (!cart) {
       cart = new CartModel({
         userId: userId || "anonymous",
@@ -33,16 +30,13 @@ apiRouter.post("/", async (req, res) => {
       });
     }
 
-    // 4️⃣ If cart was anonymous and user just logged in → attach user
     if (!cart.userId && userId) {
       cart.userId = userId;
     }
 
-    // Initialize totals
     let totalAmount = 0;
     let totalActual = 0;
 
-    // 5️⃣ Add / update products
     for (const { _id, quantity = 1 } of products) {
       const product = await ProductModel.findById(_id);
       if (!product) continue;

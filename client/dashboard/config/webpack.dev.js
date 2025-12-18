@@ -22,9 +22,9 @@ const devConfig = {
     port: 8080,
     historyApiFallback: true,
     static: {
-      directory: path.join(__dirname, "dist"), // ✅ replaces contentBase
+      directory: path.join(__dirname, "dist"),
     },
-    hot: true, // ✅ Ensure this is enabled
+    hot: true, // for hot reloading
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),

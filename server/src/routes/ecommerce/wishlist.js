@@ -8,7 +8,7 @@ apiRouter.get("/", async (req, res) => {
     const userId = req.query.userId;
 
     const wishlist = await Wishlist.find({ userId })
-      .populate("product") // get full product data
+      .populate("product") 
       .sort({ addedAt: -1 });
 
     res.json({
@@ -30,13 +30,11 @@ apiRouter.post("/add", async (req, res) => {
     const userId = req.query.userId;
     const { productId } = req.body;
 
-    // ✅ Prevent duplicates
     const exists = await Wishlist.findOne({ userId, product: productId });
     if (exists) {
       return res.json({ success: true, message: "Already saved" });
     }
 
-    // ✅ Add to wishlist
     await Wishlist.create({ userId, product: productId });
 
     res.json({ success: true });

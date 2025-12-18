@@ -23,17 +23,14 @@ apiRouter.get("/make-default", async (req, res) => {
   }
 
   try {
-    // Step 1: Set all user addresses to false
     await AddressModel.updateMany({ userId }, { $set: { isDefault: false } });
 
-    // Step 2: Set selected address to true
     await AddressModel.findByIdAndUpdate(
       addressId,
       { $set: { isDefault: true } },
       { new: true }
     );
 
-    // Step 3: Return updated list sorted
     const addresses = await AddressModel.find({ userId }).sort({
       isDefault: -1,
     });

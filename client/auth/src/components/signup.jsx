@@ -15,7 +15,6 @@ const Signup = () => {
 
   const requiredFields = ["firstName", "lastName", "email", "password"];
 
-  // Validation
   const errors = {
     firstName: !signupData.firstName,
     lastName: !signupData.lastName,

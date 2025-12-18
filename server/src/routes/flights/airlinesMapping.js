@@ -1,4 +1,3 @@
-// airlinesMapping.js
 const AirlinesMapping = {
   AA: { name: "American Airlines", code: "AA", logo: "https://content.airhex.com/content/logos/airlines_AA_200_200_r.png" },
   DL: { name: "Delta Air Lines", code: "DL", logo: "https://content.airhex.com/content/logos/airlines_DL_200_200_r.png" },
@@ -28,7 +27,6 @@ const AirlinesMapping = {
   W6: { name: "Wizz Air", code: "W6", logo: "https://content.airhex.com/content/logos/airlines_W6_200_200_r.png" },
   G3: { name: "Gol Linhas Aéreas", code: "G3", logo: "https://content.airhex.com/content/logos/airlines_G3_200_200_r.png" },
 
-  // === 25 additional airlines ===
   BA: { name: "British Airways", code: "BA", logo: "https://content.airhex.com/content/logos/airlines_BA_200_200_r.png" },
   CX: { name: "Cathay Pacific", code: "CX", logo: "https://content.airhex.com/content/logos/airlines_CX_200_200_r.png" },
   EY: { name: "Etihad Airways", code: "EY", logo: "https://content.airhex.com/content/logos/airlines_EY_200_200_r.png" },

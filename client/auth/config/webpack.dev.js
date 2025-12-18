@@ -24,7 +24,7 @@ const devConfig = {
     static: {
       directory: path.join(__dirname, "dist"),
     },
-    hot: true, // ✅ enables hot reloading
+    hot: true, // enables hot reloading
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,OPTIONS,HEAD,PUT,POST,DELETE",

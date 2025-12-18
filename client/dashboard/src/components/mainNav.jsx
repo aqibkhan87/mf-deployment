@@ -89,7 +89,6 @@ const MainNav = () => {
                 color="error"
                 max={1000}
                 sx={{
-                  // Use transform to shift badge position
                   "& .MuiBadge-badge": {
                     transform: "translate(15px, -15px)",
                   },
@@ -107,7 +106,6 @@ const MainNav = () => {
                   color="error"
                   max={1000}
                   sx={{
-                    // Use transform to shift badge position
                     "& .MuiBadge-badge": {
                       transform: "translate(15px, -15px)",
                     },

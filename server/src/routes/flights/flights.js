@@ -1,14 +1,10 @@
 import express from "express";
 import FlightPrice from "../../models/flights/flightPrice.js";
 import { applyPromoToPrice } from "../../services/flights/pricing.js";
-import offersData from "./../offerdata.js"; // small helper, or call /api/offers
+import offersData from "./../offerdata.js";
 import AirlinesMapping from "./airlinesMapping.js";
 const apiRouter = express.Router();
 
-/**
- * GET /api/flights/search?from=DEL&to=BOM&date=2025-10-08&promo=HDFCFLY
- * Reads from FlightPrice collection (populated by daily cron job).
- */
 apiRouter.get("/", async (req, res) => {
   try {
     const { from, to, date, promo, providerId, flightId } = req.query;
@@ -60,9 +56,7 @@ apiRouter.get("/", async (req, res) => {
       });
     }
 
-    // ==================================
-    // 2️⃣ CASE: Normal search (fallback)
-    // ==================================
+  
     if (!from || !to || !date) {
       return res.status(400).json({ message: "Missing from/to/date" });
     }

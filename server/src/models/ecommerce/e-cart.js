@@ -21,7 +21,7 @@ const cartSchema = new Schema(
     },
   },
   {
-    collection: "cart", // exact collection name you want
+    collection: "cart", 
   }
 );
 

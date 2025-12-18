@@ -43,7 +43,6 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
 
   const requiredFields = ["firstName", "lastName", "email", "password"];
 
-  // Validation
   const errors = {
     firstName: !signupData.firstName,
     lastName: !signupData.lastName,
@@ -59,15 +58,11 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    // Add your signup logic here, including mobile number
     setTouched(
       requiredFields.reduce((acc, key) => ({ ...acc, [key]: true }), {})
     );
 
     if (Object.values(errors).every((err) => !err)) {
-      // setSaving(true);
-      // setTimeout(() => setSaving(false), 1200);
-      // Actual save/deliver action here
       const response = await signup(signupData);
       if (response?.data?.status === 200) {
         onClose();
@@ -184,15 +179,13 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
 const LoginFormPopup = ({ open, onClose, setFormType }) => {
   const { setUser } = useAuthStore();
   const [loginData, setLoginData] = useState({
-    contact: "", // combined field for email or mobile
+    contact: "",
     password: "",
   });
   const [touched, setTouched] = useState({});
-  // Validation helpers
   const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
   const isMobile = (str) => /^[0-9]{10}$/.test(str);
 
-  // Validate if contact is valid email or mobile
   const contactValid =
     isEmail(loginData.contact) || isMobile(loginData.contact);
   const errors = {
@@ -221,9 +214,6 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
     }
 
     if (Object.values(errors).every((err) => !err)) {
-      // setSaving(true);
-      // setTimeout(() => setSaving(false), 1200);
-      // Actual save/deliver action here
       const userDetails = await login(loginData);
       if (userDetails?.data?.user) {
         localStorage.setItem("user", JSON.stringify(userDetails?.data?.user));

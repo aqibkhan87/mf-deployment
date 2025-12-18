@@ -9,7 +9,6 @@ import {
     Chip,
     Radio,
     Stack,
-    Paper,
     useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -63,8 +62,6 @@ export default function AddonsPage() {
         await getBookingDetails();
     }
 
-    /* ------------------ HANDLERS ------------------ */
-
     const toggleMeal = (pid, meal) => {
         setSelectedAddons((prev) => {
             const exists = prev[pid]?.meals?.find((m) => m._id === meal._id);
@@ -87,8 +84,6 @@ export default function AddonsPage() {
         }));
     };
 
-    /* ------------------ TOTALS ------------------ */
-
     const addonsTotal = useMemo(() => {
         return Object.values(selectedAddons).reduce((sum, p) => {
             const mealTotal = p?.meals.reduce((s, m) => s + m.price, 0);
@@ -99,69 +94,9 @@ export default function AddonsPage() {
 
     const grandTotal = baseFare + addonsTotal;
 
-    /* ------------------ UI ------------------ */
 
-
-    const handlePayment = async () => {
-        // 1️⃣ Create Order
-        const data = await createOrder({
-            type: "FLIGHT", // or ECOMMERCE
-            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
-        });
-        console.log("order data", data);
-
-        // ✅ ZERO AMOUNT
-        if (data?.skipPayment) {
-            history.push("/dashboard");
-            return;
-        }
-
-        // 2️⃣ Load Razorpay
-        const loaded = await loadRazorpay();
-        if (!loaded) {
-            alert("Payment SDK failed. Try again.");
-            return;
-        }
-        // 3️⃣ Payment Options
-        const options = {
-            key: process.env.RAZORPAY_KEY_ID,
-            order_id: data.orderId,
-            amount: data.amount,
-            currency: "INR",
-
-            handler: async (res) => {
-                try {
-                    const verify = await verifyPayment({
-                        type: "FLIGHT",
-                        entityId,
-                        ...res,
-                    });
-
-                    if (verify.success) {
-                        navigate("/dashbaord");
-                    }
-                } catch (err) {
-                    console.log("errrrrrr", err);
-                    debugger
-                    alert("Payment verification failed");
-                }
-            },
-
-            modal: {
-                ondismiss: async () => {
-                    alert("Payment cancelled");
-                },
-            },
-        };
-
-        const rzp = new window.Razorpay(options);
-
-        rzp.on("payment.failed", async (err) => {
-            debugger
-            alert("Payment failed");
-        });
-
-        rzp.open();
+    const handleSeatSelection = async () => {
+        history.push("/seat-selection");
     }
 
     return (
@@ -267,34 +202,14 @@ export default function AddonsPage() {
                             </Typography>
 
                             {!isMobile && (
-                                <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
-                                    Continue to Payment
+                                <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSeatSelection}>
+                                    Continue to Seat Selection
                                 </Button>
                             )}
                         </CardContent>
                     </Card>
                 </Grid>
             </Grid>
-
-            {/* MOBILE STICKY CTA */}
-            {isMobile && (
-                <Paper
-                    elevation={6}
-                    sx={{
-                        position: "fixed",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        p: 2,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}
-                >
-                    <Typography fontWeight={600}>₹{grandTotal}</Typography>
-                    <Button variant="contained">Proceed</Button>
-                </Paper>
-            )}
         </Box>
     );
 }

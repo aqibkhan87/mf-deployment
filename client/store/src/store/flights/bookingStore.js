@@ -1,8 +1,6 @@
-// store/useBookingStore.js
 import { create } from "zustand";
 
 export const useBookingStore = create((set, get) => ({
-  // initial mock data. In real app hydrate from router state or API
   selectedFlight: null,
   passengers: [], // [{ id, type: 'adult'|'infant', name }]
   selectedAddons: {}, // { passengerId: { meals: [], baggage: null, extras: [] } }

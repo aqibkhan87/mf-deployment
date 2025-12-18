@@ -21,7 +21,7 @@ const userSchema = new Schema(
     },
   },
   {
-    collection: "user", // exact collection name you want
+    collection: "user", 
   }
 );
 

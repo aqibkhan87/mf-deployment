@@ -41,10 +41,8 @@ const flightPriceSchema = new mongoose.Schema(
   }
 );
 
-// Unique constraint: one record per origin/destination/date
 flightPriceSchema.index({ origin: 1, destination: 1, date: 1 }, { unique: true });
 
-// Optional auto-expiration: delete old records (after 2 days)
 flightPriceSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2 * 24 * 60 * 60 }); // 2 days
 
 export default mongoose.model("flightPrice", flightPriceSchema);

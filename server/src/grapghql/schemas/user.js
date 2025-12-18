@@ -1,4 +1,3 @@
-// Define GraphQL schema
 const userTypes = `#graphql
   type Query {
     users: [User]

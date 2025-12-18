@@ -33,7 +33,7 @@ export const isEmailValid = (email) => {
 };
 
 export const isMobileValid = (mobile) => {
-  const mobileRegex = /^[0-9]{10}$/; // 10-digit number
+  const mobileRegex = /^[0-9]{10}$/;
   return mobile && mobileRegex.test(mobile);
 };
 

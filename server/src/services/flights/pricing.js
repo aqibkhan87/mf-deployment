@@ -1,12 +1,5 @@
-/**
- * Pricing helpers:
- * - compute base price (if provider doesn't supply it)
- * - apply promo discounts
- */
 export function computeBasePriceForSegment(providerOffer) {
-  // If provider has price, use it. Otherwise create a deterministic price:
   if (providerOffer && providerOffer.price) return Number(providerOffer.price);
-  // fallback: price by distance/duration heuristics (simple)
   const durationMinutes =
     parseDurationToMinutes(providerOffer?.duration) || 120;
   const base = 2000 + durationMinutes * 20; // ₹20/min

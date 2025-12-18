@@ -21,11 +21,9 @@ const Login = () => {
     password: "",
   });
   const [touched, setTouched] = useState({});
-  // Validation helpers
   const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
   const isMobile = (str) => /^[0-9]{10}$/.test(str);
 
-  // Validate if usernameValue is valid email or mobile
   const usernameValue = isEmail(formdata.contact) || isMobile(formdata.contact);
 
   const errors = {

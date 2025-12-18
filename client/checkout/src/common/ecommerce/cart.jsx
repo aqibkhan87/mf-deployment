@@ -24,7 +24,6 @@ const Cart = () => {
   const { cart, cartCount } = useCartStore();
   const { user } = useAuthStore();
 
-  // console.log("cartrtttrtr in cart", cart);
   const navigateToProduct = (product) => {
     const productId = product?.productDetail?._id;
     const categoryId = product?.productDetail?.categoryid;

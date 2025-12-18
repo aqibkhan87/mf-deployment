@@ -1,4 +1,3 @@
-// Define GraphQL schema
 const productTypes = `#graphql
   type Query {
     getAllProductCategories: [ProductsCategories]!

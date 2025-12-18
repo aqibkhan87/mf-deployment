@@ -22,7 +22,7 @@ const productCategorySchema = new Schema(
     ],
   },
   {
-    collection: "productCategory", // exact collection name you want
+    collection: "productCategory",
   }
 );
 

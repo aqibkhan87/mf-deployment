@@ -4,13 +4,11 @@ import { Button } from "@mui/material";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../apis/flights/booking";
 
-// Helper to convert ISO time to HH:MM
 const formatTime = (iso) => {
     const d = new Date(iso);
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
-// Helper to convert duration like PT2H25M → 2h 25m
 const formatDuration = (duration) => {
     const hrs = duration.match(/(\d+)H/);
     const mins = duration.match(/(\d+)M/);

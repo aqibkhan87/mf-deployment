@@ -77,7 +77,6 @@ const AddressForm = () => {
     "pincode",
   ];
 
-  // Validation
   const errors = {
     name: !fields.name,
     line1: !fields.line1,

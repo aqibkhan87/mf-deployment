@@ -37,20 +37,16 @@ const ProductDetail = () => {
         quantity,
       })) || [];
 
-    // Find if current product exists in cart
     const existingItem = existingCartProducts.find(
       (item) => item._id === productid
     );
     if (existingItem) {
-      // Increase quantity by 1
       const updatedProducts = existingCartProducts.map((item) =>
         item._id === productid ? { ...item, quantity: item.quantity + 1 } : item
       );
 
-      // Send the entire updated cart to backend
       await addToCart(updatedProducts);
     } else {
-      // Add new product with quantity 1
       const newProduct = {
         _id: productid,
         quantity: 1,
@@ -58,7 +54,6 @@ const ProductDetail = () => {
 
       const updatedProducts = [...existingCartProducts, newProduct];
 
-      // Send updated cart including new product
       await addToCart(updatedProducts);
     }
 
@@ -73,20 +68,16 @@ const ProductDetail = () => {
         quantity,
       })) || [];
 
-    // Find if current product exists in cart
     const existingItem = existingCartProducts.find(
       (item) => item._id === productid
     );
     if (existingItem) {
-      // Increase quantity by 1
       const updatedProducts = existingCartProducts.map((item) =>
         item._id === productid ? { ...item, quantity: item.quantity + 1 } : item
       );
 
-      // Send the entire updated cart to backend
       await addToCart(updatedProducts);
     } else {
-      // Add new product with quantity 1
       const newProduct = {
         _id: productid,
         quantity: 1,
@@ -94,7 +85,6 @@ const ProductDetail = () => {
 
       const updatedProducts = [...existingCartProducts, newProduct];
 
-      // Send updated cart including new product
       await addToCart(updatedProducts);
     }
     history.push("/ecommerce/checkout");

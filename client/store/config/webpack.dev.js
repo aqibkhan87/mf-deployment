@@ -13,7 +13,7 @@ const devConfig = {
     port: 8083,
     historyApiFallback: true,
     static: {
-      directory: path.resolve(__dirname, "dist"), // v4 syntax
+      directory: path.resolve(__dirname, "dist"),
     },
     hot: true, // ✅ enables hot reloading
   },

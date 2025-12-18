@@ -86,6 +86,14 @@ const App = () => {
                 </Suspense>
               )}
             />
+            <Route
+              path="/seat-selection"
+              render={() => (
+                <Suspense fallback={<div>Loading Checkout...</div>}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
             <Route path="/dashboard" component={DashboardPage} />
             <Route path="/wishlist" component={ProductWishlist} />
             <Route path="/addresses" component={AddressList} />

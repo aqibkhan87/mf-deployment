@@ -50,7 +50,6 @@ const BookingWidget = () => {
   useEffect(() => {
     fetchAirports()
       .then((res) => {
-        debugger
         setFromOptions(res);
         setToOptions(res);
       })
@@ -74,7 +73,6 @@ const BookingWidget = () => {
     }
   };
 
-  // ✅ Debounced version (to prevent hitting API every keystroke)
   const debouncedSearch = useMemo(() => debounce(handleAirportSearch, 400), []);
 
   const handleSearch = async () => {

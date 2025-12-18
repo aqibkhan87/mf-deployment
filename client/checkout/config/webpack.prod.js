@@ -5,14 +5,12 @@ const commonConfig = require("./webpack.common");
 const path = require("path");
 const dotenv = require("dotenv");
 
-// Load .env.production ONLY if it exists (local dev)
 const envFile = path.resolve(__dirname, "../.env.production");
 const fileEnv = dotenv.config({ path: envFile }).parsed || {};
 
-// Merge process.env (CI) + file-based env
 const finalEnv = {
   ...fileEnv,
-  ...process.env, // ✅ GitHub Actions injects here
+  ...process.env, // GitHub Actions injects here
 };
 
 // Pick ONLY allowed frontend vars

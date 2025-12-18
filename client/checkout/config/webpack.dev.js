@@ -22,9 +22,9 @@ const devConfig = {
     port: 8082,
     historyApiFallback: true,
     static: {
-      directory: path.join(__dirname, "dist"), // v4 syntax
+      directory: path.join(__dirname, "dist"),
     },
-    hot: true, // ✅ enables hot reloading
+    hot: true, // enables hot reloading
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET,OPTIONS,HEAD,PUT,POST,DELETE",

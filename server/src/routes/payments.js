@@ -7,9 +7,6 @@ import EcommercePayment from "../models/ecommerce/e-payment.js";
 
 const router = express.Router();
 
-/* ============================
-   CREATE RAZORPAY ORDER
-============================= */
 router.post("/create", async (req, res) => {
   try {
     const { entityId } = req.body;

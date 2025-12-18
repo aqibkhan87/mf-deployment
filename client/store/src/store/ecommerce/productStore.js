@@ -1,4 +1,3 @@
-// Zustand singleton store for auth/theme/settings
 import { create } from "zustand";
 
 console.log("Inside Products Store");

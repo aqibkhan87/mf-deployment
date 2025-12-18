@@ -43,7 +43,6 @@ router.get("/search", async (req, res) => {
 
     const regex = new RegExp(q, "i");
 
-    // Step 1️⃣ Search for airports by name, city, IATA, or ICAO
     const matchedAirports = await Airport.aggregate([
       {
         $match: {

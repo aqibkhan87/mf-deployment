@@ -3,7 +3,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   resolve: {
-    extensions: [".js", ".jsx"], // ✅ IMPORTANT
+    extensions: [".js", ".jsx"],
   },
   module: {
     rules: [

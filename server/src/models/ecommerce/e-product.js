@@ -45,7 +45,7 @@ const productSchema = new Schema(
     },
   },
   {
-    collection: "product",  // exact collection name you want
+    collection: "product", 
   }
 );
 

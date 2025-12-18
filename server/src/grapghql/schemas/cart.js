@@ -1,4 +1,3 @@
-// Define GraphQL schema
 const CartTypes = `#graphql
   type CartItem {
     _id: String!

@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 
 import UserModel from "../../models/user.js";
 
-// Define resolvers
 const UserResolver = {
   Query: {
     users: async () => await UserModel.find(),
