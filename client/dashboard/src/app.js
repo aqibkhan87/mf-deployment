@@ -12,8 +12,11 @@ import AddressList from "./components/address/addressList";
 // import AddressForm from "./mfs/authComponent/addressForm";
 import LoginSummary from "./common/loginSummary";
 import AddressForm from "./common/addressForm";
+import Loader from "./common/loader/loader";
+import { useLoaderStore } from "store/loaderStore";
 
 const App = () => {
+  const { loading } = useLoaderStore();
   return (
     <div className="min-h-screen flex flex-col">
       <BrowserRouter>
@@ -23,7 +26,7 @@ const App = () => {
             <Route
               path="/auth"
               render={() => (
-                <Suspense fallback={<div>Loading Auth...</div>}>
+                <Suspense fallback={<Loader />}>
                   <AuthMFApp />
                 </Suspense>
               )}
@@ -31,7 +34,7 @@ const App = () => {
             <Route
               path="/ecommerce/checkout"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                   <LoginSummary />
                   <AddressForm />
@@ -41,7 +44,7 @@ const App = () => {
             <Route
               path="/product"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -49,7 +52,7 @@ const App = () => {
             <Route
               path="/cart"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -57,7 +60,7 @@ const App = () => {
             <Route
               path="/ecommerce-payment"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -65,7 +68,7 @@ const App = () => {
             <Route
               path="/flight-payment"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -73,7 +76,7 @@ const App = () => {
             <Route
               path="/passenger-edit"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -81,7 +84,7 @@ const App = () => {
             <Route
               path="/addons"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -89,7 +92,7 @@ const App = () => {
             <Route
               path="/seat-selection"
               render={() => (
-                <Suspense fallback={<div>Loading Checkout...</div>}>
+                <Suspense fallback={<Loader />}>
                   <CheckoutMFApp />
                 </Suspense>
               )}
@@ -106,6 +109,7 @@ const App = () => {
         <footer className="border-t py-6 text-center text-xs text-muted-foreground">
           Built with ♥ as a micro-frontend demo project.
         </footer>
+        {loading && (<Loader />)}
       </BrowserRouter>
     </div>
   );

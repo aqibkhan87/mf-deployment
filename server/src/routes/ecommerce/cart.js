@@ -86,6 +86,11 @@ apiRouter.get("/:cartId", async (req, res) => {
       cart = await CartModel.findOne({ _id: cartId }).populate(
         "products.productDetail"
       );
+      if(!cart) {
+        return res.json({
+          cart: null,
+        });
+      }
       cart?.products?.forEach((item) => {
         cartCount += item?.quantity;
       });

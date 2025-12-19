@@ -23,6 +23,7 @@ const devConfig = {
       filename: "remoteEntry.js",
       exposes: {
         "./authStore": "./src/store/authStore.js",
+        "./loaderStore": "./src/store/loaderStore.js",
         "./cartStore": "./src/store/ecommerce/cartStore.js",
         "./orderStore": "./src/store/ecommerce/orderStore.js",
         "./productStore": "./src/store/ecommerce/productStore.js",

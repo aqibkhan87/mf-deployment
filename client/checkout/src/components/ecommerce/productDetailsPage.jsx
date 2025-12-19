@@ -46,6 +46,7 @@ const ProductDetail = () => {
       );
 
       await addToCart(updatedProducts);
+      history.push("/cart/view");
     } else {
       const newProduct = {
         _id: productid,
@@ -55,9 +56,9 @@ const ProductDetail = () => {
       const updatedProducts = [...existingCartProducts, newProduct];
 
       await addToCart(updatedProducts);
+      history.push("/cart/view");
     }
 
-    history.push("/cart/view");
   };
 
   const handleNavigateToBuyNow = async (e) => {
