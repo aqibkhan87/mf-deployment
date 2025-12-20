@@ -15,7 +15,10 @@ export const createBooking = async (payload) => {
         ...state,
         bookingId: response.data?.bookingId || null,
       }));
-      localStorage.setItem("bookingId", response.data?.bookingId);
+      localStorage.setItem(
+        "bookingId",
+        JSON.stringify(response?.data?.bookingId)
+      );
     }
     return response.data;
   } catch (error) {
@@ -25,12 +28,29 @@ export const createBooking = async (payload) => {
   }
 };
 
+export const updateAddonsInPassengers = async (payload) => {
+  useLoaderStore.getState().setLoading(true);
+  try {
+    const response = await httpRequest(
+      "put",
+      `/api/flights/bookings/update-addons-in-passengers`,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+  } finally {
+    useLoaderStore.getState().setLoading(false);
+  }
+};
+
 export const getBookingDetails = async () => {
-  const userId = JSON.parse(localStorage.getItem("user"))?._id || "";
+  const userId = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))?._id
+    : "";
   const bookingId = localStorage.getItem("bookingId")
     ? JSON.parse(localStorage.getItem("bookingId"))
     : "";
-    
   useLoaderStore.getState().setLoading(true);
   try {
     const response = await httpRequest(
@@ -41,7 +61,7 @@ export const getBookingDetails = async () => {
     if (response?.data?.success) {
       useBookingStore.setState((state) => ({
         ...state,
-        bookingDetails: response.data?.bookingDetails || [],
+        bookingDetails: response?.data?.bookingDetails || [],
       }));
     }
   } catch (error) {

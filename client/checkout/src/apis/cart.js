@@ -24,6 +24,9 @@ export const addToCart = async (products = []) => {
     });
     if (response?.data && response?.status === 200) {
       localStorage.setItem("cartId", JSON.stringify(response?.data?.cartId));
+      if (response?.data?.cart && response?.status === 200) {
+        getCart()
+      }
     }
   } catch (error) {
     console.error("Error adding to cart:", error);

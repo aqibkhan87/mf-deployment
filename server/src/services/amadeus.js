@@ -144,7 +144,7 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
   }
 
   console.log(
-    `✅ Saved ${origin}-${destination} (${date.toISOString().split("T")[0]})`
+    `✅ Saved ${origin}-${destination} (${baseDate.toISOString().split("T")[0]})`
   );
 }
 
@@ -161,7 +161,7 @@ async function fetchFlightsForDate(date) {
         departureDate: dateStr,
         adults: 1,
         currencyCode: "INR",
-        max: 5, // top 5 offers per route
+        max: 10, // top 10 offers per route
       });
 
       if (response?.data?.length) {

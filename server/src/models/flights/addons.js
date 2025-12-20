@@ -37,4 +37,4 @@ const AddonsProductSchema = new mongoose.Schema(
   { collection: "addons" }
 );
 
-export default mongoose.model("AddonsProduct", AddonsProductSchema);
+export default mongoose.model("addons", AddonsProductSchema);

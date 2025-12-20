@@ -3,6 +3,9 @@ import { Box, Typography, Grid, Card, CardContent, Button } from "@mui/material"
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
+import { useBookingStore } from "store/bookingStore";
+import { getBookingDetails } from "../../apis/flights/booking";
+import TripSummary from "./tripSummary";
 
 const BASE_FARE = 25000;
 
@@ -64,8 +67,18 @@ const PlaneNoseComponent = () => (
 );
 
 function SeatSelection() {
+    const { bookingDetails } = useBookingStore();
+    const segment = bookingDetails?.flightDetail?.segments?.[0];
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [seatStatusMap, setSeatStatusMap] = useState({});
+
+    useEffect(() => {
+        fetchBooking();
+    }, [])
+
+    const fetchBooking = async () => {
+        await getBookingDetails();
+    }
 
     useEffect(() => {
         const fetchedStatus = {
@@ -156,6 +169,18 @@ function SeatSelection() {
         rzp.open();
     }
 
+    const priceBreakdownDetails = useMemo(() => {
+        const basePrice = bookingDetails?.priceBreakdown?.basePrice || 0;
+        const taxes = bookingDetails?.priceBreakdown?.taxes || 0;
+        const addonsPrice = bookingDetails?.priceBreakdown?.addonsPrice || 0;
+        return {
+            basePrice,
+            taxes,
+            addonsPrice,
+            finalPrice: basePrice + taxes + addonsPrice,
+        }
+    }, [bookingDetails]);
+
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
@@ -205,15 +230,15 @@ function SeatSelection() {
                 </Grid>
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography fontWeight={600}>Trip Summary</Typography>
-                            <Typography mt={2}>Base Fare: ₹{BASE_FARE}</Typography>
-                            <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
-                                Continue to Payment
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    <TripSummary
+                        segment={segment}
+                        sourceAirport={bookingDetails?.sourceAirport}
+                        destinationAirport={bookingDetails?.destinationAirport}
+                        priceBreakdown={priceBreakdownDetails}
+                    />
+                    <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
+                        Proceed to Payment
+                    </Button>
                 </Grid>
             </Grid>
         </Box>

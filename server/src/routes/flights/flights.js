@@ -1,6 +1,10 @@
 import express from "express";
 import FlightPrice from "../../models/flights/flightPrice.js";
-import { applyPromoToPrice } from "../../services/flights/pricing.js";
+import Airports from "../../models/flights/airports.js";
+import {
+  applyPromoToPrice,
+  parseDurationToMinutes,
+} from "../../services/flights/pricing.js";
 import offersData from "./../offerdata.js";
 import AirlinesMapping from "./airlinesMapping.js";
 const apiRouter = express.Router();
@@ -8,6 +12,13 @@ const apiRouter = express.Router();
 apiRouter.get("/", async (req, res) => {
   try {
     const { from, to, date, promo, providerId, flightId } = req.query;
+
+    if (!from || !to || !date) {
+      return res.status(400).json({ message: "Missing from/to/date" });
+    }
+
+    const sourceAirport = await Airports.findOne({ iata: from });
+    const destinationAirport = await Airports.findOne({ iata: to });
 
     if (providerId && flightId) {
       const record = await FlightPrice.findOne({
@@ -19,9 +30,7 @@ apiRouter.get("/", async (req, res) => {
         return res.status(404).json({ message: "Flight not found" });
       }
 
-      const fare = record.fares.find(
-        (f) => f.providerOfferId === providerId
-      );
+      const fare = record.fares.find((f) => f.providerOfferId === providerId);
 
       if (!fare) {
         return res.status(404).json({ message: "Fare not found" });
@@ -49,16 +58,13 @@ apiRouter.get("/", async (req, res) => {
             totalPrice: fare.totalPrice,
             basePrice: fare.basePrice,
             currency: fare.currency,
-            duration: fare.duration,
+            duration: parseDurationToMinutes(fare.duration),
             segments: fare.segments,
           },
+          sourceAirport: sourceAirport || null,
+          destinationAirport: destinationAirport || null,
         },
       });
-    }
-
-  
-    if (!from || !to || !date) {
-      return res.status(400).json({ message: "Missing from/to/date" });
     }
 
     const redis = req.app.get("redis");
@@ -106,6 +112,8 @@ apiRouter.get("/", async (req, res) => {
       flights: {
         ...record.toObject(),
         fares,
+        sourceAirport: sourceAirport || null,
+        destinationAirport: destinationAirport || null,
       },
     };
 
@@ -114,7 +122,6 @@ apiRouter.get("/", async (req, res) => {
     }
 
     return res.json(payload);
-
   } catch (err) {
     console.error("Flight search error:", err);
     res.status(500).json({ message: "Internal server error" });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useHistory } from "react-router-dom";
 import {
     Box,
     Grid,
@@ -9,45 +10,32 @@ import {
     Chip,
     Radio,
     Stack,
-    useMediaQuery,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useBookingStore } from "store/bookingStore";
 import { getAddons } from "../../apis/flights/addons";
-import { getBookingDetails } from "../../apis/flights/booking";
+import { getBookingDetails, updateAddonsInPassengers } from "../../apis/flights/booking";
+import TripSummary from "./tripSummary";
 
-const BASE_FARE = 25000;
-
-export default function AddonsPage() {
-    const theme = useTheme();
+function AddonsPage() {
+    const history = useHistory();
     const { addons, bookingDetails } = useBookingStore();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-    const [selectedAddons, setSelectedAddons] = useState({});
+    const [passengerAddons, setPassengerAddons] = useState([]);
+    const segment = bookingDetails?.flightDetail?.segments?.[0];
 
     const meals = useMemo(
         () => addons?.filter((a) => a.type === "meal") || [],
         [addons]
     );
 
-    const baggage = useMemo(
+    const baggages = useMemo(
         () => addons?.filter((a) => a.type === "baggage") || [],
         [addons]
     );
 
-    const passengers = bookingDetails?.passengers || [];
-    const baseFare = bookingDetails?.baseFare || 0;
-
-
     useEffect(() => {
-        if (!passengers.length) return;
-
-        const init = {};
-        passengers.forEach((p) => {
-            init[p._id] = { meals: [], baggage: null, extras: [] };
-        });
-
-        setSelectedAddons(init);
-    }, [passengers]);
+        if (!bookingDetails?.passengers?.length) return;
+        setPassengerAddons(bookingDetails?.passengers);
+    }, [bookingDetails?.passengers]);
 
     useEffect(() => {
         fetchAddons();
@@ -62,42 +50,68 @@ export default function AddonsPage() {
         await getBookingDetails();
     }
 
-    const toggleMeal = (pid, meal) => {
-        setSelectedAddons((prev) => {
-            const exists = prev[pid]?.meals?.find((m) => m._id === meal._id);
-            return {
-                ...prev,
-                [pid]: {
-                    ...prev[pid],
-                    meals: exists
-                        ? prev[pid]?.meals?.filter((m) => m._id !== meal._id)
-                        : [...prev[pid].meals, meal],
-                },
-            };
-        });
+    const toggleAddon = (passengerId, addon) => {
+        setPassengerAddons((prev) =>
+            prev.map((p, index) => {
+                if (index !== passengerId) return p;
+                const exists = p.addons.some(a => a._id === addon._id);
+
+                if (exists) {
+                    return {
+                        ...p,
+                        addons: p.addons.filter(a => a._id !== addon._id),
+                    };
+                }
+                return {
+                    ...p,
+                    addons: [
+                        ...p.addons.filter(a => a.type !== addon.type),
+                        addon,
+                    ],
+                };
+            })
+        );
     };
 
-    const setBaggage = (pid, bag) => {
-        setSelectedAddons((prev) => ({
-            ...prev,
-            [pid]: { ...prev[pid], baggage: bag },
+
+
+    const assemblePassengersWithAddons = () => {
+        return passengerAddons.map(p => ({
+            ...p,
+            addons: p.addons.map(a => a._id),
         }));
     };
 
-    const addonsTotal = useMemo(() => {
-        return Object.values(selectedAddons).reduce((sum, p) => {
-            const mealTotal = p?.meals.reduce((s, m) => s + m.price, 0);
-            const baggageTotal = p?.baggage?.price || 0;
-            return sum + mealTotal + baggageTotal;
-        }, 0);
-    }, [selectedAddons]);
-
-    const grandTotal = baseFare + addonsTotal;
-
 
     const handleSeatSelection = async () => {
+        const passengersWithAddons = assemblePassengersWithAddons();
+        const response = await updateAddonsInPassengers({
+            bookingId: bookingDetails?.bookingId,
+            passengers: passengersWithAddons,
+        });
+        if (!response?.success) return;
         history.push("/seat-selection");
     }
+
+    const addonsPrice = useMemo(() => {
+        return passengerAddons.reduce((sum, p) => {
+            return (
+                sum +
+                p.addons.reduce((s, a) => s + (a.price || 0), 0)
+            );
+        }, 0);
+    }, [passengerAddons]);
+
+    const priceBreakdownDetails = useMemo(() => {
+        const basePrice = bookingDetails?.priceBreakdown?.basePrice || 0;
+        const taxes = bookingDetails?.priceBreakdown?.taxes || 0;
+        return {
+            basePrice,
+            taxes,
+            addonsPrice,
+            finalPrice: basePrice + taxes + addonsPrice,
+        }
+    }, [bookingDetails, addonsPrice]);
 
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
@@ -109,8 +123,9 @@ export default function AddonsPage() {
                     </Typography>
 
                     <Stack spacing={3}>
-                        {passengers?.map((p) => {
-                            const selected = selectedAddons[p?._id];
+                        {bookingDetails?.passengers?.map((p, passengerIndex) => {
+                            console.log("ppppp", p);
+                            const passengerAddon = passengerAddons[passengerIndex];
 
                             return (
                                 <Grid key={p.id}>
@@ -124,23 +139,22 @@ export default function AddonsPage() {
                                                 Meals
                                             </Typography>
                                             <Grid container spacing={2}>
-                                                {meals?.map((m) => {
-                                                    const added = selected?.meals?.some((x) => x._id === m._id);
-                                                    console.log("mmmmm", m)
+                                                {meals?.map((meal) => {
+                                                    const added = passengerAddon?.addons?.some((x) => x._id === meal._id);
                                                     return (
-                                                        <Grid item xs={12} sm={6} key={m._id}>
+                                                        <Grid item xs={12} sm={6} key={meal._id}>
                                                             <Card variant="outlined">
                                                                 <CardContent>
                                                                     <Typography fontWeight={600}>
-                                                                        {m.title}
-                                                                        <Chip size="small" label={m.tag} sx={{ ml: 1 }} />
+                                                                        {meal.title}
+                                                                        <Chip size="small" label={meal.tag} sx={{ ml: 1, bgcolor: "#f7fbff" }} />
                                                                     </Typography>
-                                                                    <Typography variant="caption">{m.description}</Typography>
-                                                                    <Typography fontWeight={600}>₹{m.price}</Typography>
+                                                                    <Typography variant="caption">{meal.description}</Typography>
+                                                                    <Typography fontWeight={600}>₹{meal.price}</Typography>
                                                                     <Button
                                                                         fullWidth
                                                                         variant={added ? "contained" : "outlined"}
-                                                                        onClick={() => toggleMeal(p._id, m)}
+                                                                        onClick={() => toggleAddon(passengerIndex, meal)}
                                                                         sx={{ mt: 1 }}
                                                                     >
                                                                         {added ? "Added" : "Add"}
@@ -158,29 +172,35 @@ export default function AddonsPage() {
                                                 Baggage
                                             </Typography>
                                             <Grid container spacing={2}>
-                                                {baggage?.map((b) => (
-                                                    <Grid item xs={6} sm={4} key={b._id}>
-                                                        <Card
-                                                            variant="outlined"
-                                                            sx={{
-                                                                cursor: "pointer",
-                                                                borderColor:
-                                                                    selected?.baggage?._id === b._id
-                                                                        ? "primary.main"
-                                                                        : "divider",
-                                                            }}
-                                                            onClick={() => setBaggage(p._id, b)}
-                                                        >
-                                                            <CardContent>
-                                                                <Box display="flex" alignItems="center" >
-                                                                    <Radio checked={selected?.baggage?._id === b._id} sx={{pl: 0}}/>
-                                                                    <Typography>{b.title}</Typography>
-                                                                </Box>
-                                                                <Typography variant="caption">₹{b.price}</Typography>
-                                                            </CardContent>
-                                                        </Card>
-                                                    </Grid>
-                                                ))}
+                                                {baggages?.map((baggage) => {
+                                                    const added = passengerAddon?.addons?.some((x) => x._id === baggage._id);
+                                                    console.log("passengerAddon?.addons", passengerAddon?.addons)
+                                                    return (
+                                                        <Grid item xs={6} sm={4} key={baggage._id}>
+                                                            <Card
+                                                                variant="outlined"
+                                                                sx={{
+                                                                    cursor: "pointer",
+                                                                    borderColor:
+                                                                        added
+                                                                            ? "primary.main"
+                                                                            : "divider",
+                                                                }}
+                                                                onClick={() => toggleAddon(passengerIndex, baggage)}
+                                                            >
+                                                                <CardContent>
+                                                                    <Box display="flex" alignItems="center" >
+                                                                        <Radio checked={added || false} sx={{ pl: 0 }} />
+                                                                        <Typography>{baggage.title}</Typography>
+                                                                    </Box>
+                                                                    <Typography variant="caption">
+                                                                        ₹{baggage.price}
+                                                                    </Typography>
+                                                                </CardContent>
+                                                            </Card>
+                                                        </Grid>
+                                                    )
+                                                })}
                                             </Grid>
                                         </Box>
                                     </CardContent>
@@ -192,24 +212,19 @@ export default function AddonsPage() {
 
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            <Typography fontWeight={600}>Trip Summary</Typography>
-                            <Typography mt={2}>Base Fare: ₹{BASE_FARE}</Typography>
-                            <Typography>Add-ons: ₹{addonsTotal}</Typography>
-                            <Typography fontWeight={600} mt={1}>
-                                Total: ₹{grandTotal}
-                            </Typography>
-
-                            {!isMobile && (
-                                <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSeatSelection}>
-                                    Continue to Seat Selection
-                                </Button>
-                            )}
-                        </CardContent>
-                    </Card>
+                    <TripSummary
+                        segment={segment}
+                        sourceAirport={bookingDetails?.sourceAirport}
+                        destinationAirport={bookingDetails?.destinationAirport}
+                        priceBreakdown={priceBreakdownDetails}
+                    />
+                    <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSeatSelection}>
+                        Continue to Seat Selection
+                    </Button>
                 </Grid>
             </Grid>
         </Box>
     );
 }
+
+export default AddonsPage;

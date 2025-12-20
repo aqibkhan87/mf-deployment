@@ -14,6 +14,7 @@ import {
   Divider,
   IconButton,
   Container,
+  Paper
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -21,6 +22,7 @@ import { createBooking } from "../../apis/flights/booking";
 import { searchFlights } from "../../apis/flights/searchflight";
 import { useBookingStore } from "store/bookingStore";
 import { isEmailValid, isMobileValid, formatDate, formatTime } from "../../utils/helper";
+import TripSummary from "./tripSummary";
 
 
 const createPassenger = (type, open = false) => ({
@@ -54,8 +56,6 @@ function PassengerDetailsPage() {
   const adults = paxObj?.adult || 0;
   const infants = paxObj?.infant || 0;
 
-  const [loading, setLoading] = useState(false);
-
   const [passengers, setPassengers] = useState(() => [
     ...Array.from({ length: adults }, (_, i) => createPassenger("adult", i === 0)),
     ...Array.from({ length: infants }, (_, i) => createPassenger("infant")),
@@ -70,9 +70,7 @@ function PassengerDetailsPage() {
   }, []);
 
   const fetchFlight = async () => {
-    setLoading(true);
     await searchFlights({ from, to, date: departDate, providerId, flightId });
-    setLoading(false);
   };
 
   const toggleCard = (idx) => {
@@ -87,36 +85,38 @@ function PassengerDetailsPage() {
     );
   };
 
-  const isFormValid = useMemo(() => passengers.every(isPassengerValid), [passengers]);
+  const isFormValid = useMemo(() => passengers.every(isPassengerValid) && isEmailValid(contact.email) && isMobileValid(contact.mobile), [passengers, contact]);
 
   const handleNext = async () => {
-    const payload = { flightId, providerId, from, to, departDate, passengers, contact };
-    const res = await createBooking(payload);
-    localStorage.setItem("bookingId", res.bookingId);
-    history.push("/addons");
+    const payload = {
+      flightDetail: selectedFlight?.fare,
+      providerId,
+      departDate,
+      passengers,
+      contact,
+      sourceIATA: from,
+      destinationIATA: to
+    };
+    const response = await createBooking(payload);
+    if (response?.bookingId) {
+      history.push("/addons");
+    }
   };
 
   const handleContactChange = (field, value) => {
     setContact((prev) => ({ ...prev, [field]: value }));
   };
 
-  if (loading || !selectedFlight) return <Container sx={{ py: 6 }}>Loading…</Container>;
-
   return (
-    <Container  sx={{ py: 3 }}>
+    <Container sx={{ py: 3 }}>
       <Grid container spacing={3}>
         {/* LEFT */}
         <Grid item xs={12} md={8}>
-          <Card sx={{ my: 2 }}>
-            <CardContent>
-              <Typography align="center" fontWeight="bold">
-                {segment?.departureAirport} → {segment?.arrivalAirport}
-              </Typography>
-              <Typography align="center" color="text.secondary">
-                {formatDate(departDate)}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#c4e2ff', color: 'white' }}>
+            <Typography align="center" fontWeight="bold">
+              {segment?.departureAirport} → {segment?.arrivalAirport}
+            </Typography>
+          </Paper>
 
           {passengers.map((p, i) => {
             const valid = isPassengerValid(p);
@@ -199,9 +199,9 @@ function PassengerDetailsPage() {
                     required
                     value={contact.email}
                     onChange={(e) => handleContactChange("email", e.target.value)}
-                    error={contact.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)}
+                    error={contact.email && !isEmailValid(contact.email)}
                     helperText={
-                      contact.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)
+                      contact.email && !isEmailValid(contact.email)
                         ? "Invalid email"
                         : ""
                     }
@@ -215,9 +215,9 @@ function PassengerDetailsPage() {
                     required
                     value={contact.mobile}
                     onChange={(e) => handleContactChange("mobile", e.target.value)}
-                    error={contact.mobile && !/^[0-9]{10}$/.test(contact.mobile)}
+                    error={contact.mobile && !isMobileValid(contact.mobile)}
                     helperText={
-                      contact.mobile && !/^[0-9]{10}$/.test(contact.mobile)
+                      contact.mobile && !isMobileValid(contact.mobile)
                         ? "Enter 10-digit mobile number"
                         : ""
                     }
@@ -230,36 +230,16 @@ function PassengerDetailsPage() {
 
         {/* RIGHT */}
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Trip Summary</Typography>
-              <Typography color="text.secondary" mt={1}>
-                {adults} Adult{adults > 1 ? "s" : ""}{infants > 0 && `, ${infants} Infant`}
-              </Typography>
-
-              <Box mt={2} p={2} bgcolor="#f5f5f5" borderRadius={2}>
-                <Typography fontWeight="bold">{segment?.departureAirport} → {segment?.arrivalAirport}</Typography>
-                <Typography variant="caption">{formatTime(segment?.departureTime)} — {formatTime(segment?.arrivalTime)}</Typography>
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-              <Box display="flex" justifyContent="space-between">
-                <Typography>Adults × {adults}</Typography>
-                <Typography>₹ {selectedFlight?.fare?.totalPrice * adults}</Typography>
-              </Box>
-
-              {infants > 0 && (
-                <Box display="flex" justifyContent="space-between">
-                  <Typography>Infants × {infants}</Typography>
-                  <Typography color="success.main">Free</Typography>
-                </Box>
-              )}
-
-              <Divider sx={{ my: 2 }} />
-              <Typography align="right" variant="h6">Total: ₹ {selectedFlight?.fare?.totalPrice * adults}</Typography>
-            </CardContent>
-          </Card>
-
+          <TripSummary
+            segment={segment}
+            sourceAirport={selectedFlight?.sourceAirport}
+            destinationAirport={selectedFlight?.destinationAirport}
+            priceBreakdown={{
+              basePrice: selectedFlight?.fare?.basePrice * adults || 0,
+              taxes: (selectedFlight?.fare?.totalPrice - selectedFlight?.fare?.basePrice) * adults,
+              finalPrice: selectedFlight?.fare?.totalPrice * adults || 0,
+            }}
+          />
           <Button
             fullWidth
             size="large"

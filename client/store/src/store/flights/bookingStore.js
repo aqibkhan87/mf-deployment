@@ -11,7 +11,7 @@ export const useBookingStore = create((set, get) => ({
 
   setAddons: (addons) => set({ addons: addons }),
   setSelectedFlight: (flight) => set({ selectedFlight: flight }),
-  setBookingRef: (id) => set({ bookingId: id }),
+  setBookingId: (id) => set({ bookingId: id }),
   setPaymentStatus: (status) => set({ paymentStatus: status }),
 
   resetBooking: () =>

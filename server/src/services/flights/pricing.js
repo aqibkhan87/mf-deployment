@@ -6,14 +6,19 @@ export function computeBasePriceForSegment(providerOffer) {
   return Math.round(base);
 }
 
-function parseDurationToMinutes(isoDur) {
+export function parseDurationToMinutes(isoDur) {
   // isoDur like "PT2H30M" or "PT2H"
   if (!isoDur) return null;
   const m = isoDur.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
   if (!m) return null;
-  const h = parseInt(m[1] || 0, 10);
-  const mm = parseInt(m[2] || 0, 10);
-  return h * 60 + mm;
+  const hours = parseInt(m[1] || 0, 10);
+  const minutes = parseInt(m[2] || 0, 10);
+
+  if (hours && minutes) return `${hours}h ${minutes}m`;
+  if (hours) return `${hours}h`;
+  if (minutes) return `${minutes}m`;
+
+  return "0m"; // fallback if no hours or minutes
 }
 
 export function applyPromoToPrice(price, promo) {

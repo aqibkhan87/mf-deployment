@@ -63,11 +63,10 @@ export default function DashboardPage() {
               navigation={true}
               modules={[Navigation]}
               spaceBetween={20}
-              slidesPerView={4}
               breakpoints={{
                 1024: { slidesPerView: 4 },
-                768: { slidesPerView: 3 },
-                480: { slidesPerView: 2 },
+                768: { slidesPerView: 3.3 },
+                480: { slidesPerView: 1.3 },
               }}
             >
               {sec?.products?.map((p, i) => (

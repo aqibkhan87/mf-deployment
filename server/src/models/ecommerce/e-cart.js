@@ -19,6 +19,10 @@ const cartSchema = new Schema(
     totalActual: {
       type: String,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     collection: "cart", 

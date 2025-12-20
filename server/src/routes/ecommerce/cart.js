@@ -60,7 +60,7 @@ apiRouter.post("/", async (req, res) => {
     cart.totalAmount = totalAmount.toFixed(2);
     cart.totalActual = totalActual.toFixed(2);
     cart.savedAmount = (totalActual - totalAmount).toFixed(2);
-
+    
     await cart.save();
 
     res.json({
@@ -86,7 +86,7 @@ apiRouter.get("/:cartId", async (req, res) => {
       cart = await CartModel.findOne({ _id: cartId }).populate(
         "products.productDetail"
       );
-      if(!cart) {
+      if (!cart) {
         return res.json({
           cart: null,
         });

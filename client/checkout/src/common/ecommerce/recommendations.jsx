@@ -32,11 +32,10 @@ const Recommendations = () => {
           navigation={true}
           modules={[Navigation]}
           spaceBetween={20}
-          slidesPerView={5}
           breakpoints={{
             1024: { slidesPerView: 5 },
-            768: { slidesPerView: 3 },
-            480: { slidesPerView: 2 },
+            768: { slidesPerView: 3.3 },
+            480: { slidesPerView: 1.3 },
           }}
         >
           {productsByCategory?.map((p, i) => (

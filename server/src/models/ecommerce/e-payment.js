@@ -4,7 +4,7 @@ const EcommercePaymentSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
 
     gateway: { type: String, default: "RAZORPAY" },

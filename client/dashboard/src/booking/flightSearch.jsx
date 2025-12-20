@@ -138,6 +138,9 @@ function FlightResults() {
                     </div>
                 ))}
             </div>
+            {!selectedFlight?.fares?.length && <div>
+                No Flight Found
+            </div>}
         </div>
 
     );
