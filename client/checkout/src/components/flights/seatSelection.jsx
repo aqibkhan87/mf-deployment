@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Box, Typography, Grid, Chip, CardContent, Button } from "@mui/material";
+import { Box, Typography, Grid, Chip, CardContent, Button, Paper } from "@mui/material";
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
@@ -33,6 +33,8 @@ function SeatSelection() {
     const [seatPricing, setSeatPricing] = useState(0);
     const ECONONMY_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "ECONOMY") || {};
     const BUSINESS_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "BUSINESS") || {};
+    const sourceAirport = bookingDetails?.sourceAirport;
+    const destinationAirport = bookingDetails?.destinationAirport;
 
 
     useEffect(() => {
@@ -149,7 +151,7 @@ function SeatSelection() {
                     [seatId]: "selected",
                 }
             }));
-            
+
             setSeatPricing(seatPricing + seatTypeWithPrice?.price)
 
             // Move to next passenger
@@ -169,7 +171,7 @@ function SeatSelection() {
             flightInstanceKey: flightInstanceKey?.current,
             passengers: adultPassengers,
         });
-        
+
         // history.push("/flight/checkout");
     }
     console.log("adultPassengersadultPassengers", adultPassengers)
@@ -190,6 +192,14 @@ function SeatSelection() {
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
+                    <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                        <Typography align="center" fontWeight="bold">
+                            {sourceAirport?.city} to {destinationAirport?.city}
+                        </Typography>
+                    </Paper>
+                    <Box>
+                        <Typography>Passengers</Typography>
+                    </Box>
                     <Box sx={{ gap: 2, display: "flex", flexWrap: "wrap" }}>
                         {adultPassengers?.map((passenger, index) => {
                             const isActive = index === activePassengerIndex;
@@ -238,7 +248,7 @@ function SeatSelection() {
                             }}
                         >
                             <Typography fontWeight={600} mb={1}>
-                                Seat Status
+                                Seat Types
                             </Typography>
 
                             <Box display="flex" gap={1.5}>

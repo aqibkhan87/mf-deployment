@@ -50,6 +50,8 @@ const isPassengerValid = (p) => {
 function PassengerDetailsPage() {
   const history = useHistory();
   const { selectedFlight } = useBookingStore();
+  const sourceAirport = selectedFlight?.sourceAirport;
+  const destinationAirport = selectedFlight?.destinationAirport;
 
   const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
   const { from, to, departDate, passengers: paxObj, providerId, flightId } = searchInfo;
@@ -112,18 +114,23 @@ function PassengerDetailsPage() {
       <Grid container spacing={3}>
         {/* LEFT */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#c4e2ff', color: 'white' }}>
+          <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
             <Typography align="center" fontWeight="bold">
-              {segment?.departureAirport} → {segment?.arrivalAirport}
+              {sourceAirport?.city} to {destinationAirport?.city}
             </Typography>
           </Paper>
 
-          {passengers.map((p, i) => {
+          {passengers?.map((p, i) => {
             const valid = isPassengerValid(p);
             return (
               <Card key={i} sx={{ mb: 2 }}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" onClick={() => toggleCard(i)} sx={{ cursor: "pointer" }}>
+                <Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    onClick={() => toggleCard(i)}
+                    sx={{ cursor: "pointer", backgroundColor: "#f7fbff", p: 2 }}
+                  >
                     {/* Vertical Progress */}
                     <Box sx={{ width: 4, height: 48, bgcolor: valid ? "success.main" : "error.main", borderRadius: 1, mr: 2 }} />
                     <Box flexGrow={1}>
@@ -139,49 +146,53 @@ function PassengerDetailsPage() {
 
                   {p.open && (
                     <>
-                      <Divider sx={{ my: 2 }} />
-                      <RadioGroup row value={p.gender} onChange={(e) => updatePassenger(i, "gender", e.target.value)}>
-                        <FormControlLabel value="Male" control={<Radio />} label="Male" />
-                        <FormControlLabel value="Female" control={<Radio />} label="Female" />
-                      </RadioGroup>
+                      <Divider sx={{ mb: 2 }} />
+                      <Box sx={{ p: 2, pt: 0 }}>
+                        <RadioGroup row value={p.gender} onChange={(e) => updatePassenger(i, "gender", e.target.value)}>
+                          <FormControlLabel value="Male" control={<Radio />} label="Male" />
+                          <FormControlLabel value="Female" control={<Radio />} label="Female" />
+                        </RadioGroup>
 
-                      <Grid container spacing={2} mt={1}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="First Name"
-                            fullWidth
-                            required
-                            value={p.firstName}
-                            onChange={(e) => updatePassenger(i, "firstName", e.target.value)}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Last Name"
-                            fullWidth
-                            required
-                            value={p.lastName}
-                            onChange={(e) => updatePassenger(i, "lastName", e.target.value)}
-                          />
-                        </Grid>
+                        <Grid container spacing={2} mt={1}>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="First Name"
+                              fullWidth
+                              required
+                              value={p.firstName}
+                              onChange={(e) => updatePassenger(i, "firstName", e.target.value)}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              label="Last Name"
+                              fullWidth
+                              required
+                              value={p.lastName}
+                              onChange={(e) => updatePassenger(i, "lastName", e.target.value)}
+                            />
+                          </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            type="date"
-                            label="Date of Birth"
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                            required={p.type === "infant"}
-                            value={p.dob}
-                            onChange={(e) => updatePassenger(i, "dob", e.target.value)}
-                            error={p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2)}
-                            helperText={p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ? "Infant must be under 2 years" : ""}
-                          />
+                          <Grid item xs={12} sm={6}>
+                            <TextField
+                              type="date"
+                              label={`Date of Birth ${p.type === "infant" ? "(Mandatory)" : "(Optional)"}`}
+                              fullWidth
+                              InputLabelProps={{ shrink: true }}
+                              required={p.type === "infant"}
+                              value={p.dob}
+                              onChange={(e) => updatePassenger(i, "dob", e.target.value)}
+                              error={p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2)}
+                              helperText={
+                                p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ? 
+                                "Infant must be under 2 years" : ""}
+                            />
+                          </Grid>
                         </Grid>
-                      </Grid>
+                      </Box>
                     </>
                   )}
-                </CardContent>
+                </Box>
               </Card>
             );
           })}

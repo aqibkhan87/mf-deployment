@@ -8,6 +8,7 @@ import {
     Typography,
     Button,
     Chip,
+    Paper,
     Radio,
     Stack,
 } from "@mui/material";
@@ -21,6 +22,8 @@ function AddonsPage() {
     const { addons, bookingDetails } = useBookingStore();
     const [passengerAddons, setPassengerAddons] = useState([]);
     const segment = bookingDetails?.flightDetail?.segments?.[0];
+    const sourceAirport= bookingDetails?.sourceAirport;
+    const destinationAirport = bookingDetails?.destinationAirport;
 
     const meals = useMemo(
         () => addons?.filter((a) => a.type === "meal") || [],
@@ -118,8 +121,13 @@ function AddonsPage() {
             <Grid container spacing={3}>
                 {/* LEFT */}
                 <Grid item xs={12} md={8}>
+                    <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                        <Typography align="center" fontWeight="bold">
+                            {sourceAirport?.city} to {destinationAirport?.city}
+                        </Typography>
+                    </Paper>
                     <Typography variant="h5" fontWeight={600} mb={2}>
-                        Select Add-ons
+                        Select Addons
                     </Typography>
 
                     <Stack spacing={3}>
@@ -127,12 +135,15 @@ function AddonsPage() {
                             const passengerAddon = passengerAddons[passengerIndex];
 
                             return (
-                                <Grid key={p.id}>
-                                    <CardContent>
+                                <Card key={p.id} sx={{ mb: 2 }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", backgroundColor: "#f7fbff", p: 2 }}>
+                                        <Box sx={{ width: 4, height: 48, bgcolor: "success.main", borderRadius: 1, mr: 2 }} />
                                         <Typography fontWeight={600}>{p.firstName} {p.lastName}</Typography>
                                         <Typography variant="caption" color="text.secondary">
                                             {p.type}
                                         </Typography>
+                                    </Box>
+                                    <Box sx={{ p: 2 }}>
                                         <Box mt={3}>
                                             <Typography fontWeight={600} mb={1}>
                                                 Meals
@@ -201,8 +212,8 @@ function AddonsPage() {
                                                 })}
                                             </Grid>
                                         </Box>
-                                    </CardContent>
-                                </Grid>
+                                    </Box>
+                                </Card>
                             );
                         })}
                     </Stack>

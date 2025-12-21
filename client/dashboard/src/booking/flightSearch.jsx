@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Button } from "@mui/material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../apis/flights/booking";
+import "./flightSearch.scss"
 
 const formatTime = (iso) => {
     const d = new Date(iso);
@@ -23,8 +28,8 @@ function FlightResults() {
     const to = searchInfo.to;
     const date = searchInfo.date;
     const passengers = searchInfo.passengers;
-    const [loading, setLoading] = useState(false);
-    const formattedDate = new Date(date).toLocaleDateString();
+    const sourceAirport = selectedFlight?.sourceAirport;
+    const destinationAirport = selectedFlight?.destinationAirport;
 
     useEffect(() => {
         getSearchFlights();
@@ -37,14 +42,7 @@ function FlightResults() {
             date: date,
             passengers: passengers
         };
-        try {
-            setLoading(true);
-            await searchFlights(searchData);
-        } catch (err) {
-            console.error("Search failed:", err);
-        } finally {
-            setLoading(false);
-        }
+        await searchFlights(searchData);
     }
 
 
@@ -67,20 +65,50 @@ function FlightResults() {
     }
 
     return (
-        <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
-            {/* Header */}
-            <div className="bg-white rounded-2xl shadow p-4 border">
-                <h1 className="text-2xl font-semibold">Flights from {from} → {to}</h1>
-                <p className="text-gray-600">{formattedDate}</p>
-                <p className="mt-2 text-gray-800 font-medium">{selectedFlight?.fares?.length || 0} flights found</p>
-            </div>
+        <div className="w-full max-w-5xl mx-auto p-4 space-y-6 flight-search">
+            <Swiper
+                modules={[Navigation]}
+                spaceBetween={20}
+                breakpoints={{
+                    1024: { slidesPerView: 8 },
+                    768: { slidesPerView: 5 },
+                    480: { slidesPerView: 3 },
+                }}
+            >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]?.map((p, i) => (
+                    <SwiperSlide className="cursor-pointer">
+                        <Card sx={{ height: "100%" }}>
+                            <CardContent>
+                                <Typography variant="body1" gutterBottom>
+                                    7, Dec
+                                </Typography>
+                                <Typography variant="h6" color="green">
+                                    ₹ 10,000
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </SwiperSlide>
+                ))}
 
+            </Swiper>
+            {/* Header */}
+            <div className="shadow p-4 border text-center" style={{ backgroundColor: "#1976d2", borderRadius: 100 }}>
+                <h1 className="text-2xl font-semibold text-white">
+                    Flights from {sourceAirport?.city} to {destinationAirport?.city}
+                </h1>
+            </div>
+            <Box>
+                <p className="mt-2 text-gray-800 font-medium">
+                    {selectedFlight?.fares?.length || 0} Flights Found
+                </p>
+            </Box>
             {/* Flight List */}
             <div className="space-y-4">
                 {selectedFlight?.fares?.map((fare) => (
                     <div
                         key={fare.providerOfferId}
-                        className="bg-white rounded-2xl shadow border p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
+                        className="bg-white rounded-2xl shadow p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
+                        style={{ borderColor: "#f7fbff", borderRadius: 2 }}
                     >
                         {/* Left Section */}
                         <div className="flex flex-col space-y-3 w-full md:w-2/3">
@@ -93,24 +121,26 @@ function FlightResults() {
                                 />
                                 <div className="flex flex-col">
                                     <div className="text-lg font-semibold">{fare.airline.name} ({fare.airline.code})</div>
-                                    <div className="text-sm text-gray-500">{fare.airline.country} • {fare.airline.alliance}</div>
                                 </div>
                             </div>
 
                             {/* Flight Segments */}
                             {fare.segments.map((segment, index) => (
-                                <div key={index} className="flex items-center space-x-6">
-                                    <div>
+                                <Box key={index} className="flex items-center space-x-6 justify-between">
+                                    <Box>
                                         <p className="text-xl font-bold">{formatTime(segment.departureTime)}</p>
-                                        <p className="text-gray-500">{segment.departureAirport}</p>
-                                    </div>
-                                    <div className="text-gray-500">→</div>
-                                    <div>
+                                        <p className="text-gray-500">{sourceAirport?.city}, {segment.departureAirport}</p>
+                                    </Box>
+                                    <Box className="text-gray-500">
+                                        <p className="text-gray-600">{formatDuration(segment.duration)}</p>
+                                        <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
+                                    </Box>
+                                    <Box>
                                         <p className="text-xl font-bold">{formatTime(segment.arrivalTime)}</p>
-                                        <p className="text-gray-500">{segment.arrivalAirport}</p>
-                                    </div>
-                                    <p className="ml-4 text-gray-600">{formatDuration(segment.duration)}</p>
-                                </div>
+                                        <p className="text-gray-500">{destinationAirport?.city}, {segment.arrivalAirport}</p>
+                                    </Box>
+
+                                </Box>
                             ))}
 
                             {/* Aircraft & Cabin Info */}
@@ -126,7 +156,10 @@ function FlightResults() {
 
                         {/* Price & Button */}
                         <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
-                            <p className="text-2xl font-semibold">₹ {fare.totalPrice}</p>
+                            <Box className="flex text-lg font-semibold items-center">
+                                ₹ {Math.floor(fare.totalPrice)}
+                                <Typography className="text-sm"> / adult</Typography>
+                            </Box>
                             <Button
                                 variant="contained"
                                 className="mt-2 px-5 py-2 transition"

@@ -83,7 +83,7 @@ const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdow
                 <Divider sx={{ my: 2 }} />
                 <Box display="flex" justifyContent="space-between">
                     <Typography>{adults > 1 ? "Adults" : "Adult"} × {adults}</Typography>
-                    <Typography>₹ {priceBreakdown?.basePrice}</Typography>
+                    <Typography>₹ {Math.floor(priceBreakdown?.basePrice)}</Typography>
                 </Box>
 
                 {infants > 0 && (
@@ -97,23 +97,23 @@ const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdow
                 {priceBreakdown?.addonsPrice > 0 && (
                     <Box display="flex" justifyContent="space-between">
                         <Typography>Addons</Typography>
-                        <Typography>₹ {priceBreakdown?.addonsPrice}</Typography>
+                        <Typography>₹ {Math.floor(priceBreakdown?.addonsPrice)}</Typography>
                     </Box>
                 )}
                 {priceBreakdown?.seatsPrice > 0 && (
                     <Box display="flex" justifyContent="space-between">
                         <Typography>Seats Charges</Typography>
-                        <Typography>₹ {priceBreakdown?.seatsPrice}</Typography>
+                        <Typography>₹ {Math.floor(priceBreakdown?.seatsPrice)}</Typography>
                     </Box>
                 )}
                 {priceBreakdown?.taxes > 0 && (
                     <Box display="flex" justifyContent="space-between">
                         <Typography>Taxes</Typography>
-                        <Typography>₹ {Number(priceBreakdown?.taxes)}</Typography>
+                        <Typography>₹ {Math.floor(priceBreakdown?.taxes)}</Typography>
                     </Box>
                 )}
                 <Typography align="right" variant="h6">
-                    Total: ₹ {priceBreakdown?.finalPrice}
+                    Total: ₹ {Math.floor(priceBreakdown?.finalPrice)}
                 </Typography>
             </CardContent>
         </Card>
