@@ -44,6 +44,22 @@ export const updateAddonsInPassengers = async (payload) => {
   }
 };
 
+export const updateSeatSelectionInBooking = async (payload) => {
+  useLoaderStore.getState().setLoading(true);
+  try {
+    const response = await httpRequest(
+      "put",
+      `/api/flights/bookings/update-seats-in-booking`,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+  } finally {
+    useLoaderStore.getState().setLoading(false);
+  }
+};
+
 export const getBookingDetails = async () => {
   const userId = localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))?._id

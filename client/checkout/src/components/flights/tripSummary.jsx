@@ -11,7 +11,6 @@ import { formatDate, formatTime } from "../../utils/helper";
 
 const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdown }) => {
     const { selectedFlight } = useBookingStore();
-    console.log("priceBreakdown in TripSummary", priceBreakdown);
 
     const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
     const { passengers: paxObj } = searchInfo;
@@ -99,6 +98,12 @@ const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdow
                     <Box display="flex" justifyContent="space-between">
                         <Typography>Addons</Typography>
                         <Typography>₹ {priceBreakdown?.addonsPrice}</Typography>
+                    </Box>
+                )}
+                {priceBreakdown?.seatsPrice > 0 && (
+                    <Box display="flex" justifyContent="space-between">
+                        <Typography>Seats Charges</Typography>
+                        <Typography>₹ {priceBreakdown?.seatsPrice}</Typography>
                     </Box>
                 )}
                 {priceBreakdown?.taxes > 0 && (

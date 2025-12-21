@@ -15,10 +15,11 @@ const createSeatMapForSegment = (segment) => {
 
   const seatStatus = {};
   layout?.cabins?.forEach((cabin) => {
+    seatStatus[cabin.cabin] = {};
     Array.from({ length: cabin.rows }, (_, i) => i + 1).forEach((row) => {
       cabin.columns.forEach((col) => {
         const seatLabel = `${row}${col}`;
-        seatStatus[seatLabel] = "available"; // default
+        seatStatus[cabin.cabin][seatLabel] = "available"; // default
       });
     });
   });
@@ -37,7 +38,7 @@ const createSeatMapForSegment = (segment) => {
 };
 
 export const createSeatMapsForFare = (fare) => {
-  return fare.segments.map((segment) => createSeatMapForSegment(segment));
+  return fare?.segments?.map((segment) => createSeatMapForSegment(segment));
 };
 
 export const createSeatMapsForFlight = async (flights) => {

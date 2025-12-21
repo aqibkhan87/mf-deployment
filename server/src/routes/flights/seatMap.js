@@ -5,7 +5,6 @@ const apiRouter = express.Router();
 
 apiRouter.get("/:flightInstanceKey", async (req, res) => {
   try {
-    console.log("Fetching seatMap for flightInstanceKey:", req.params.flightInstanceKey);
     const seatMap = await SeatMapModel.findOne({
       flightInstanceKey: req.params.flightInstanceKey,
     });

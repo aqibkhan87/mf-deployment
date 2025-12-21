@@ -11,9 +11,9 @@ const PassengerSchema = new mongoose.Schema(
     addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
     seat: {
       seatNumber: String, // "12A"
-      segmentId: String,
       cabin: String, // ECONOMY
       price: Number,
+      seatType: { type: String, enum: ["window", "aisle", "middle"] },
     },
   },
   {
@@ -63,6 +63,7 @@ const BookingSchema = new mongoose.Schema(
       taxes: { type: Number, default: 0 },
       addonsPrice: { type: Number, default: 0 },
       finalPrice: { type: Number, default: 0 },
+      seatsPrice: { type: Number, default: 0 },
     },
 
     paymentRequired: { type: Boolean, default: true },

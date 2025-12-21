@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Box, Typography, Grid, Chip, CardContent, Button } from "@mui/material";
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
 import { useBookingStore } from "store/bookingStore";
-import { getBookingDetails } from "../../apis/flights/booking";
+import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking";
 import { getSeatMap } from "../../apis/flights/seatMap";
 import TripSummary from "./tripSummary";
 
@@ -24,11 +24,13 @@ const LegendItem = ({ color, label }) => (
 );
 
 function SeatSelection() {
+    const flightInstanceKey = useRef(null);
     const { bookingDetails, seatMap } = useBookingStore();
     const segment = bookingDetails?.flightDetail?.segments?.[0];
     const [seatStatusMap, setSeatStatusMap] = useState({});
     const [flightPassengers, setFlightPassengers] = useState([]);
     const [activePassengerIndex, setActivePassengerIndex] = useState(0);
+    const [seatPricing, setSeatPricing] = useState(0);
     const ECONONMY_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "ECONOMY") || {};
     const BUSINESS_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "BUSINESS") || {};
 
@@ -52,8 +54,8 @@ function SeatSelection() {
 
     const fetchSeatMap = async () => {
         const segment = bookingDetails?.flightDetail?.segments?.[0];
-        let flightInstanceKey = `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`;
-        await getSeatMap(flightInstanceKey);
+        flightInstanceKey.current = `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`;
+        await getSeatMap(flightInstanceKey?.current);
     }
 
     useEffect(() => {
@@ -62,8 +64,8 @@ function SeatSelection() {
         }
     }, [seatMap?.seatStatus]);
 
-    const handleSeatSelect = (seatId) => {
-        if (seatStatusMap[seatId] === "reserved") return;
+    const handleSeatSelect = (seatId, seatLayoutType, seatTypeWithPrice) => {
+        if (seatStatusMap[seatLayoutType][seatId] === "reserved") return;
 
         const currentPassenger = adultPassengers[activePassengerIndex];
         if (!currentPassenger) return;
@@ -81,7 +83,7 @@ function SeatSelection() {
                 p => p === currentPassenger
             );
 
-            const currentSeat = updated[passengerIndex]?.seatId;
+            const currentSeat = updated[passengerIndex]?.seat?.seatNumber;
 
             /* ---------------------------------
             CASE 1: Clicking same seat → DESELECT
@@ -89,13 +91,22 @@ function SeatSelection() {
             if (currentSeat === seatId) {
                 updated[passengerIndex] = {
                     ...updated[passengerIndex],
-                    seatId: null,
+                    seat: {
+                        seatNumber: null,
+                        cabin: null,
+                        price: 0,
+                        seatType: null,
+                    },
                 };
 
                 setSeatStatusMap(map => ({
                     ...map,
-                    [seatId]: "available",
+                    [seatLayoutType]: {
+                        ...map[seatLayoutType],
+                        [seatId]: "available",
+                    }
                 }));
+                setSeatPricing(seatPricing - seatTypeWithPrice?.price)
 
                 return updated;
             }
@@ -106,15 +117,19 @@ function SeatSelection() {
             if (currentSeat) {
                 setSeatStatusMap(map => ({
                     ...map,
-                    [currentSeat]: "available",
+                    [seatLayoutType]: {
+                        ...map[seatLayoutType],
+                        [currentSeat]: "available",
+                    }
                 }));
+                setSeatPricing(seatPricing - seatTypeWithPrice?.price)
             }
 
             /* ---------------------------------
                CASE 3: Seat taken by another passenger → block
             ---------------------------------- */
             const isSeatTaken = updated.some(
-                (p, idx) => idx !== passengerIndex && p.seatId === seatId
+                (p, idx) => idx !== passengerIndex && p?.seat?.seatNumber === seatId
             );
 
             if (isSeatTaken) return prev;
@@ -124,13 +139,18 @@ function SeatSelection() {
             ---------------------------------- */
             updated[passengerIndex] = {
                 ...updated[passengerIndex],
-                seatId,
+                seat: seatTypeWithPrice,
             };
 
             setSeatStatusMap(map => ({
                 ...map,
-                [seatId]: "selected",
+                [seatLayoutType]: {
+                    ...map[seatLayoutType],
+                    [seatId]: "selected",
+                }
             }));
+            
+            setSeatPricing(seatPricing + seatTypeWithPrice?.price)
 
             // Move to next passenger
             setActivePassengerIndex(prevIdx =>
@@ -144,32 +164,33 @@ function SeatSelection() {
     };
 
     const handlePayment = async () => {
-        history.push("/flight/checkout");
+        await updateSeatSelectionInBooking({
+            bookingId: bookingDetails?.bookingId,
+            flightInstanceKey: flightInstanceKey?.current,
+            passengers: adultPassengers,
+        });
+        
+        // history.push("/flight/checkout");
     }
+    console.log("adultPassengersadultPassengers", adultPassengers)
     const adultPassengers = useMemo(
         () => flightPassengers?.filter(p => p.isAdult),
         [flightPassengers]
     );
 
     const priceBreakdownDetails = useMemo(() => {
-        const basePrice = bookingDetails?.priceBreakdown?.basePrice || 0;
-        const taxes = bookingDetails?.priceBreakdown?.taxes || 0;
-        const addonsPrice = bookingDetails?.priceBreakdown?.addonsPrice || 0;
         return {
-            basePrice,
-            taxes,
-            addonsPrice,
-            finalPrice: basePrice + taxes + addonsPrice,
+            ...bookingDetails?.priceBreakdown,
+            seatsPrice: seatPricing,
+            finalPrice: bookingDetails?.priceBreakdown?.finalPrice + seatPricing,
         }
-    }, [bookingDetails]);
-
-    console.log("adultPassengers", adultPassengers);
+    }, [bookingDetails, seatPricing]);
 
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
-                    <Box sx={{ gap: 2, display: "flex", flexWrap: "wrap"}}>
+                    <Box sx={{ gap: 2, display: "flex", flexWrap: "wrap" }}>
                         {adultPassengers?.map((passenger, index) => {
                             const isActive = index === activePassengerIndex;
                             return (
@@ -193,9 +214,9 @@ function SeatSelection() {
                                     <Typography variant="body2" color="text.secondary">
                                         {passenger.gender}
                                     </Typography>
-                                    {passenger?.seatId ? (
+                                    {passenger?.seat?.seatNumber ? (
                                         <Chip
-                                            label={passenger.seatId}
+                                            label={passenger.seat.seatNumber}
                                             sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2, mt: 1 }} />
                                     ) : (
                                         <Typography variant="body2" color="text.secondary">
@@ -206,7 +227,7 @@ function SeatSelection() {
                             )
                         })}
                     </Box>
-                    <Box>
+                    {seatStatusMap?.ECONOMY && seatStatusMap?.BUSINESS && <Box>
                         <Box
                             sx={{
                                 display: "flex",
@@ -266,13 +287,25 @@ function SeatSelection() {
                                 }}
                             >
                                 <Box display="flex">
-                                    <SeatBlock layout={BUSINESS_SEAT_MAP} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <SeatBlock
+                                        layout={BUSINESS_SEAT_MAP}
+                                        seatState={seatStatusMap["BUSINESS"]}
+                                        onSelect={handleSeatSelect}
+                                        seatLayoutType="BUSINESS"
+                                        activePassenger={adultPassengers[activePassengerIndex]}
+                                    />
                                     <ExitGap />
-                                    <SeatBlock layout={ECONONMY_SEAT_MAP} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <SeatBlock
+                                        layout={ECONONMY_SEAT_MAP}
+                                        seatState={seatStatusMap["ECONOMY"]}
+                                        onSelect={handleSeatSelect}
+                                        seatLayoutType="ECONOMY"
+                                        activePassenger={adultPassengers[activePassengerIndex]}
+                                    />
                                 </Box>
                             </Box>
                         </Box>
-                    </Box>
+                    </Box>}
                 </Grid>
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>

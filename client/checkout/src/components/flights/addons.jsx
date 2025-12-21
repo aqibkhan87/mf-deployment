@@ -124,7 +124,6 @@ function AddonsPage() {
 
                     <Stack spacing={3}>
                         {bookingDetails?.passengers?.map((p, passengerIndex) => {
-                            console.log("ppppp", p);
                             const passengerAddon = passengerAddons[passengerIndex];
 
                             return (
@@ -174,7 +173,6 @@ function AddonsPage() {
                                             <Grid container spacing={2}>
                                                 {baggages?.map((baggage) => {
                                                     const added = passengerAddon?.addons?.some((x) => x._id === baggage._id);
-                                                    console.log("passengerAddon?.addons", passengerAddon?.addons)
                                                     return (
                                                         <Grid item xs={6} sm={4} key={baggage._id}>
                                                             <Card

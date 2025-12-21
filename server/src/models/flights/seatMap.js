@@ -8,11 +8,31 @@ const SeatMapSchema = new mongoose.Schema(
     departureDate: Date, // Date of flight
     aircraftCode: String, // "73J"
     cabin: { type: String, enum: ["ECONOMY", "BUSINESS"], default: "ECONOMY" },
-    seatLayout: [],
+    seatLayout: [
+      {
+        cabin: { type: String, enum: ["ECONOMY", "BUSINESS"] },
+        rows: Number,
+        columns: [String],
+        seatPricing: {
+          window: Number,
+          aisle: Number,
+          middle: Number,
+          extraLegroom: Number,
+        },
+      },
+    ],
     code: String,
     seatStatus: {
-      type: Map,
-      of: { type: String, enum: ["available", "reserved"], default: "available" }, // selected seats will only be on frontend
+      type: Map, // key: ECONOMY, BUSINESS
+      of: {
+        type: Map, // key: 1A, 1B, 1C
+        of: {
+          type: String,
+          enum: ["available", "reserved"],
+          default: "available",
+        },
+      },
+      default: {},
     },
   },
   { collection: "seatmap" }

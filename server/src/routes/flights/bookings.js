@@ -1,14 +1,11 @@
 import express from "express";
 const router = express.Router();
 import crypto from "crypto";
-import FlightPrice from "../../models/flights/flightPrice.js";
 import BookingModel from "../../models/flights/booking.js";
 import AirportModel from "../../models/flights/airports.js";
 import AddonModel from "../../models/flights/addons.js";
-import offersData from "./../offerdata.js";
-import { applyPromoToPrice } from "../../services/flights/pricing.js";
+import SeatMapModel from "../../models/flights/seatMap.js";
 import { razorpay } from "../../razorpayService.js";
-import booking from "../../models/flights/booking.js";
 
 router.get("/:bookingId", async (req, res) => {
   const { bookingId } = req.params;
@@ -82,10 +79,11 @@ router.post("/", async (req, res) => {
 
     passengers?.forEach((p) => {
       if (p.type === "adult") {
-        priceBreakdown.basePrice += flightDetail?.basePrice || 0;
-        priceBreakdown.taxes +=
-          Number(flightDetail?.totalPrice - flightDetail?.basePrice);
-        priceBreakdown.finalPrice += flightDetail?.totalPrice;
+        priceBreakdown.basePrice += Math.round(flightDetail?.basePrice) || 0;
+        priceBreakdown.taxes += Math.round(
+          flightDetail?.totalPrice - flightDetail?.basePrice
+        );
+        priceBreakdown.finalPrice += Math.round(flightDetail?.totalPrice);
       }
     });
 
@@ -152,7 +150,10 @@ router.put("/update-addons-in-passengers", async (req, res) => {
       }
     });
 
-    priceBreakdown.finalPrice = priceBreakdown.basePrice + priceBreakdown.taxes + priceBreakdown.addonsPrice;
+    priceBreakdown.finalPrice =
+      priceBreakdown.basePrice +
+      priceBreakdown.taxes +
+      priceBreakdown.addonsPrice;
 
     // 4️⃣ Return updated booking
     const updatedBooking = await BookingModel.findByIdAndUpdate(
@@ -166,6 +167,68 @@ router.put("/update-addons-in-passengers", async (req, res) => {
     console.error("Update passenger addons error:", error);
     return res.status(500).json({
       message: "Failed to update passenger addons",
+      error: error.message,
+    });
+  }
+});
+
+router.put("/update-seats-in-booking", async (req, res) => {
+  const { bookingId, passengers = [], flightInstanceKey } = req.body;
+
+  try {
+    // 1️⃣ Basic validation
+    if (!bookingId) {
+      return res.status(400).json({ message: "bookingId is required" });
+    }
+
+    if (!Array.isArray(passengers) || passengers.length === 0) {
+      return res.status(400).json({ message: "Passengers data is required" });
+    }
+
+    // 2️⃣ Check booking exists
+    let booking = await BookingModel.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    const seatMap = await SeatMapModel.findOne({
+      flightInstanceKey: flightInstanceKey,
+    }).lean();
+
+    if (!seatMap) {
+      return res.status(404).json({ message: "Seat map not found" });
+    }
+
+    let priceBreakdown = booking.priceBreakdown;
+    priceBreakdown.seatsPrice = 0;
+
+    passengers.forEach((p) => {
+      // Calculate seat price
+      if (p?.seat?.seatNumber) {
+        const seatPrice = p?.seat?.price || 0;
+        priceBreakdown.seatsPrice += seatPrice;
+      }
+    });
+
+    const finalPrice =
+      priceBreakdown.basePrice +
+      priceBreakdown.taxes +
+      priceBreakdown.addonsPrice +
+      priceBreakdown.seatsPrice;
+    priceBreakdown.finalPrice = Math.round(finalPrice);
+
+    // 4️⃣ Return updated booking
+    const updatedBooking = await BookingModel.findByIdAndUpdate(
+      { _id: bookingId },
+      { passengers: passengers, priceBreakdown: priceBreakdown },
+      { new: true }
+    );
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("Update passenger Seat error:", error);
+    return res.status(500).json({
+      message: "Failed to update seat price",
       error: error.message,
     });
   }

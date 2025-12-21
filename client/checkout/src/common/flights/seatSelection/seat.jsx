@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 
-const Seat = ({ seatId, status, index, onSelect, gapAfter = 3 }) => {
+const Seat = ({ seatId, status, index, onSelect, gapAfter = 3, seatTypeWithPrice }) => {
     const styles = {
         available: {
             bg: "#fff",
@@ -21,6 +21,7 @@ const Seat = ({ seatId, status, index, onSelect, gapAfter = 3 }) => {
             cursor: "not-allowed",
         },
     };
+    // console.log("seatTypeWithPrice", seatTypeWithPrice);
     return (
         <Box
             onClick={status !== "reserved" ? onSelect : undefined}
@@ -42,7 +43,6 @@ const Seat = ({ seatId, status, index, onSelect, gapAfter = 3 }) => {
                 "&:hover": status === "available"
                     ? { transform: "scale(1.05)" }
                     : {},
-
             }}
 
         >
