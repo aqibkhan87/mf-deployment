@@ -9,6 +9,12 @@ const PassengerSchema = new mongoose.Schema(
     isAdult: { type: Boolean, default: true },
     isInfant: { type: Boolean, default: false },
     addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
+    seat: {
+      seatNumber: String, // "12A"
+      segmentId: String,
+      cabin: String, // ECONOMY
+      price: Number,
+    },
   },
   {
     _id: false,

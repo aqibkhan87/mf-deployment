@@ -84,7 +84,7 @@ router.post("/", async (req, res) => {
       if (p.type === "adult") {
         priceBreakdown.basePrice += flightDetail?.basePrice || 0;
         priceBreakdown.taxes +=
-          flightDetail?.totalPrice - flightDetail?.basePrice;
+          Number(flightDetail?.totalPrice - flightDetail?.basePrice);
         priceBreakdown.finalPrice += flightDetail?.totalPrice;
       }
     });

@@ -8,8 +8,10 @@ export const useBookingStore = create((set, get) => ({
   paymentStatus: null,
   bookingDetails: null,
   addons: [],
+  seatMap: {},
 
   setAddons: (addons) => set({ addons: addons }),
+  setSeatMap: (seatMap) => set({ seatMap: seatMap }),
   setSelectedFlight: (flight) => set({ selectedFlight: flight }),
   setBookingId: (id) => set({ bookingId: id }),
   setPaymentStatus: (status) => set({ paymentStatus: status }),

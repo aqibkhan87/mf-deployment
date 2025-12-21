@@ -4,26 +4,40 @@ import Seat from "./seat";
 
 const ROWS = ["A", "B", "C", "D", "E", "F"];
 
-const SeatBlock = ({ columns, seatState, onSelect }) => (
-    <Box display="flex" gap={2}>
-        {columns.map((col) => (
-            <Box key={col} display="flex" flexDirection="column" gap={2}>
-                {ROWS.map((row, i) => {
-                    const seatId = `${col}${row}`;
+const SeatBlock = ({ layout, seatState, onSelect }) => {
+    const columns = layout?.columns || [];
+    const rows = layout?.rows || 0;
+
+    const RenderRows = () => {
+        let rowMap = [];
+        for (let row = 1; row <= rows; row++) {
+            rowMap.push(
+            <Box key={row} display="flex" gap={2} flexDirection="column" justifyContent="space-around">
+                {columns?.map((col, i) => {
+                    const seatId = `${row}${col}`;
                     const status = seatState[seatId] || "available";
+                    const gapAfter = Math.ceil((columns?.length / 2));
                     return (
                         <Seat
-                            key={row}
+                            key={i}
                             status={status}
                             seatId={seatId}
                             index={i}
                             onSelect={() => onSelect(seatId)}
+                            gapAfter={gapAfter}
                         />
                     )
                 })}
-            </Box>
-        ))}
-    </Box>
-);
+            </Box>)
+        }
+        return rowMap;
+    }
+
+    return (
+        <Box display="flex" gap={2}>
+            <RenderRows />
+        </Box>
+    )
+};
 
 export default SeatBlock;

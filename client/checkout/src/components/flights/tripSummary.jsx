@@ -104,7 +104,7 @@ const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdow
                 {priceBreakdown?.taxes > 0 && (
                     <Box display="flex" justifyContent="space-between">
                         <Typography>Taxes</Typography>
-                        <Typography>₹ {priceBreakdown?.taxes}</Typography>
+                        <Typography>₹ {Number(priceBreakdown?.taxes)}</Typography>
                     </Box>
                 )}
                 <Typography align="right" variant="h6">

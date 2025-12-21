@@ -1,17 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Box, Typography, Grid, Card, CardContent, Button } from "@mui/material";
+import { Box, Typography, Grid, Chip, CardContent, Button } from "@mui/material";
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
 import { useBookingStore } from "store/bookingStore";
 import { getBookingDetails } from "../../apis/flights/booking";
+import { getSeatMap } from "../../apis/flights/seatMap";
 import TripSummary from "./tripSummary";
-
-const BASE_FARE = 25000;
-
-const LEFT = [1, 2, 3, 4, 5, 6, 7];
-const MIDDLE = [9, 10, 11, 12, 13];
-const RIGHT = [15, 16, 17, 18, 19, 20, 21];
 
 const LegendItem = ({ color, label }) => (
     <Box display="flex" alignItems="center" gap={1.5}>
@@ -28,49 +23,24 @@ const LegendItem = ({ color, label }) => (
     </Box>
 );
 
-function SeatLegend() {
-    return (
-        <Box
-            sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 3,
-                p: 2,
-            }}
-        >
-            <Typography fontWeight={600} mb={1}>
-                Seat Status
-            </Typography>
-
-            <Box display="flex" gap={1.5}>
-                <LegendItem color="#ffffff" label="Available" />
-                <LegendItem color="#cfe9ff" label="Selected" />
-                <LegendItem color="#ffd6d6" label="Reserved" />
-            </Box>
-        </Box>
-    );
-}
-
-const PlaneNoseComponent = () => (
-    <Box
-        component="img"
-        src={PlaneNose}
-        alt="Plane Nose"
-        sx={{
-            width: 300,
-            height: 300,
-            mr: -6,
-            zIndex: 2,
-        }}
-    />
-);
-
 function SeatSelection() {
-    const { bookingDetails } = useBookingStore();
+    const { bookingDetails, seatMap } = useBookingStore();
     const segment = bookingDetails?.flightDetail?.segments?.[0];
-    const [selectedSeats, setSelectedSeats] = useState([]);
     const [seatStatusMap, setSeatStatusMap] = useState({});
+    const [flightPassengers, setFlightPassengers] = useState([]);
+    const [activePassengerIndex, setActivePassengerIndex] = useState(0);
+    const ECONONMY_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "ECONOMY") || {};
+    const BUSINESS_SEAT_MAP = seatMap?.seatLayout?.find(layout => layout.cabin === "BUSINESS") || {};
+
+
+    useEffect(() => {
+        if (bookingDetails) {
+            fetchSeatMap();
+            if (bookingDetails?.passengers) {
+                setFlightPassengers(bookingDetails?.passengers || [])
+            };
+        }
+    }, [bookingDetails])
 
     useEffect(() => {
         fetchBooking();
@@ -80,94 +50,106 @@ function SeatSelection() {
         await getBookingDetails();
     }
 
+    const fetchSeatMap = async () => {
+        const segment = bookingDetails?.flightDetail?.segments?.[0];
+        let flightInstanceKey = `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`;
+        await getSeatMap(flightInstanceKey);
+    }
+
     useEffect(() => {
-        const fetchedStatus = {
-            "3B": "reserved",
-            "3C": "reserved",
-            "10D": "reserved",
-            "18A": "reserved",
-        };
-        setSeatStatusMap(fetchedStatus);
-    }, []
-    );
+        if (seatMap?.seatStatus) {
+            setSeatStatusMap(seatMap?.seatStatus);
+        }
+    }, [seatMap?.seatStatus]);
 
     const handleSeatSelect = (seatId) => {
-        if (seatStatusMap[seatId] === "occupied") return;
+        if (seatStatusMap[seatId] === "reserved") return;
 
-        if (selectedSeats.includes(seatId)) {
-            setSelectedSeats(selectedSeats.filter((id) => id !== seatId));
-            setSeatStatusMap({
-                ...seatStatusMap,
-                [seatId]: "available",
-            });
-        } else {
-            setSelectedSeats([...selectedSeats, seatId]);
-            setSeatStatusMap({
-                ...seatStatusMap,
-                [seatId]: "selected",
-            });
+        const currentPassenger = adultPassengers[activePassengerIndex];
+        if (!currentPassenger) return;
+
+        // Prevent selecting more seats than adults
+        const alreadySelectedSeats = adultPassengers.filter(p => p.seatId).length;
+        if (!currentPassenger.seatId && alreadySelectedSeats >= adultPassengers.length) {
+            return;
         }
+
+        setFlightPassengers(prev => {
+            const updated = [...prev];
+
+            const passengerIndex = updated.findIndex(
+                p => p === currentPassenger
+            );
+
+            const currentSeat = updated[passengerIndex]?.seatId;
+
+            /* ---------------------------------
+            CASE 1: Clicking same seat → DESELECT
+            ---------------------------------- */
+            if (currentSeat === seatId) {
+                updated[passengerIndex] = {
+                    ...updated[passengerIndex],
+                    seatId: null,
+                };
+
+                setSeatStatusMap(map => ({
+                    ...map,
+                    [seatId]: "available",
+                }));
+
+                return updated;
+            }
+
+            /* ---------------------------------
+               CASE 2: Passenger already has seat → free it
+            ---------------------------------- */
+            if (currentSeat) {
+                setSeatStatusMap(map => ({
+                    ...map,
+                    [currentSeat]: "available",
+                }));
+            }
+
+            /* ---------------------------------
+               CASE 3: Seat taken by another passenger → block
+            ---------------------------------- */
+            const isSeatTaken = updated.some(
+                (p, idx) => idx !== passengerIndex && p.seatId === seatId
+            );
+
+            if (isSeatTaken) return prev;
+
+            /* ---------------------------------
+               ASSIGN NEW SEAT
+            ---------------------------------- */
+            updated[passengerIndex] = {
+                ...updated[passengerIndex],
+                seatId,
+            };
+
+            setSeatStatusMap(map => ({
+                ...map,
+                [seatId]: "selected",
+            }));
+
+            // Move to next passenger
+            setActivePassengerIndex(prevIdx =>
+                prevIdx < adultPassengers.length - 1 ? prevIdx + 1 : prevIdx
+            );
+
+            return updated;
+        });
+
+
     };
 
     const handlePayment = async () => {
-        // 1️⃣ Create Order
-        const data = await createOrder({
-            type: "FLIGHT", // or ECOMMERCE
-            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
-        });
-        console.log("order data", data);
-
-        // ✅ ZERO AMOUNT
-        if (data?.skipPayment) {
-            history.push("/dashboard");
-            return;
-        }
-
-        // 2️⃣ Load Razorpay
-        const loaded = await loadRazorpay();
-        if (!loaded) {
-            alert("Payment SDK failed. Try again.");
-            return;
-        }
-        // 3️⃣ Payment Options
-        const options = {
-            key: process.env.RAZORPAY_KEY_ID,
-            order_id: data.orderId,
-            amount: data.amount,
-            currency: "INR",
-
-            handler: async (res) => {
-                try {
-                    const verify = await verifyPayment({
-                        type: "FLIGHT",
-                        entityId,
-                        ...res,
-                    });
-
-                    if (verify.success) {
-                        navigate("/dashbaord");
-                    }
-                } catch (err) {
-                    console.log("errrrrrr", err);
-                    alert("Payment verification failed");
-                }
-            },
-
-            modal: {
-                ondismiss: async () => {
-                    alert("Payment cancelled");
-                },
-            },
-        };
-
-        const rzp = new window.Razorpay(options);
-
-        rzp.on("payment.failed", async (err) => {
-            alert("Payment failed");
-        });
-
-        rzp.open();
+        history.push("/flight/checkout");
     }
+    const adultPassengers = useMemo(
+        () => flightPassengers?.filter(p => p.isAdult),
+        [flightPassengers]
+    );
 
     const priceBreakdownDetails = useMemo(() => {
         const basePrice = bookingDetails?.priceBreakdown?.basePrice || 0;
@@ -181,12 +163,69 @@ function SeatSelection() {
         }
     }, [bookingDetails]);
 
+    console.log("adultPassengers", adultPassengers);
+
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
+                    <Box sx={{ gap: 2, display: "flex", flexWrap: "wrap"}}>
+                        {adultPassengers?.map((passenger, index) => {
+                            const isActive = index === activePassengerIndex;
+                            return (
+                                <Box key={index} variant="outlined" sx={{
+                                    mb: 2,
+                                    boxShadow: isActive
+                                        ? "0 6px 16px rgba(25,118,210,0.25)"
+                                        : "0 2px 6px rgba(0,0,0,0.08)",
+                                    border: isActive ? "2px solid #d0e5ff" : "1px solid #e0e0e0",
+                                    background: isActive ? "rgb(238, 247, 255)" : "#fff",
+                                    borderRadius: "10px",
+                                    padding: 1,
+                                    color: "#000",
+                                    width: 200
+                                }}
+                                    onClick={() => setActivePassengerIndex(index)}
+                                >
+                                    <Typography variant="h6">
+                                        {passenger.firstName} {passenger.lastName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {passenger.gender}
+                                    </Typography>
+                                    {passenger?.seatId ? (
+                                        <Chip
+                                            label={passenger.seatId}
+                                            sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2, mt: 1 }} />
+                                    ) : (
+                                        <Typography variant="body2" color="text.secondary">
+                                            No Seat Selected
+                                        </Typography>
+                                    )}
+                                </Box>
+                            )
+                        })}
+                    </Box>
                     <Box>
-                        <SeatLegend />
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                gap: 3,
+                                p: 2,
+                            }}
+                        >
+                            <Typography fontWeight={600} mb={1}>
+                                Seat Status
+                            </Typography>
+
+                            <Box display="flex" gap={1.5}>
+                                <LegendItem color="#ffffff" label="Available" />
+                                <LegendItem color="#cfe9ff" label="Selected" />
+                                <LegendItem color="#ffd6d6" label="Reserved" />
+                            </Box>
+                        </Box>
                         <Box
                             sx={{
                                 overflow: "hidden",
@@ -205,24 +244,31 @@ function SeatSelection() {
                                 },
                             }}
                         >
-                            <PlaneNoseComponent />
+                            <Box
+                                component="img"
+                                src={PlaneNose}
+                                alt="Plane Nose"
+                                sx={{
+                                    width: 300,
+                                    height: 300,
+                                    mr: -6,
+                                    zIndex: 2,
+                                }}
+                            />
                             <Box display="flex" alignItems="center"
                                 style={{
                                     paddingLeft: 60,
                                     paddingRight: 30,
                                     height: 300,
-                                    border: "2px solid #8ec5ff",
                                     borderBottomRightRadius: 10,
                                     borderTopRightRadius: 10,
                                     backgroundColor: "#eef7ff",
                                 }}
                             >
                                 <Box display="flex">
-                                    <SeatBlock columns={LEFT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <SeatBlock layout={BUSINESS_SEAT_MAP} seatState={seatStatusMap} onSelect={handleSeatSelect} />
                                     <ExitGap />
-                                    <SeatBlock columns={MIDDLE} seatState={seatStatusMap} onSelect={handleSeatSelect} />
-                                    <ExitGap />
-                                    <SeatBlock columns={RIGHT} seatState={seatStatusMap} onSelect={handleSeatSelect} />
+                                    <SeatBlock layout={ECONONMY_SEAT_MAP} seatState={seatStatusMap} onSelect={handleSeatSelect} />
                                 </Box>
                             </Box>
                         </Box>

@@ -10,14 +10,14 @@ const Checkout = () => {
   const { user, address } = useAuthStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
-  const [step, setStep] = useState("auth"); // 1-auth, 2-address
+  const [step, setStep] = useState("auth"); // 1-auth
 
   useEffect(() => {
     if (step == "auth" && isEditMode && user?.email && !address) {
       setStep("address");
     }
 
-    if (isEditMode && user?.email && address?.length) {
+    if (isEditMode && user?.email) {
       setIsContinueDisabled(false);
       setIsEditMode(false);
     }
@@ -29,17 +29,65 @@ const Checkout = () => {
     setIsEditMode(true);
   };
 
-  const selectAddress = () => {
-    const eventData = { openAddressForm: true };
-    eventEmitter("openAddressForm", eventData);
-    setStep("address");
-  };
+  const handlePayment = async () => {
+    // 1️⃣ Create Order
+    const data = await createOrder({
+      type: "FLIGHT", // or ECOMMERCE
+      entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+    });
+    console.log("order data", data);
 
-  const editAddress = () => {
-    const eventData = { openAddressForm: true, address: address };
-    eventEmitter("openAddressForm", eventData);
-    setIsEditMode(true);
-  };
+    // ✅ ZERO AMOUNT
+    if (data?.skipPayment) {
+      history.push("/dashboard");
+      return;
+    }
+
+    // 2️⃣ Load Razorpay
+    const loaded = await loadRazorpay();
+    if (!loaded) {
+      alert("Payment SDK failed. Try again.");
+      return;
+    }
+    // 3️⃣ Payment Options
+    const options = {
+      key: process.env.RAZORPAY_KEY_ID,
+      order_id: data.orderId,
+      amount: data.amount,
+      currency: "INR",
+
+      handler: async (res) => {
+        try {
+          const verify = await verifyPayment({
+            type: "FLIGHT",
+            entityId,
+            ...res,
+          });
+
+          if (verify.success) {
+            navigate("/dashbaord");
+          }
+        } catch (err) {
+          console.log("errrrrrr", err);
+          alert("Payment verification failed");
+        }
+      },
+
+      modal: {
+        ondismiss: async () => {
+          alert("Payment cancelled");
+        },
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+
+    rzp.on("payment.failed", async (err) => {
+      alert("Payment failed");
+    });
+
+    rzp.open();
+  }
 
   const LoginUserDetails = () => {
     return (
@@ -94,74 +142,14 @@ const Checkout = () => {
     );
   };
 
-  const AddressNotSelected = () => {
-    return (
-      <Paper
-        sx={{
-          p: 2,
-          mb: 2,
-          bgcolor: step === "address" ? "#F5F7F8" : "#fafafa",
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item>
-            <Chip
-              label="2"
-              sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2 }}
-            />
-          </Grid>
-          <Grid item xs>
-            <Typography sx={{ fontWeight: 600 }}>DELIVERY ADDRESS</Typography>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={(e) => selectAddress(true)}
-            >
-              Select Address
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-    );
-  };
 
-  const DisplayAddress = () => {
-    return (
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item>
-            <Chip
-              label="2"
-              sx={{ background: "#e3ebfd", fontWeight: 600, mr: 2 }}
-            />
-          </Grid>
-          <Grid item xs>
-            <Typography sx={{ fontWeight: 600 }}>{address}</Typography>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={(e) => editAddress()}
-            >
-              Edit Address
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-    );
-  };
 
-  
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", p: 3 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
           {user?.email ? <LoginUserDetails /> : <UserNotLoggedIn />}
-          {address ? <DisplayAddress /> : <AddressNotSelected />}
           <CheckoutItems />
 
           {user?.email && (

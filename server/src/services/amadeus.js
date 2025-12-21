@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import Amadeus from "amadeus";
 import FlightPrice from "./../models/flights/flightPrice.js";
+import { createSeatMapsForFlight } from "../utils/flightSeatMap/importSeatMap.js";
 
 const amadeus = new Amadeus({
   clientId: process.env.AMADEUS_CLIENT_ID,
@@ -109,20 +110,32 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
         basePrice: applyPriceDecrease(offer.price.base, day),
         currency: offer.price.currency,
         duration: firstItinerary.duration,
-        segments: firstItinerary.segments.map((seg) => ({
-          carrierCode: seg.carrierCode,
-          flightNumber: seg.number,
-          aircraftCode: seg.aircraft?.code,
-          departureAirport: seg.departure.iataCode,
-          arrivalAirport: seg.arrival.iataCode,
-          departureTime: new Date(seg.departure.at),
-          arrivalTime: new Date(seg.arrival.at),
-          duration: seg.duration,
-          cabin: traveler?.cabin,
-          class: traveler?.class,
-        })),
+        segments: firstItinerary.segments.map((seg) => {
+          const departureDate = new Date(seg.departure.at);
+          const nextDayDeparture = new Date(departureDate); // create a copy
+          nextDayDeparture.setDate(departureDate.getDate() + day);
+
+          const arrivalDate = new Date(seg.arrival.at);
+          const nextDayArrival = new Date(arrivalDate); // create a copy
+          nextDayArrival.setDate(arrivalDate.getDate() + day);
+
+          return {
+            carrierCode: seg.carrierCode,
+            flightNumber: seg.number,
+            aircraftCode: seg.aircraft?.code,
+            departureAirport: seg.departure.iataCode,
+            arrivalAirport: seg.arrival.iataCode,
+            departureTime: nextDayDeparture,
+            arrivalTime: nextDayArrival,
+            duration: seg.duration,
+            cabin: traveler?.cabin,
+            class: traveler?.class,
+          };
+        }),
       };
     });
+
+    await createSeatMapsForFlight(fares);
 
     await FlightPrice.updateOne(
       {
@@ -144,7 +157,9 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
   }
 
   console.log(
-    `✅ Saved ${origin}-${destination} (${baseDate.toISOString().split("T")[0]})`
+    `✅ Saved ${origin}-${destination} (${
+      baseDate.toISOString().split("T")[0]
+    })`
   );
 }
 
