@@ -54,7 +54,7 @@ function PassengerDetailsPage() {
   const destinationAirport = selectedFlight?.destinationAirport;
 
   const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
-  const { from, to, departDate, passengers: paxObj, providerId, flightId } = searchInfo;
+  const { from, to, date: departDate, passengers: paxObj, providerId, flightId } = searchInfo;
   const adults = paxObj?.adult || 0;
   const infants = paxObj?.infant || 0;
 

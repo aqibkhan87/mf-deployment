@@ -8,10 +8,31 @@ import "swiper/css/navigation";
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
+import dayjs from "dayjs";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../apis/flights/booking";
 import BookingWidget from "./bookingWidget";
 import "./flightSearch.scss"
+
+export const getAllowedDates = (days = 10) => {
+    const today = dayjs().startOf("day");
+    const endDate = today.add(days, "day");
+
+    const dates = [];
+    let current = today;
+
+    while (current.isBefore(endDate) || current.isSame(endDate)) {
+        dates.push({
+            iso: current.format("YYYY-MM-DD"),
+            label: current.format("DD MMM"),
+            day: current.format("ddd"),
+            date: current,
+        });
+        current = current.add(1, "day");
+    }
+
+    return dates;
+};
 
 const formatTime = (iso) => {
     const d = new Date(iso);
@@ -28,17 +49,32 @@ function FlightResults() {
     const { selectedFlight, setSearchEditing } = useBookingStore();
     const history = useHistory();
     const [enableBookingWidget, setEnableBookingWidget] = useState(false);
-    const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
-    const from = searchInfo.from;
-    const to = searchInfo.to;
-    const date = searchInfo.date;
-    const passengers = searchInfo.passengers;
+    const [dates] = useState(getAllowedDates());
+    const [searchInfo, setSearchInfo] = useState({});
+
     const sourceAirport = selectedFlight?.sourceAirport;
     const destinationAirport = selectedFlight?.destinationAirport;
+    const connectingAirports = selectedFlight?.connectingAirports;
+
+    console.log(getAllowedDates());
 
     useEffect(() => {
-        getSearchFlights();
+        if (localStorage.getItem("search-info")) {
+            const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
+            setSearchInfo({
+                from: searchInfo.from,
+                to: searchInfo.to,
+                date: searchInfo.date,
+                passengers: searchInfo.passengers
+            })
+        }
     }, []);
+
+    useEffect(() => {
+        if (searchInfo?.date) {
+            getSearchFlights();
+        }
+    }, [searchInfo]);
 
     useEffect(() => {
         const handler = (event) => {
@@ -47,6 +83,13 @@ function FlightResults() {
                 getSearchFlights();
                 setSearchEditing(false);
                 setEnableBookingWidget(false);
+                const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
+                setSearchInfo({
+                    from: searchInfo.from,
+                    to: searchInfo.to,
+                    date: searchInfo.date,
+                    passengers: searchInfo.passengers
+                })
             }
         };
         window.addEventListener("SearchUpdated", handler);
@@ -56,13 +99,7 @@ function FlightResults() {
     }, []);
 
     const getSearchFlights = async () => {
-        let searchData = {
-            from: from,
-            to: to,
-            date: date,
-            passengers: passengers
-        };
-        await searchFlights(searchData);
+        await searchFlights(searchInfo);
     }
 
 
@@ -71,10 +108,7 @@ function FlightResults() {
         const payload = {
             flightId: selectedFlight._id,
             providerId: flight.providerOfferId,
-            from,
-            to,
-            departDate: date,
-            passengers,
+            ...searchInfo,
         };
 
         sessionStorage.setItem(
@@ -91,6 +125,10 @@ function FlightResults() {
 
     const cancelEditBooking = () => {
         setEnableBookingWidget(!enableBookingWidget)
+    }
+
+    const handleNewDate = async (searchDate) => {
+        setSearchInfo({ ...searchInfo, date: searchDate?.iso })
     }
 
     return (
@@ -121,10 +159,10 @@ function FlightResults() {
                             {sourceAirport?.city} - {destinationAirport?.city}
                         </Typography>
                         <Typography className="border-right flex-1">
-                            {date}
+                            {searchInfo?.date}
                         </Typography>
                         <Typography className="flex-1">
-                            {passengers?.adult} Passenger
+                            {searchInfo?.passengers?.adult} Passenger
                         </Typography>
                         <IconButton onClick={handleEdit} color="primary">
                             <EditIcon />
@@ -134,31 +172,49 @@ function FlightResults() {
             <Box className="w-full max-w-5xl mx-auto p-4 space-y-6 flight-search">
                 <Swiper
                     modules={[Navigation]}
+                    navigation={true}
                     spaceBetween={20}
                     breakpoints={{
                         1024: { slidesPerView: 8 },
                         768: { slidesPerView: 5 },
                         480: { slidesPerView: 3 },
                     }}
+                    style={{ marginBottom: "32px" }}
                 >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]?.map((p, i) => (
-                        <SwiperSlide className="cursor-pointer" key={i}>
-                            <Card sx={{ height: "100%" }}>
-                                <CardContent>
-                                    <Box sx={{ display: "flex" }}>
-                                        <Typography variant="body1" gutterBottom>
-                                            7, Dec
-                                        </Typography>
-                                        <Typography variant="h6" color="green">
-                                            ₹ 10,000
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </SwiperSlide>
-                    ))}
+                    {dates?.map((flightSearchDate, i) => {
+                        return (
+                            <SwiperSlide
+                                key={i}
+                                onClick={() => handleNewDate(flightSearchDate)}
+                            >
+                                <Card className="cursor-pointer h-full"
+                                    style={{
+                                        border: `${flightSearchDate?.iso === searchInfo?.date ? "1px solid #6AA0FF" : ""}`
+                                    }}
+                                >
+                                    <CardContent className=" items-center">
+                                        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                            <Typography
+                                                variant="body1"
+                                                gutterBottom
+                                                sx={{
+                                                    color: `${flightSearchDate?.iso === searchInfo?.date ? "#6AA0FF" : ""}`
+                                                }}
+                                            >
+                                                {flightSearchDate?.day}
+                                            </Typography>
+                                            <Typography sx={{
+                                                color: `${flightSearchDate?.iso === searchInfo?.date ? "#6AA0FF" : ""}`
+                                            }}>
+                                                {flightSearchDate?.label}
+                                            </Typography>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </SwiperSlide>
+                        )
+                    })}
                 </Swiper>
-                {/* Header */}
                 <Box className="shadow p-4 border text-center" sx={{ backgroundColor: "#1976d2", borderRadius: 100, mt: 3 }}>
                     <Typography variant="h6" className="text-2xl font-semibold text-white">
                         Flights from {sourceAirport?.city} to {destinationAirport?.city}
@@ -192,23 +248,27 @@ function FlightResults() {
                                 </div>
 
                                 {/* Flight Segments */}
-                                {fare.segments.map((segment, index) => (
-                                    <Box key={index} className="flex items-center space-x-6 justify-between">
-                                        <Box>
-                                            <p className="text-xl font-bold">{formatTime(segment.departureTime)}</p>
-                                            <p className="text-gray-500">{sourceAirport?.city}, {segment.departureAirport}</p>
-                                        </Box>
-                                        <Box className="text-gray-500">
-                                            <p className="text-gray-600">{formatDuration(segment.duration)}</p>
-                                            <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
-                                        </Box>
-                                        <Box>
-                                            <p className="text-xl font-bold">{formatTime(segment.arrivalTime)}</p>
-                                            <p className="text-gray-500">{destinationAirport?.city}, {segment.arrivalAirport}</p>
-                                        </Box>
+                                {fare?.segments?.map((segment, index) => {
+                                    const departureAirportObj = connectingAirports.find(a => a.iata === segment.departureAirport);
+                                    const arrivalAirportObj = connectingAirports.find(a => a.iata === segment.arrivalAirport);
+                                    return (
+                                        <Box key={index} className="flex items-center space-x-6 justify-between">
+                                            <Box className="flex-1">
+                                                <p className="text-xl font-bold">{formatTime(segment.departureTime)}</p>
+                                                <p className="text-gray-500">{departureAirportObj?.city}, {departureAirportObj?.iata}</p>
+                                            </Box>
+                                            <Box className="text-gray-500 flex-1">
+                                                <p className="text-gray-600">{formatDuration(segment.duration)}</p>
+                                                <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
+                                            </Box>
+                                            <Box className="flex-1">
+                                                <p className="text-xl font-bold">{formatTime(segment.arrivalTime)}</p>
+                                                <p className="text-gray-500">{arrivalAirportObj?.city}, {arrivalAirportObj?.iata}</p>
+                                            </Box>
 
-                                    </Box>
-                                ))}
+                                        </Box>
+                                    )
+                                })}
 
                                 {/* Aircraft & Cabin Info */}
                                 <div className="text-gray-600 text-sm">

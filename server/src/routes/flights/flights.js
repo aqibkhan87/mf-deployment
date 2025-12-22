@@ -42,6 +42,17 @@ apiRouter.get("/", async (req, res) => {
         logo: "https://via.placeholder.com/48?text=?",
       };
 
+      const segmentCodes = new Set();
+      fare.segments.forEach((seg) => {
+        if (seg.arrivalAirport) segmentCodes.add(seg.arrivalAirport);
+        if (seg.departureAirport) segmentCodes.add(seg.departureAirport);
+      });
+
+      // Fetch all connecting airports from DB
+      const connectingAirports = await Airports.find({
+        iata: { $in: Array.from(segmentCodes) },
+      });
+
       return res.json({
         flights: {
           _id: record._id,
@@ -63,6 +74,7 @@ apiRouter.get("/", async (req, res) => {
           },
           sourceAirport: sourceAirport || null,
           destinationAirport: destinationAirport || null,
+          connectingAirports: connectingAirports || [],
         },
       });
     }
@@ -108,12 +120,26 @@ apiRouter.get("/", async (req, res) => {
       };
     });
 
+    // Collect all unique connecting airports from all fares
+    const allSegmentCodes = new Set();
+    record.fares.forEach((fare) => {
+      fare.segments.forEach((seg) => {
+        if (seg.arrivalAirport) allSegmentCodes.add(seg.arrivalAirport);
+        if (seg.departureAirport) allSegmentCodes.add(seg.departureAirport);
+      });
+    });
+
+    const connectingAirports = await Airports.find({
+      iata: { $in: Array.from(allSegmentCodes) },
+    });
+
     const payload = {
       flights: {
         ...record.toObject(),
         fares,
         sourceAirport: sourceAirport || null,
         destinationAirport: destinationAirport || null,
+        connectingAirports: connectingAirports || []
       },
     };
 

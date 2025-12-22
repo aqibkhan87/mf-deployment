@@ -73,8 +73,8 @@ function SeatSelection() {
         if (!currentPassenger) return;
 
         // Prevent selecting more seats than adults
-        const alreadySelectedSeats = adultPassengers.filter(p => p.seatId).length;
-        if (!currentPassenger.seatId && alreadySelectedSeats >= adultPassengers.length) {
+        const alreadySelectedSeats = adultPassengers.filter(p => p?.seat?.seatNumber).length;
+        if (!currentPassenger?.seat?.seatNumber && alreadySelectedSeats >= adultPassengers.length) {
             return;
         }
 
@@ -85,56 +85,52 @@ function SeatSelection() {
                 p => p === currentPassenger
             );
 
-            const currentSeat = updated[passengerIndex]?.seat?.seatNumber;
+            const oldSeat = updated[passengerIndex]?.seat;
 
             /* ---------------------------------
             CASE 1: Clicking same seat → DESELECT
             ---------------------------------- */
-            if (currentSeat === seatId) {
-                updated[passengerIndex] = {
-                    ...updated[passengerIndex],
-                    seat: {
-                        seatNumber: null,
-                        cabin: null,
-                        price: 0,
-                        seatType: null,
-                    },
-                };
-
+            if (oldSeat?.seatNumber === seatId) {
                 setSeatStatusMap(map => ({
                     ...map,
-                    [seatLayoutType]: {
-                        ...map[seatLayoutType],
+                    [oldSeat.cabin]: {
+                        ...map[oldSeat.cabin],
                         [seatId]: "available",
                     }
                 }));
-                setSeatPricing(seatPricing - seatTypeWithPrice?.price)
+                setSeatPricing(seatPricing - oldSeat?.price);
+                updated[passengerIndex] = {
+                    ...updated[passengerIndex],
+                    seat: null,
+                };
 
                 return updated;
             }
 
             /* ---------------------------------
-               CASE 2: Passenger already has seat → free it
+            CASE 2: Seat taken by another passenger → block
             ---------------------------------- */
-            if (currentSeat) {
-                setSeatStatusMap(map => ({
-                    ...map,
-                    [seatLayoutType]: {
-                        ...map[seatLayoutType],
-                        [currentSeat]: "available",
-                    }
-                }));
-                setSeatPricing(seatPricing - seatTypeWithPrice?.price)
-            }
 
-            /* ---------------------------------
-               CASE 3: Seat taken by another passenger → block
-            ---------------------------------- */
             const isSeatTaken = updated.some(
                 (p, idx) => idx !== passengerIndex && p?.seat?.seatNumber === seatId
             );
 
             if (isSeatTaken) return prev;
+
+
+            /* ---------------------------------
+               CASE 3: Passenger already has seat → free it
+            ---------------------------------- */
+            if (oldSeat) {
+                setSeatStatusMap(map => ({
+                    ...map,
+                    [oldSeat.cabin]: {
+                        ...map[oldSeat.cabin],
+                        [oldSeat.seatNumber]: "available",
+                    }
+                }));
+                setSeatPricing(seatPricing - seatTypeWithPrice?.price)
+            }
 
             /* ---------------------------------
                ASSIGN NEW SEAT
@@ -161,8 +157,6 @@ function SeatSelection() {
 
             return updated;
         });
-
-
     };
 
     const handlePayment = async () => {
@@ -174,7 +168,6 @@ function SeatSelection() {
 
         // history.push("/flight/checkout");
     }
-    console.log("adultPassengersadultPassengers", adultPassengers)
     const adultPassengers = useMemo(
         () => flightPassengers?.filter(p => p.isAdult),
         [flightPassengers]
