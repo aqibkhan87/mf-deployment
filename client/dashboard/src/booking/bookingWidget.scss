@@ -14,37 +14,25 @@
     padding-left: 24px;
     padding-right: 24px;
   }
-  
-
-  .bottom-row {
-    .search-btn {
-      background-color: #0d47a1;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border-radius: 28px;
-      text-transform: none;
-      transition: 0.3s ease all;
-
-      &:hover {
-        background-color: #002171;
-      }
+  .item-card {
+    .date-selector {
+      min-height: 105px;
     }
-  }
+    .passenger-selector {
+      min-height: 105px;
+    }
 
-  .flight-card {
-    margin-top: 16px;
-    padding: 16px 20px;
-    border-radius: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #eee;
-    transition: all 0.3s ease;
-
-    &:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      border-color: #0d47a1;
+    h6 {
+      font-size: 14px;
+      @media (min-width: 599px) and (max-width: 768px) {
+        font-size: 16px;
+      }
+      @media (min-width: 769px) and (max-width: 1024px) {
+        font-size: 18px;
+      }
+      @media (min-width: 1025px) {
+        font-size: 20px;
+      }
     }
   }
 }

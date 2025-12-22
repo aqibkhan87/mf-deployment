@@ -4,48 +4,122 @@ import {
   Box,
   Grid,
   Paper,
-  TextField,
   Button,
-  MenuItem,
-  Select,
-  InputLabel,
-  IconButton,
-  FormControl,
-  CircularProgress,
   Typography,
-  Autocomplete,
+  Popover,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  Stack
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import dayjs from "dayjs";
 import { fetchAirports, searchAirports } from "./../apis/flights/booking";
+import { debounce, numberStyle } from "../utils/helper";
+import AirportSelector from "./bookingwidget/airportSelector";
+import DateSelector from "./bookingwidget/dateSelector";
 import "./bookingWidget.scss";
+import { useBookingStore } from "store/bookingStore";
+import { eventEmitter } from "../utils/helper";
 
-const MAX_ADULTS = 9;
-const MAX_INFANTS = 2;
+const PillSelector = ({ values, selected, onSelect }) => (
+  <Stack direction="row" spacing={1}>
+    {values.map((val) => (
+      <Box
+        key={val}
+        sx={numberStyle(val === selected)}
+        onClick={() => onSelect(val)}
+      >
+        {val}
+      </Box>
+    ))}
+  </Stack>
+)
 
-const debounce = (fn, delay) => {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-};
+const TravellerPopOver = ({ onApply }) => {
+  const [adults, setAdults] = useState(1);
+  const [infant, setInfants] = useState(0);
+
+  return (
+    <Paper sx={{ p: 3, width: 560, borderRadius: "16px" }}>
+      <Box mb={3}>
+        <Typography fontWeight={700}>ADULTS (12y+)</Typography>
+        <Typography variant="body2" color="text.secondary" mb={1}>
+          on the day of travel
+        </Typography>
+        <PillSelector
+          values={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          selected={adults}
+          onSelect={(adults) => setAdults(adults)}
+        />
+      </Box>
+
+      <Box mb={3}>
+        <Typography fontWeight={700}>INFANTS (below 2y)</Typography>
+        <Typography variant="body2" color="text.secondary" mb={1}>
+          on the day of travel
+        </Typography>
+        <PillSelector
+          values={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          selected={infant}
+          onSelect={(infant) => setInfants(infant)}
+        />
+      </Box>
+
+      {/* APPLY */}
+      <Box display="flex" justifyContent="flex-start">
+        <Button
+          variant="contained"
+          sx={{
+            borderRadius: "24px",
+            px: 4,
+            py: 1.5,
+            fontSize: "16px"
+          }}
+          onClick={() =>
+            onApply({
+              adults,
+              infant,
+            })
+          }
+        >
+          APPLY
+        </Button>
+      </Box>
+    </Paper>
+  )
+}
 
 const BookingWidget = () => {
+  const { searchEditing } = useBookingStore();
   const history = useHistory();
-  const [from, setFrom] = useState(null);
+  const [anchors, setAnchors] = useState({
+    fromAnchor: null,
+    toAnchor: null,
+    passengerAnchor: null,
+    dateAnchor: null,
+  });
+
+  const [from, setFrom] = useState({
+    city: "New Delhi",
+    coords: [28.55563, 77.09519],
+    country: "IN",
+    iata: "DEL",
+    icao: "VIDP",
+    name: "Indira Gandhi International Airport"
+  });
   const [to, setTo] = useState(null);
   const [departDate, setDepartDate] = useState(new Date().toISOString().split("T")[0]);
   const [passengers, setPassengers] = useState({
     adults: 1,
     infant: 0
   });
-  const [loadingAirports, setLoadingAirports] = useState(false);
   const [fromOptions, setFromOptions] = useState([]);
   const [toOptions, setToOptions] = useState([]);
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [tripType, setTripType] = useState("one-way");
+
 
   useEffect(() => {
     fetchAirports()
@@ -61,15 +135,12 @@ const BookingWidget = () => {
 
   const handleAirportSearch = async (q, type) => {
     if (!q || q.length < 2) return;
-    setLoadingAirports(true);
     try {
       const results = await searchAirports(q);
       if (type === "from") setFromOptions(results?.queryResults || []);
       else setToOptions(results?.queryResults || []);
     } catch (err) {
       console.error("Airport search failed:", err);
-    } finally {
-      setLoadingAirports(false);
     }
   };
 
@@ -84,294 +155,183 @@ const BookingWidget = () => {
       from: from.iata, to: to.iata, date: departDate,
       passengers: { adult: passengers.adults, infant: passengers.infant }
     }))
-    history.push(`/flight-search`);
+    if(!searchEditing) history.push(`/flight-search`);
+    else if(searchEditing) {
+      const eventData = { searchUpdated: true };
+      eventEmitter("SearchUpdated", eventData)
+    }
   };
+
+  const handleTripType = (e) => {
+    setTripType(e.target.value);
+  }
 
   return (
     <Paper elevation={0} className="booking-widget">
-      <Box sx={{ py: 8, px: 3 }}>
-        <Grid container spacing={2} alignItems="center" className="inputs-row">
-          {/* From */}
-          <Grid item xs={12} md={3}>
-            <Autocomplete
-              options={fromOptions}
-              getOptionLabel={(opt) =>
-                opt?.name
-                  ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
-                  : ""
-              }
-              value={from}
-              inputValue={fromInput}
-              onInputChange={(_, val) => {
-                setFromInput(val);
-                debouncedSearch(val, "from");
-              }}
-              filterOptions={(x) => x}
-              onChange={(_, val) => setFrom(val)}
-              isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
-              loading={loadingAirports}
-              renderOption={(props, option) => (
-                <li {...props} key={option._id}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span style={{ fontWeight: 600 }}>{option.name}</span>
-                      <span style={{ fontSize: 13, color: "gray" }}>
-                        {option.city}, {option.country}
-                      </span>
-                      <span style={{ fontSize: 13, color: "gray" }}>
-                        {option?.distanceInKm
-                          ? `${Math.round(option?.distanceInKm)} Km`
-                          : ""}
-                      </span>
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: 600 }}>{option.iata}</p>
-                    </div>
-                  </div>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="From"
-                  placeholder="Search by place/airport"
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {loadingAirports ? (
-                          <CircularProgress color="inherit" size={18} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                />
-              )}
-            />
-          </Grid>
-
-          {/* To */}
-          <Grid item xs={12} md={3}>
-            <Autocomplete
-              options={toOptions}
-              getOptionLabel={(opt) =>
-                opt?.name
-                  ? `${opt.name}, ${opt.city} ${opt.country} (${opt.iata})`
-                  : ""
-              }
-              value={to}
-              inputValue={toInput}
-              onInputChange={(_, val) => {
-                setToInput(val);
-                debouncedSearch(val, "to");
-              }}
-              filterOptions={(x) => x}
-              onChange={(_, val) => setTo(val)}
-              isOptionEqualToValue={(opt, val) => opt.iata === val.iata}
-              loading={loadingAirports}
-              renderOption={(props, option) => (
-                <li {...props} key={option._id}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span style={{ fontWeight: 600 }}>{option.name}</span>
-                      <span style={{ fontSize: 13, color: "gray" }}>
-                        {option.city}, {option.country}
-                      </span>
-                      <span style={{ fontSize: 13, color: "gray" }}>
-                        {option?.distanceInKm
-                          ? `${Math.round(option?.distanceInKm)} Km`
-                          : ""}
-                      </span>
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: 600 }}>{option.iata}</p>
-                    </div>
-                  </div>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="To"
-                  placeholder="Search by place/airport"
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {loadingAirports ? (
-                          <CircularProgress color="inherit" size={18} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  }}
-                />
-              )}
-            />
-          </Grid>
-
-          {/* Dates */}
-          <Grid item xs={12} md={2}>
-            <TextField
-              fullWidth
-              label="Departure"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              value={departDate}
-              onChange={(e) => setDepartDate(e.target.value)}
-              inputProps={{
-                min: new Date().toISOString().split("T")[0],
-              }}
-            />
-          </Grid>
-
-          {/* Passengers */}
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel id="passengers-label">Passengers</InputLabel>
-
-              <Select
-                labelId="passengers-label"
-                label="Passengers"
-                value="passengers"
-                displayEmpty
-                renderValue={() =>
-                  `${passengers.adults} Adult${passengers.adults > 1 ? "s" : ""}, 
-                  ${passengers.infant} Infant${passengers.infant > 1 ? "s" : ""}`
-                }
+      <Box sx={{ pb: 4, pt: 3, px: 3 }}>
+        <Box sx={{ display: "flex" }}>
+          <Grid item xs={12} md={3} mb={2}>
+            <FormControl>
+              <RadioGroup
+                value={tripType}
+                onChange={handleTripType}
+                row // optional: makes them horizontal
               >
-                {/* ADULT */}
-                <MenuItem disableRipple disableTouchRipple>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width="100%"
-                  >
-                    <Box>
-                      <Typography fontWeight={600}>Adult</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Age 12+
-                      </Typography>
-                    </Box>
-
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPassengers((p) => ({
-                            ...p,
-                            adults: Math.max(1, p.adults - 1),
-                            infant: Math.min(p.infant, Math.max(0, p.adults - 1)),
-                          }));
-                        }}
-                        disabled={passengers.adults <= 1}
-                      >
-                        <RemoveIcon />
-                      </IconButton>
-
-                      <Typography width={20} textAlign="center">
-                        {passengers.adults}
-                      </Typography>
-
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPassengers((p) => ({
-                            ...p,
-                            adults: Math.min(MAX_ADULTS, p.adults + 1),
-                          }));
-                        }}
-                        disabled={passengers.adults >= MAX_ADULTS}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </MenuItem>
-
-                {/* INFANT */}
-                <MenuItem disableRipple disableTouchRipple>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    width="100%"
-                  >
-                    <Box>
-                      <Typography fontWeight={600}>Infant</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Below 2 years
-                      </Typography>
-                    </Box>
-
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPassengers((p) => ({
-                            ...p,
-                            infant: Math.max(0, p.infant - 1),
-                          }));
-                        }}
-                        disabled={passengers.infant <= 0}
-                      >
-                        <RemoveIcon />
-                      </IconButton>
-
-                      <Typography width={20} textAlign="center">
-                        {passengers.infant}
-                      </Typography>
-
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setPassengers((p) => ({
-                            ...p,
-                            infant: Math.min(p.adults, p.infant + 1),
-                          }));
-                        }}
-                        disabled={passengers.infant >= passengers.adults}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                </MenuItem>
-              </Select>
+                <FormControlLabel
+                  value="one-way"
+                  control={<Radio />}
+                  label="One Way"
+                />
+              </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
-            <div className="bottom-row">
-              <Button
-                variant="contained"
-                className="search-btn"
-                onClick={handleSearch}
-                disabled={loading}
-              >
-                {loading ? "Searching..." : "Search"}
-              </Button>
-            </div>
+        </Box>
+        <Grid container spacing={2} alignItems="center" className="inputs-row">
+          <Grid item xs={12} md={3} className="item-card">
+            <AirportSelector
+              label="From"
+              value={from}
+              placeholder="Select Source City"
+              options={fromOptions}
+              anchorEl={anchors.fromAnchor}
+              inputValue={fromInput}
+              onOpen={(e) => setAnchors({ ...anchors, fromAnchor: e.currentTarget })}
+              onClose={() => setAnchors({ ...anchors, fromAnchor: null })}
+              onInputChange={(v) => {
+                setFromInput(v);
+                debouncedSearch(v, "from");
+              }}
+              onSelect={(v) => {
+                setFrom(v);
+                setAnchors({ ...anchors, fromAnchor: null });
+              }}
+            />
           </Grid>
+          <Grid item xs={12} md={3} className="item-card">
+            <AirportSelector
+              label="To"
+              placeholder="Select Destination City"
+              value={to}
+              options={toOptions}
+              anchorEl={anchors.toAnchor}
+              inputValue={toInput}
+              onOpen={(e) => setAnchors({ ...anchors, toAnchor: e.currentTarget })}
+              onClose={() => setAnchors({ ...anchors, toAnchor: null })}
+              onInputChange={(v) => {
+                setToInput(v);
+                debouncedSearch(v, "to");
+              }}
+              onSelect={(v) => {
+                setTo(v);
+                setAnchors({ ...anchors, toAnchor: null });
+              }}
+            />
+          </Grid>
+          {/* Dates */}
+          <Grid item xs={12} md={3} className="item-card">
+            <Paper sx={{
+              borderRadius: "8px",
+              border: "1px solid #E0E0E0",
+              backgroundColor: "#fff"
+            }}>
+              <Grid container alignItems="center" sx={{ padding: 2 }} onClick={(e) =>
+                setAnchors({ ...anchors, dateAnchor: e.currentTarget })
+              } className="date-selector">
+                <Grid item >
+                  <Typography variant="caption" color="text.secondary">
+                    Departure Date
+                  </Typography>
+                  <Typography variant="h6" color="#1976d2">
+                    {dayjs(departDate).format("DD MMM YYYY")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+            {/* DATE POPOVER */}
+            <Popover
+              open={Boolean(anchors.dateAnchor)}
+              anchorEl={anchors.dateAnchor}
+              onClose={() =>
+                setAnchors({ ...anchors, dateAnchor: null })
+              }
+              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+              transformOrigin={{ vertical: "top", horizontal: "left" }}
+              PaperProps={{
+                sx: { width: 320, borderRadius: "12px", mt: 1, p: 2 },
+              }}
+            >
+              <DateSelector
+                label="Departure Date"
+                value={departDate}
+                minDate={new Date().toISOString().split("T")[0]}
+                onChange={(date) => {
+                  setDepartDate(date);
+                  setAnchors({ ...anchors, dateAnchor: null });
+                }}
+              />
+            </Popover>
+          </Grid>
+          {/* Passengers */}
+          <Grid item xs={12} md={3} className="item-card">
+            <Paper sx={{
+              borderRadius: "8px",
+              border: "1px solid #E0E0E0",
+              backgroundColor: "#fff",
+            }}
+              className="passenger-selector"
+            >
+              <Grid container alignItems="center" >
+                <Grid
+                  item
+                  onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#F5F7FA",
+                      borderRadius: "12px"
+                    },
+                    p: 2
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    Passenger
+                  </Typography>
+                  <Typography variant="h6" color={"#1976d2"}>
+                    {`${passengers?.adults > 1 ? `${passengers?.adults} Adults` : `${passengers?.adults} Adult`}`} {`${passengers?.infant ? `, ${passengers?.infant} Infant` : ""}`}
+                  </Typography>
+                </Grid>
+              </Grid>
+              {/* PASSENGER POPOVER */}
+              <Popover
+                open={Boolean(anchors.passengerAnchor)}
+                anchorEl={anchors.passengerAnchor}
+                onClose={() => setAnchors({ ...anchors, passengerAnchor: null })}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+                PaperProps={{
+                  sx: { width: 360, borderRadius: "12px", mt: 1 }
+                }}
+              >
+                <TravellerPopOver onApply={(data) => {
+                  setPassengers(data);
+                  setAnchors({ ...anchors, passengerAnchor: null });
+                }} />
+              </Popover>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+      <Box sx={{ pb: 4, px: 3, display: "flex", justifyContent: "flex-end" }}>
+        <Grid item xs={12} md={3}>
+          <div className="bottom-row">
+            <Button
+              variant="contained"
+              onClick={handleSearch}
+              sx={{ px: 2 }}
+            >
+              Search
+            </Button>
+          </div>
         </Grid>
       </Box>
     </Paper>
