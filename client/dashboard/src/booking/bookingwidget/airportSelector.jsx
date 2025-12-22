@@ -49,7 +49,7 @@ const AirportSelector = ({
                 />
             </Box>
             <List>
-                {options.map((item) => (
+                {options?.map((item) => (
                     <ListItemButton
                         key={item?.iata}
                         selected={item?.iata === value?.iata}

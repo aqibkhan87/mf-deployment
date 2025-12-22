@@ -24,7 +24,7 @@ import { eventEmitter } from "../utils/helper";
 
 const PillSelector = ({ values, selected, onSelect }) => (
   <Stack direction="row" spacing={1}>
-    {values.map((val) => (
+    {values?.map((val) => (
       <Box
         key={val}
         sx={numberStyle(val === selected)}

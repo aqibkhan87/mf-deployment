@@ -81,7 +81,7 @@ function AddonsPage() {
     const assemblePassengersWithAddons = () => {
         return passengerAddons.map(p => ({
             ...p,
-            addons: p.addons.map(a => a._id),
+            addons: p?.addons?.map(a => a?._id),
         }));
     };
 

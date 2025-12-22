@@ -62,10 +62,10 @@ function FlightResults() {
         if (localStorage.getItem("search-info")) {
             const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
             setSearchInfo({
-                from: searchInfo.from,
-                to: searchInfo.to,
-                date: searchInfo.date,
-                passengers: searchInfo.passengers
+                from: searchInfo?.from,
+                to: searchInfo?.to,
+                date: searchInfo?.date,
+                passengers: searchInfo?.passengers
             })
         }
     }, []);
@@ -85,10 +85,10 @@ function FlightResults() {
                 setEnableBookingWidget(false);
                 const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
                 setSearchInfo({
-                    from: searchInfo.from,
-                    to: searchInfo.to,
-                    date: searchInfo.date,
-                    passengers: searchInfo.passengers
+                    from: searchInfo?.from,
+                    to: searchInfo?.to,
+                    date: searchInfo?.date,
+                    passengers: searchInfo?.passengers
                 })
             }
         };
@@ -238,32 +238,40 @@ function FlightResults() {
                                 {/* Airline Info */}
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={fare.airline.logo}
-                                        alt={fare.airline.name}
+                                        src={fare?.airline?.logo}
+                                        alt={fare?.airline?.name}
                                         className="w-10 h-10 object-contain rounded"
                                     />
                                     <div className="flex flex-col">
-                                        <div className="text-lg font-semibold">{fare.airline.name} ({fare.airline.code})</div>
+                                        <div className="text-lg font-semibold">
+                                            {fare?.airline?.name} ({fare?.airline?.code})
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Flight Segments */}
                                 {fare?.segments?.map((segment, index) => {
-                                    const departureAirportObj = connectingAirports.find(a => a.iata === segment.departureAirport);
-                                    const arrivalAirportObj = connectingAirports.find(a => a.iata === segment.arrivalAirport);
+                                    const departureAirportObj = connectingAirports?.find(a => a?.iata === segment?.departureAirport);
+                                    const arrivalAirportObj = connectingAirports?.find(a => a?.iata === segment?.arrivalAirport);
                                     return (
                                         <Box key={index} className="flex items-center space-x-6 justify-between">
                                             <Box className="flex-1">
-                                                <p className="text-xl font-bold">{formatTime(segment.departureTime)}</p>
+                                                <p className="text-xl font-bold">{formatTime(segment?.departureTime)}</p>
                                                 <p className="text-gray-500">{departureAirportObj?.city}, {departureAirportObj?.iata}</p>
                                             </Box>
                                             <Box className="text-gray-500 flex-1">
-                                                <p className="text-gray-600">{formatDuration(segment.duration)}</p>
+                                                <p className="text-gray-600">
+                                                    {formatDuration(segment?.duration)}
+                                                </p>
                                                 <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
                                             </Box>
                                             <Box className="flex-1">
-                                                <p className="text-xl font-bold">{formatTime(segment.arrivalTime)}</p>
-                                                <p className="text-gray-500">{arrivalAirportObj?.city}, {arrivalAirportObj?.iata}</p>
+                                                <p className="text-xl font-bold">
+                                                    {formatTime(segment?.arrivalTime)}
+                                                </p>
+                                                <p className="text-gray-500">
+                                                    {arrivalAirportObj?.city}, {arrivalAirportObj?.iata}
+                                                </p>
                                             </Box>
 
                                         </Box>
@@ -272,10 +280,10 @@ function FlightResults() {
 
                                 {/* Aircraft & Cabin Info */}
                                 <div className="text-gray-600 text-sm">
-                                    {fare.segments.map((seg, idx) => (
+                                    {fare?.segments?.map((seg, idx) => (
                                         <span key={idx}>
-                                            Aircraft: {seg.aircraftCode} • Cabin: {seg.cabin} • Class: {seg.class}
-                                            {idx < fare.segments.length - 1 && " | "}
+                                            Aircraft: {seg?.aircraftCode} • Cabin: {seg?.cabin} • Class: {seg?.class}
+                                            {idx < fare?.segments?.length - 1 && " | "}
                                         </span>
                                     ))}
                                 </div>
@@ -284,7 +292,7 @@ function FlightResults() {
                             {/* Price & Button */}
                             <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
                                 <Box className="flex text-lg font-semibold items-center">
-                                    ₹ {Math.floor(fare.totalPrice)}
+                                    ₹ {Math.floor(fare?.totalPrice)}
                                     <Typography className="text-sm"> / adult</Typography>
                                 </Box>
                                 <Button
@@ -298,9 +306,6 @@ function FlightResults() {
                         </div>
                     ))}
                 </div>
-                {!selectedFlight?.fares?.length && <div>
-                    No Flight Found
-                </div>}
             </Box>
         </Box>
     );
