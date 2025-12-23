@@ -23,7 +23,6 @@ const SeatMapSchema = new mongoose.Schema(
         },
       },
     ],
-    code: String,
     seatStatus: {
       type: Map, // key: ECONOMY, BUSINESS
       of: {

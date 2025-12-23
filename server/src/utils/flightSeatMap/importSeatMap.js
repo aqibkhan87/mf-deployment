@@ -41,18 +41,13 @@ const createSeatMapForSegment = (segment) => {
 
 export const createSeatMapsForFare = (fare) => {
   let itineraryKey = fare?.segments
-    ?.map(
-      (s) =>
-        `${s?.carrierCode}-${s?.flightNumber}-${new Date(
-          s?.departureTime
-        ).toISOString()}`
-    )
+    ?.map((s) => `${s?.carrierCode}-${s?.flightNumber}-${s?.departureTime}`)
     .join("_");
-  return (
-    fare?.segments?.flatMap((seg) => {
-      createSeatMapForSegment({ ...seg, itineraryKey: itineraryKey });
-    }) || []
-  );
+  const seatMapForFare =
+    fare?.segments?.flatMap((seg) =>
+      createSeatMapForSegment({ ...seg, itineraryKey: itineraryKey })
+    ) || [];
+  return seatMapForFare;
 };
 
 export const createSeatMapsForFlight = async (flights) => {

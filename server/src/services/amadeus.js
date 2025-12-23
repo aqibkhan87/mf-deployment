@@ -112,13 +112,15 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
         duration: firstItinerary.duration,
         travelerPricings: offer.travelerPricings,
         segments: firstItinerary.segments.map((seg) => {
-          const departureDate = new Date(seg.departure.at);
-          const nextDayDeparture = new Date(departureDate); // create a copy
-          nextDayDeparture.setDate(departureDate.getDate() + day);
+          const departureDateUTC = new Date(seg.departure.at);
+          let nextDayDepartureUTC = new Date(departureDateUTC); // create a copy
+          nextDayDepartureUTC.setDate(departureDateUTC.getDate() + day);
+          const nextDayDepartureISO = nextDayDepartureUTC.toISOString();
 
-          const arrivalDate = new Date(seg.arrival.at);
-          const nextDayArrival = new Date(arrivalDate); // create a copy
-          nextDayArrival.setDate(arrivalDate.getDate() + day);
+          const arrivalDateUTC = new Date(seg.arrival.at);
+          let nextDayArrivalDateUTC = new Date(arrivalDateUTC); // create a copy
+          nextDayArrivalDateUTC.setDate(arrivalDateUTC.getDate() + day);
+          const nextDayArrivalISO = nextDayArrivalDateUTC.toISOString();
 
           return {
             carrierCode: seg.carrierCode,
@@ -129,8 +131,8 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
             arrivalAirport: seg.arrival.iataCode,
             departureTerminal: seg.departure.terminal,
             arrivalTerminal: seg.arrival.terminal,
-            departureTime: nextDayDeparture,
-            arrivalTime: nextDayArrival,
+            departureTime: nextDayDepartureISO,
+            arrivalTime: nextDayArrivalISO,
             duration: seg.duration,
             cabin: traveler?.cabin,
             class: traveler?.class,
@@ -140,8 +142,8 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
     });
 
     const flights = {
-      fares: fares
-    }
+      fares: fares,
+    };
 
     await createSeatMapsForFlight(flights);
 
