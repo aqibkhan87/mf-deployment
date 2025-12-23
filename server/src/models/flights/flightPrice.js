@@ -7,11 +7,14 @@ const segmentSchema = new mongoose.Schema(
     aircraftCode: String,
     departureAirport: String,
     arrivalAirport: String,
+    departureTerminal: String,
+    arrivalTerminal: String,
     departureTime: Date,
     arrivalTime: Date,
     duration: String, // e.g. "PT3H55M"
     cabin: String,
     class: String,
+    numberOfStops: String,
   },
   { _id: false }
 );
@@ -25,6 +28,7 @@ const fareSchema = new mongoose.Schema(
     currency: String,
     duration: String,
     segments: [segmentSchema],
+    travelerPricings: Object
   },
   { _id: false }
 );

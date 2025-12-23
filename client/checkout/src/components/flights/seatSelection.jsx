@@ -24,7 +24,7 @@ const LegendItem = ({ color, label }) => (
 );
 
 function SeatSelection() {
-    const flightInstanceKey = useRef(null);
+    const itineraryKey = useRef(null);
     const { bookingDetails, seatMap } = useBookingStore();
     const segment = bookingDetails?.flightDetail?.segments?.[0];
     const [seatStatusMap, setSeatStatusMap] = useState({});
@@ -55,9 +55,13 @@ function SeatSelection() {
     }
 
     const fetchSeatMap = async () => {
-        const segment = bookingDetails?.flightDetail?.segments?.[0];
-        flightInstanceKey.current = `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`;
-        await getSeatMap(flightInstanceKey?.current);
+        const segments = bookingDetails?.flightDetail?.segments || [];
+        itineraryKey.current = segments
+            .map(seg =>
+                `${seg.carrierCode}-${seg.flightNumber}-${seg.departureTime}`
+            )
+            .join("_");
+        await getSeatMap(itineraryKey.current);
     }
 
     useEffect(() => {
@@ -162,7 +166,7 @@ function SeatSelection() {
     const handlePayment = async () => {
         await updateSeatSelectionInBooking({
             bookingId: bookingDetails?.bookingId,
-            flightInstanceKey: flightInstanceKey?.current,
+            itineraryKey: itineraryKey?.current,
             passengers: adultPassengers,
         });
 

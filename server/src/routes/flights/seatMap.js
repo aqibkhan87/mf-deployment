@@ -3,10 +3,10 @@ import SeatMapModel from "../../models/flights/seatMap.js";
 
 const apiRouter = express.Router();
 
-apiRouter.get("/:flightInstanceKey", async (req, res) => {
+apiRouter.get("/", async (req, res) => {
   try {
-    const seatMap = await SeatMapModel.findOne({
-      flightInstanceKey: req.params.flightInstanceKey,
+    const seatMap = await SeatMapModel.find({
+      itineraryKey: req.query.itineraryKey,
     });
     if (!seatMap) return res.status(404).json({ message: "SeatMap not found" });
 

@@ -110,6 +110,7 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
         basePrice: applyPriceDecrease(offer.price.base, day),
         currency: offer.price.currency,
         duration: firstItinerary.duration,
+        travelerPricings: offer.travelerPricings,
         segments: firstItinerary.segments.map((seg) => {
           const departureDate = new Date(seg.departure.at);
           const nextDayDeparture = new Date(departureDate); // create a copy
@@ -121,10 +122,13 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
 
           return {
             carrierCode: seg.carrierCode,
+            numberOfStops: seg.numberOfStops,
             flightNumber: seg.number,
             aircraftCode: seg.aircraft?.code,
             departureAirport: seg.departure.iataCode,
             arrivalAirport: seg.arrival.iataCode,
+            departureTerminal: seg.departure.terminal,
+            arrivalTerminal: seg.arrival.terminal,
             departureTime: nextDayDeparture,
             arrivalTime: nextDayArrival,
             duration: seg.duration,
@@ -135,7 +139,11 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
       };
     });
 
-    await createSeatMapsForFlight(fares);
+    const flights = {
+      fares: fares
+    }
+
+    await createSeatMapsForFlight(flights);
 
     await FlightPrice.updateOne(
       {

@@ -9,9 +9,12 @@ import {
 import { useBookingStore } from "store/bookingStore";
 import { formatDate, formatTime } from "../../utils/helper";
 
-const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdown }) => {
+const TripSummary = ({ priceBreakdown }) => {
     const { selectedFlight } = useBookingStore();
-
+    const sourceAirport = selectedFlight?.sourceAirport;
+    const destinationAirport = selectedFlight?.destinationAirport;
+    const segments = selectedFlight?.fare?.segments;
+    const segment = segments?.[0];
     const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
     const { passengers: paxObj } = searchInfo;
     const adults = paxObj?.adult || 0;
@@ -46,29 +49,36 @@ const TripSummary = ({ segment, sourceAirport, destinationAirport, priceBreakdow
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography>
-                                <Typography mx={1} fontSize={14}>
-                                    {sourceAirport?.city}, {segment?.departureAirport}
-                                </Typography>
-                                <Typography mx={1} fontSize={12}>
-                                    {sourceAirport?.name}
-                                </Typography>
-                                <Typography mx={1}>
-                                    {formatTime(segment?.departureTime)}
-                                </Typography>
-                            </Typography>
-                            <Typography fontWeight="bold">→</Typography>
-                            <Typography>
-                                <Typography mx={1} fontSize={14}>
-                                    {destinationAirport?.city}, {segment?.arrivalAirport}
-                                </Typography>
-                                <Typography mx={1} fontSize={12}>
-                                    {destinationAirport?.name}
-                                </Typography>
-                                <Typography mx={1}>
-                                    {formatTime(segment?.arrivalTime)}
-                                </Typography>
-                            </Typography>
+                            {segments?.map((seg) => {
+                                return (
+                                    <>
+                                        <Typography>
+                                            <Typography mx={1} fontSize={14}>
+                                                {sourceAirport?.city}, {seg?.departureAirport}
+                                            </Typography>
+                                            <Typography mx={1} fontSize={12}>
+                                                {sourceAirport?.name} {seg?.departureTerminal ? `, Terminal ${seg?.departureTerminal}` : ""}
+                                            </Typography>
+                                            <Typography mx={1}>
+                                                {formatTime(seg?.departureTime)}
+                                            </Typography>
+                                        </Typography>
+                                        <Typography fontWeight="bold">→</Typography>
+                                        <Typography>
+                                            <Typography mx={1} fontSize={14}>
+                                                {destinationAirport?.city}, {seg?.arrivalAirport}
+                                            </Typography>
+                                            <Typography mx={1} fontSize={12}>
+                                                {destinationAirport?.name} {seg?.arrivalTerminal ? `, Terminal ${seg?.arrivalTerminal}` : ""}
+                                            </Typography>
+                                            <Typography mx={1}>
+                                                {formatTime(seg?.arrivalTime)}
+                                            </Typography>
+                                        </Typography>
+                                    </>
+                                )
+                            }
+                            )}
                         </Box>
                     </Box>
                 </Box>

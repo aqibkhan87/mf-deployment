@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 
 const SeatMapSchema = new mongoose.Schema(
   {
-    flightInstanceKey: { type: String, unique: true, index: true },
+    flightInstanceKey: { type: String },
+    itineraryKey: { type: String },
     flightNumber: String, // "6E123"
     airlineCode: String, // "AI", "6E"
     departureDate: Date, // Date of flight
+    arrivalDate: Date, // Date of flight
     aircraftCode: String, // "73J"
     cabin: { type: String, enum: ["ECONOMY", "BUSINESS"], default: "ECONOMY" },
     seatLayout: [

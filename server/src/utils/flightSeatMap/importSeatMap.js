@@ -25,30 +25,46 @@ const createSeatMapForSegment = (segment) => {
   });
 
   return {
-    flightNumber: segment.flightNumber,
-    airlineCode: segment.carrierCode,
-    departureDate: segment.departureTime,
-    aircraftCode: segment.aircraftCode,
-    cabin: segment.cabin,
-    code: layout.code,
+    flightNumber: segment?.flightNumber,
+    airlineCode: segment?.carrierCode,
+    departureDate: segment?.departureTime,
+    arrivalDate: segment?.arrivalTime,
+    aircraftCode: segment?.aircraftCode,
+    cabin: segment?.cabin,
+    code: layout?.code,
     seatLayout: layout?.cabins,
     seatStatus,
     flightInstanceKey: `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`,
+    itineraryKey: segment?.itineraryKey,
   };
 };
 
 export const createSeatMapsForFare = (fare) => {
-  return fare?.segments?.map((segment) => createSeatMapForSegment(segment));
+  let itineraryKey = fare?.segments
+    ?.map(
+      (s) =>
+        `${s?.carrierCode}-${s?.flightNumber}-${new Date(
+          s?.departureTime
+        ).toISOString()}`
+    )
+    .join("_");
+  return (
+    fare?.segments?.flatMap((seg) => {
+      createSeatMapForSegment({ ...seg, itineraryKey: itineraryKey });
+    }) || []
+  );
 };
 
 export const createSeatMapsForFlight = async (flights) => {
-  const allSeatMaps = [];
-  flights?.forEach((flight) => {
-    const seatMaps = createSeatMapsForFare(flight);
-    allSeatMaps.push(...seatMaps);
-  });
-  const response = await SeatMapModel.insertMany(allSeatMaps);
-  return response;
+  const allSeatMaps = flights?.fares?.flatMap((fare) =>
+    createSeatMapsForFare(fare)
+  );
+  try {
+    const response = await SeatMapModel.insertMany(allSeatMaps);
+    return response;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export default createSeatMapsForFlight;

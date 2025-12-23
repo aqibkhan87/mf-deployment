@@ -24,7 +24,7 @@ apiRouter.get("/", async (req, res) => {
       const record = await FlightPrice.findOne({
         _id: flightId,
         "fares.providerOfferId": providerId,
-      });
+      }).lean();
 
       if (!record) {
         return res.status(404).json({ message: "Flight not found" });
@@ -52,6 +52,7 @@ apiRouter.get("/", async (req, res) => {
       const connectingAirports = await Airports.find({
         iata: { $in: Array.from(segmentCodes) },
       });
+      console.log("record", record)
 
       return res.json({
         flights: {

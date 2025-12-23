@@ -64,8 +64,6 @@ function PassengerDetailsPage() {
   ]);
   const [contact, setContact] = useState({ email: "", mobile: "" });
 
-  const segment = selectedFlight?.fare?.segments?.[0];
-
 
   useEffect(() => {
     fetchFlight();
@@ -242,9 +240,6 @@ function PassengerDetailsPage() {
         {/* RIGHT */}
         <Grid item xs={12} md={4}>
           <TripSummary
-            segment={segment}
-            sourceAirport={selectedFlight?.sourceAirport}
-            destinationAirport={selectedFlight?.destinationAirport}
             priceBreakdown={{
               basePrice: selectedFlight?.fare?.basePrice * adults || 0,
               taxes: (selectedFlight?.fare?.totalPrice - selectedFlight?.fare?.basePrice) * adults,

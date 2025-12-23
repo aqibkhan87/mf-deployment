@@ -173,7 +173,7 @@ router.put("/update-addons-in-passengers", async (req, res) => {
 });
 
 router.put("/update-seats-in-booking", async (req, res) => {
-  const { bookingId, passengers = [], flightInstanceKey } = req.body;
+  const { bookingId, passengers = [], itineraryKey } = req.body;
 
   try {
     // 1️⃣ Basic validation
@@ -192,7 +192,7 @@ router.put("/update-seats-in-booking", async (req, res) => {
     }
 
     const seatMap = await SeatMapModel.findOne({
-      flightInstanceKey: flightInstanceKey,
+      itineraryKey: itineraryKey,
     }).lean();
 
     if (!seatMap) {
