@@ -13,6 +13,7 @@ import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../apis/flights/booking";
 import BookingWidget from "./bookingWidget";
 import "./flightSearch.scss"
+import { eventEmitter } from "../utils/helper"
 
 export const getAllowedDates = (days = 10) => {
     const today = dayjs().startOf("day");
@@ -46,17 +47,12 @@ const formatDuration = (duration) => {
 };
 
 function FlightResults() {
-    const { selectedFlight, setSearchEditing } = useBookingStore();
+    const { selectedFlight, setSearchEditing, sourceAirport, destinationAirport } = useBookingStore();
     const history = useHistory();
     const [enableBookingWidget, setEnableBookingWidget] = useState(false);
     const [dates] = useState(getAllowedDates());
     const [searchInfo, setSearchInfo] = useState({});
-
-    const sourceAirport = selectedFlight?.sourceAirport;
-    const destinationAirport = selectedFlight?.destinationAirport;
     const connectingAirports = selectedFlight?.connectingAirports;
-
-    console.log(getAllowedDates());
 
     useEffect(() => {
         if (localStorage.getItem("search-info")) {
@@ -71,24 +67,22 @@ function FlightResults() {
     }, []);
 
     useEffect(() => {
-        if (searchInfo?.date) {
+        if (searchInfo?.date && searchInfo?.from && searchInfo?.to && searchInfo?.passengers) {
             getSearchFlights();
         }
     }, [searchInfo]);
 
     useEffect(() => {
-        const handler = (event) => {
+        const handler = async (event) => {
             const payload = event.detail;
             if (payload?.searchUpdated) {
-                getSearchFlights();
                 setSearchEditing(false);
                 setEnableBookingWidget(false);
-                const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
                 setSearchInfo({
-                    from: searchInfo?.from,
-                    to: searchInfo?.to,
-                    date: searchInfo?.date,
-                    passengers: searchInfo?.passengers
+                    from: payload?.from,
+                    to: payload?.to,
+                    date: payload?.date,
+                    passengers: payload?.passengers
                 })
             }
         };
@@ -121,6 +115,8 @@ function FlightResults() {
     const handleEdit = () => {
         setEnableBookingWidget(!enableBookingWidget)
         setSearchEditing(true);
+        const eventData = { ...searchInfo, from: sourceAirport, to: destinationAirport };
+        eventEmitter("UpdateSearchInBooking", eventData)
     }
 
     const cancelEditBooking = () => {
@@ -138,36 +134,41 @@ function FlightResults() {
                 p: 2,
                 mb: 5
             }}>
-                {enableBookingWidget ?
-                    <Box>
-                        <IconButton
-                            onClick={cancelEditBooking}
-                            color="primary"
-                            sx={{
-                                position: "absolute",
-                                right: "20px",
-                                top: "65px"
-                            }}
-                        >
-                            <CloseIcon />
-                        </IconButton>
-                        <BookingWidget />
-                    </Box> :
-                    <Box className="flex w-1/2 mx-auto shadow border text-center items-center"
-                        sx={{ backgroundColor: "aliceblue", borderRadius: 100, justifyContent: "space-evenly" }}>
-                        <Typography className="border-right flex-1">
-                            {sourceAirport?.city} - {destinationAirport?.city}
-                        </Typography>
-                        <Typography className="border-right flex-1">
-                            {searchInfo?.date}
-                        </Typography>
-                        <Typography className="flex-1">
-                            {searchInfo?.passengers?.adult} Passenger
-                        </Typography>
-                        <IconButton onClick={handleEdit} color="primary">
-                            <EditIcon />
-                        </IconButton>
-                    </Box>}
+                <Box
+                    sx={{
+                        position: "relative",
+                        display: "block", // always render
+                        visibility: enableBookingWidget ? "visible" : "hidden", // hide visually
+                        height: enableBookingWidget ? "auto" : 0, // optional: collapse height
+                    }}
+                >
+                    <IconButton
+                        onClick={cancelEditBooking}
+                        color="primary"
+                        sx={{
+                            position: "absolute",
+                            right: "20px",
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                    <BookingWidget />
+                </Box>
+                {!enableBookingWidget && <Box className="flex w-1/2 mx-auto shadow border text-center items-center"
+                    sx={{ backgroundColor: "aliceblue", borderRadius: 100, justifyContent: "space-evenly" }}>
+                    <Typography className="border-right flex-1">
+                        {sourceAirport?.city} - {destinationAirport?.city}
+                    </Typography>
+                    <Typography className="border-right flex-1">
+                        {searchInfo?.date}
+                    </Typography>
+                    <Typography className="flex-1">
+                        {searchInfo?.passengers?.adult} Passenger
+                    </Typography>
+                    <IconButton onClick={handleEdit} color="primary">
+                        <EditIcon />
+                    </IconButton>
+                </Box>}
             </Box>
             <Box className="w-full max-w-5xl mx-auto p-4 space-y-6 flight-search">
                 <Swiper

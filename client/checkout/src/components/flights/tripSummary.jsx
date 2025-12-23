@@ -10,10 +10,20 @@ import { useBookingStore } from "store/bookingStore";
 import { formatDate, formatTime } from "../../utils/helper";
 
 const TripSummary = ({ priceBreakdown }) => {
-    const { selectedFlight } = useBookingStore();
-    const sourceAirport = selectedFlight?.sourceAirport;
-    const destinationAirport = selectedFlight?.destinationAirport;
-    const segments = selectedFlight?.fare?.segments;
+    const { selectedFlight, sourceAirport: fromAirport, destinationAirport: toAirport, bookingDetails } = useBookingStore();
+    const sourceAirport = fromAirport?.name ?
+        fromAirport :
+        bookingDetails?.sourceAirport;
+    const destinationAirport = toAirport?.name ?
+        toAirport :
+        bookingDetails?.destinationAirport;
+
+    let segments = [];
+    if (selectedFlight?.fare?.segments?.length) {
+        segments = selectedFlight?.fare?.segments;
+    } else {
+        segments = bookingDetails?.flightDetail?.segments
+    }
     const segment = segments?.[0];
     const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
     const { passengers: paxObj } = searchInfo;
@@ -49,9 +59,9 @@ const TripSummary = ({ priceBreakdown }) => {
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            {segments?.map((seg) => {
+                            {segments?.map((seg, i) => {
                                 return (
-                                    <>
+                                    <Box key={i}>
                                         <Typography>
                                             <Typography mx={1} fontSize={14}>
                                                 {sourceAirport?.city}, {seg?.departureAirport}
@@ -75,7 +85,11 @@ const TripSummary = ({ priceBreakdown }) => {
                                                 {formatTime(seg?.arrivalTime)}
                                             </Typography>
                                         </Typography>
-                                    </>
+                                        {segments?.length > 1 && segments?.length !== index - 1 &&
+                                            <Box>
+                                                <Typography>Connecting flight</Typography>
+                                            </Box>}
+                                    </Box>
                                 )
                             }
                             )}

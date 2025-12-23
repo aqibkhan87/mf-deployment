@@ -5,13 +5,13 @@ const apiRouter = express.Router();
 
 apiRouter.get("/", async (req, res) => {
   try {
-    const seatMap = await SeatMapModel.find({
+    const seatMaps = await SeatMapModel.find({
       itineraryKey: req.query.itineraryKey,
     });
-    if (!seatMap) return res.status(404).json({ message: "SeatMap not found" });
+    if (!seatMaps) return res.status(404).json({ message: "SeatMaps not found" });
 
     res.json({
-      seatMap: seatMap,
+      seatMaps: seatMaps,
     });
   } catch (err) {
     console.error("Error fetching seatMap:", err);

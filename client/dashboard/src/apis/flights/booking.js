@@ -25,7 +25,18 @@ export const searchFlights = async ({ from, to, date, promo }) => {
     useBookingStore.setState((state) => ({
       ...state,
       selectedFlight: response.data?.flights || {},
+      sourceAirport: response.data?.sourceAirport || {},
+      destinationAirport: response.data?.destinationAirport || {},
     }));
+  } else {
+    if(response.data?.sourceAirport && response.data?.destinationAirport) {
+      useBookingStore.setState((state) => ({
+        ...state,
+        selectedFlight: response.data?.flights || {},
+        sourceAirport: response.data?.sourceAirport || {},
+        destinationAirport: response.data?.destinationAirport || {},
+      }));
+    }
   }
   return response.data;
 };

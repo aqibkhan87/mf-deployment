@@ -49,10 +49,7 @@ const isPassengerValid = (p) => {
 
 function PassengerDetailsPage() {
   const history = useHistory();
-  const { selectedFlight } = useBookingStore();
-  const sourceAirport = selectedFlight?.sourceAirport;
-  const destinationAirport = selectedFlight?.destinationAirport;
-
+  const { selectedFlight, sourceAirport, destinationAirport } = useBookingStore();
   const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
   const { from, to, date: departDate, passengers: paxObj, providerId, flightId } = searchInfo;
   const adults = paxObj?.adult || 0;

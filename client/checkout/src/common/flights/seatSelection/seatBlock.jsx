@@ -50,7 +50,7 @@ const SeatPreview = ({ seatId, status, seatTypeWithPrice, passengerName }) => {
                     </Typography>
                 )}
                 <Typography fontSize={13}>
-                    ₹{seatTypeWithPrice.price}
+                    ₹{seatTypeWithPrice?.price}
                 </Typography>
 
             </Box>
@@ -59,17 +59,9 @@ const SeatPreview = ({ seatId, status, seatTypeWithPrice, passengerName }) => {
 };
 
 
-const SeatBlock = ({ layout, seatState, onSelect, seatLayoutType, activePassenger }) => {
-    const { seatMap } = useBookingStore();
+const SeatBlock = ({ layout, seatState, onSelect, seatPricing = {}, seatLayoutType = "ECONOMY", activePassenger, flightKey }) => {
     const columns = layout?.columns || [];
     const rows = layout?.rows || 0;
-    let seatPricing = {};
-
-    if (seatLayoutType === "ECONOMY")
-        seatPricing = seatMap?.seatLayout?.find(layout => layout.cabin === seatLayoutType)?.seatPricing || {};
-    else if (seatLayoutType === "BUSINESS")
-        seatPricing = seatMap?.seatLayout?.find(layout => layout.cabin === seatLayoutType)?.seatPricing || {};
-
 
     const RenderRows = () => {
         let rowMap = [];
@@ -96,7 +88,7 @@ const SeatBlock = ({ layout, seatState, onSelect, seatLayoutType, activePassenge
                                         index={i}
                                         seatTypeWithPrice={seatTypeWithPrice}
                                         passengerName={
-                                            activePassenger?.seat?.seatNumber === seatId ?
+                                            activePassenger?.seats?.[flightKey]?.seatNumber === seatId ?
                                                 activePassenger?.firstName + " " + activePassenger?.lastName :
                                                 ""}
                                     />

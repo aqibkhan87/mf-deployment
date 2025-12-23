@@ -22,13 +22,20 @@ const AirportSelector = ({
     onSelect,
     placeholder
 }) => (
-    <Paper sx={{ borderRadius: "8px", border: "1px solid #E0E0E0", p: 2 }}>
-        <Box onClick={onOpen} sx={{ cursor: "pointer" }}>
+    <Paper sx={{ width: "100%", borderRadius: "8px", border: "1px solid #E0E0E0", p: 2 }}>
+        <Box onClick={onOpen} sx={{
+            cursor: "pointer", maxWidth: "100%",
+            overflow: "hidden",
+        }}>
             <Typography variant="caption" color="text.secondary">{label}</Typography>
             <Typography variant="h6" color={"#1976d2"}>
-                {value ? `${value.city}, ${value.iata}` : `${label === "from" ? "Select Deperature City" : "Select Destination"}`}
+                {value ? `${value.city}, ${value.iata}` : `${label === "from" ? "Select Deperature City" : "Select Destination City"}`}
             </Typography>
-            <Typography variant="body2" color="text.secondary" noWrap>
+            <Typography variant="body2" color="text.secondary"
+                sx={{
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                }}>
                 {value?.name ? value?.name : "Select airport by place/city"}
             </Typography>
         </Box>

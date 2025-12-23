@@ -21,8 +21,7 @@ function AddonsPage() {
     const history = useHistory();
     const { addons, bookingDetails } = useBookingStore();
     const [passengerAddons, setPassengerAddons] = useState([]);
-    const segment = bookingDetails?.flightDetail?.segments?.[0];
-    const sourceAirport= bookingDetails?.sourceAirport;
+    const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
 
     const meals = useMemo(
@@ -222,9 +221,6 @@ function AddonsPage() {
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>
                     <TripSummary
-                        segment={segment}
-                        sourceAirport={bookingDetails?.sourceAirport}
-                        destinationAirport={bookingDetails?.destinationAirport}
                         priceBreakdown={priceBreakdownDetails}
                     />
                     <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSeatSelection}>

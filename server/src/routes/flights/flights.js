@@ -27,7 +27,11 @@ apiRouter.get("/", async (req, res) => {
       }).lean();
 
       if (!record) {
-        return res.status(404).json({ message: "Flight not found" });
+        return res.status(404).json({
+          flights: [],
+          sourceAirport: sourceAirport || null,
+          destinationAirport: destinationAirport || null,
+        });
       }
 
       const fare = record.fares.find((f) => f.providerOfferId === providerId);
@@ -52,7 +56,6 @@ apiRouter.get("/", async (req, res) => {
       const connectingAirports = await Airports.find({
         iata: { $in: Array.from(segmentCodes) },
       });
-      console.log("record", record)
 
       return res.json({
         flights: {
@@ -73,10 +76,10 @@ apiRouter.get("/", async (req, res) => {
             duration: parseDurationToMinutes(fare.duration),
             segments: fare.segments,
           },
-          sourceAirport: sourceAirport || null,
-          destinationAirport: destinationAirport || null,
           connectingAirports: connectingAirports || [],
         },
+        sourceAirport: sourceAirport || null,
+        destinationAirport: destinationAirport || null,
       });
     }
 
@@ -97,7 +100,12 @@ apiRouter.get("/", async (req, res) => {
       date: { $gte: startDate, $lte: endDate },
     });
 
-    if (!record) return res.json({ flights: [] });
+    if (!record)
+      return res.json({
+        flights: [],
+        sourceAirport: sourceAirport || null,
+        destinationAirport: destinationAirport || null,
+      });
 
     const fares = record.fares.map((f) => {
       const airline = AirlinesMapping[f.validatingAirline] || {
@@ -138,10 +146,10 @@ apiRouter.get("/", async (req, res) => {
       flights: {
         ...record.toObject(),
         fares,
-        sourceAirport: sourceAirport || null,
-        destinationAirport: destinationAirport || null,
         connectingAirports: connectingAirports || []
       },
+      sourceAirport: sourceAirport || null,
+      destinationAirport: destinationAirport || null,
     };
 
     if (redis) {
