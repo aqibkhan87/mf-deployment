@@ -116,7 +116,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                             <TimelineSeparator>
                                                 <TimelineDot
                                                     variant="outlined"
-                                                    color={segments?.length > 1 && segments?.length - 1 == i ? "primary" : "grey"}
+                                                    color={segments?.length >= 1 && segments?.length - 1 == i ? "primary" : "grey"}
                                                 />
                                                 {segments?.length - 1 !== i && <TimelineConnector />}
                                             </TimelineSeparator>

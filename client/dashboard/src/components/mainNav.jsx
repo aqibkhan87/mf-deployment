@@ -82,6 +82,9 @@ const MainNav = () => {
           </Link>
         </Box>
         <Box>
+          <Link to="/check-in" className="p-2">
+            Check-in
+          </Link>
           <Link to="/cart/view" className="p-2">
             <IconButton>
               <Badge

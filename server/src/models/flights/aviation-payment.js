@@ -1,20 +1,16 @@
 import mongoose from "mongoose";
 
-const EcommercePaymentSchema = new mongoose.Schema(
+const AviationPaymentSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
-
     gateway: { type: String, default: "RAZORPAY" },
 
     razorpay_order_id: String,
     razorpay_payment_id: String,
     razorpay_signature: String,
     receipt: String,
+    PNR: String,
 
-    amount: { type: Number, required: true },
+    amount: { type: Number, required: true }, 
     currency: { type: String, default: "INR" },
 
     status: {
@@ -31,14 +27,14 @@ const EcommercePaymentSchema = new mongoose.Schema(
     },
 
     retries: { type: Number, default: 0 },
-    cartId: {
+    bookingId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "cart",
+      ref: "booking",
     },
     paidAt: Date,
     failedAt: Date,
   },
-  { collection: "EcommercePayment" }
+  { collection: "AviationPayment" }
 );
 
-export default mongoose.model("EcommercePayment", EcommercePaymentSchema);
+export default mongoose.model("AviationPayment", AviationPaymentSchema);

@@ -9,6 +9,7 @@ import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flig
 import { getSeatMaps } from "../../apis/flights/seatMap";
 import TripSummary from "./tripSummary";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
+import { loadRazorpay } from "../../utils/loadRazorpay.js";
 
 const LegendItem = ({ color, label }) => (
     <Box display="flex" alignItems="center" gap={1.5}>
@@ -181,6 +182,8 @@ function SeatSelection() {
                     }
                 }
             }));
+            if(activeSegmentIndex === 1) setActiveSegmentIndex(0)
+            if(segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
 
             setSeatPricing((prev) => prev + seatTypeWithPrice?.price)
 
@@ -213,12 +216,7 @@ function SeatSelection() {
             entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
         });
         console.log("order data", data);
-
-        // ✅ ZERO AMOUNT
-        if (data?.skipPayment) {
-            history.push("/dashboard");
-            return;
-        }
+      
 
         // 2️⃣ Load Razorpay
         const loaded = await loadRazorpay();
@@ -237,15 +235,16 @@ function SeatSelection() {
                 try {
                     const verify = await verifyPayment({
                         type: "FLIGHT",
-                        entityId,
+                        entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
                         ...res,
                     });
 
-                    if (verify.success) {
+                    if (verify?.success) {
                         navigate("/dashbaord");
                     }
-                } catch {
+                } catch(err) {
                     alert("Payment verification failed");
+                    console.log("err: Payment verification failed", err)
                 }
             },
 
@@ -258,8 +257,8 @@ function SeatSelection() {
 
         const rzp = new window.Razorpay(options);
 
-        rzp.on("payment.failed", async () => {
-            alert("Payment failed");
+        rzp.on("payment.failed", async (err) => {
+            alert("Payment failed", err);
         });
 
         rzp.open();
@@ -295,15 +294,29 @@ function SeatSelection() {
                             <KeyboardBackspaceIcon /> Back To Addons
                         </Link>
                     </Box>
-                    <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                    {/* <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
                         <Typography align="center" fontWeight="bold">
                             {sourceAirport?.city} to {destinationAirport?.city}
                         </Typography>
-                    </Paper>
-                    <Box sx={{ py: 2 }}>
+                    </Paper> */}
+                    <Box display="flex" gap={2} mb={2} sx={{ py: 2 }}>
+                        {seatMaps?.map((seg, idx) => {
+                            const segment = segments[idx]
+                            return (
+                                <Chip
+                                    key={idx}
+                                    label={`${segment?.departureAirport} - ${segment?.arrivalAirport}`}
+                                    color={idx === activeSegmentIndex ? "primary" : "default"}
+                                    onClick={() => setActiveSegmentIndex(idx)}
+                                    sx={{ width: `${Math.floor(100/segments?.length)}%`, p: 2 }}
+                                />
+                            )
+                        })}
+                    </Box>
+                    <Box sx={{ my: 2 }}>
                         <Typography>Passengers</Typography>
                     </Box>
-                    <Box sx={{ gap: 2, display: "flex", flexWrap: "wrap" }}>
+                    <Box sx={{ my: 2, gap: 2, display: "flex", flexWrap: "wrap" }}>
                         {adultPassengers?.map((passenger, index) => {
                             const isActive = index === activePassengerIndex;
                             return (
@@ -324,7 +337,7 @@ function SeatSelection() {
                                     <Typography variant="h6">
                                         {passenger.firstName} {passenger.lastName}
                                     </Typography>
-                                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         {passenger?.seats?.[flightKey] ? (
                                             <Chip
                                                 label={passenger?.seats?.[flightKey]?.seatNumber}
@@ -334,7 +347,7 @@ function SeatSelection() {
                                                 No Seat Selected
                                             </Typography>
                                         )}
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2" color="text.secondary" fontWeight={600}>
                                             {passenger?.seats?.[flightKey]?.price ? `₹ ${passenger?.seats?.[flightKey]?.price}` : ""}
                                         </Typography>
                                     </Box>
@@ -342,19 +355,7 @@ function SeatSelection() {
                             )
                         })}
                     </Box>
-                    <Box display="flex" gap={2} mb={2} sx={{ py: 2 }}>
-                        {seatMaps?.map((seg, idx) => {
-                            const segment = segments[idx]
-                            return (
-                                <Chip
-                                    key={idx}
-                                    label={`${segment?.departureAirport} - ${segment?.arrivalAirport}`}
-                                    color={idx === activeSegmentIndex ? "primary" : "default"}
-                                    onClick={() => setActiveSegmentIndex(idx)}
-                                />
-                            )
-                        })}
-                    </Box>
+                    
                     {seatStatusMap?.ECONOMY && seatStatusMap?.BUSINESS && <Box>
                         <Box
                             sx={{
