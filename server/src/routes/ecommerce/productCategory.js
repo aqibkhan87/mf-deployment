@@ -7,7 +7,6 @@ apiRouter.get("/:categoryid", async (req, res) => {
   const categoryid = req.params.categoryid;
 
   const { minPrice, maxPrice, rating, sortBy } = req.query;
-  console.log("Filters:", minPrice, maxPrice, rating, sortBy);
 
   // Step 1: fetch category
   const category = await ProductCategoryModel.findOne({ categoryid });

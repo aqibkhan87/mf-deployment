@@ -21,7 +21,6 @@ const Seat = ({ seatId, status, index, onSelect, gapAfter = 3, seatTypeWithPrice
             cursor: "not-allowed",
         },
     };
-    // console.log("seatTypeWithPrice", seatTypeWithPrice);
     return (
         <Box
             onClick={status !== "reserved" ? onSelect : undefined}

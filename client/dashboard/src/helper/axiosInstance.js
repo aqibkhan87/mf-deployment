@@ -14,8 +14,6 @@ axiosInstance.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     
-    console.log('Starting Request', config);
-    
     return config;
   },
   error => {
@@ -26,7 +24,6 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   response => {
-    console.log('Response:', response);
     return response;
   },
   error => {

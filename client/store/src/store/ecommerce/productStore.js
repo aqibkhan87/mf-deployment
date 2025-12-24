@@ -1,7 +1,5 @@
 import { create } from "zustand";
 
-console.log("Inside Products Store");
-
 export const useProductStore = create((set, get) => ({
   
   allCategories: [],

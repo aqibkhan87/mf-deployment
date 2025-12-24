@@ -1,7 +1,5 @@
 import { create } from "zustand";
 
-console.log("Inside Order Store");
-
 export const useOrderStore = create((set, get) => ({
   orderHistory: [],
   orderDetails: {},

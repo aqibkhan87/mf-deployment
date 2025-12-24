@@ -215,8 +215,6 @@ function SeatSelection() {
             type: "FLIGHT", // or ECOMMERCE
             entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
         });
-        console.log("order data", data);
-      
 
         // 2️⃣ Load Razorpay
         const loaded = await loadRazorpay();
