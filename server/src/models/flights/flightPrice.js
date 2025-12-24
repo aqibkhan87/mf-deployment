@@ -28,7 +28,7 @@ const fareSchema = new mongoose.Schema(
     currency: String,
     duration: String,
     segments: [segmentSchema],
-    travelerPricings: Object
+    travelerPricings: Object,
   },
   { _id: false }
 );

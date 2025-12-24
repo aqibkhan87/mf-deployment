@@ -43,8 +43,6 @@ function SeatSelection() {
     const flightKey = activeSeatMap?.flightInstanceKey;
     const seatStatusMap = seatStatusBySegment?.[flightKey] || {};
 
-    console.log("seatMapsseatMaps", seatMaps)
-
     useEffect(() => {
         if (!activeSeatMap) return;
         setSeatStatusBySegment(prev => ({
@@ -201,8 +199,7 @@ function SeatSelection() {
             itineraryKey: itineraryKey?.current,
             passengers: adultPassengers,
         });
-
-        if (response?.status) {
+        if (response?.success) {
             proceedToPayment();
         }
 
@@ -281,9 +278,6 @@ function SeatSelection() {
         }
     }, [bookingDetails, seatPricing]);
 
-    console.log("seatStatusMap seatStatusMap", seatStatusMap, adultPassengers)
-    console.log("seatStatusBySegment ", seatStatusBySegment)
-
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
@@ -301,7 +295,7 @@ function SeatSelection() {
                             <KeyboardBackspaceIcon /> Back To Addons
                         </Link>
                     </Box>
-                    <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                    <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
                         <Typography align="center" fontWeight="bold">
                             {sourceAirport?.city} to {destinationAirport?.city}
                         </Typography>

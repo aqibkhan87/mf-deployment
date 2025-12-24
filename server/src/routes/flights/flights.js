@@ -1,11 +1,7 @@
 import express from "express";
 import FlightPrice from "../../models/flights/flightPrice.js";
 import Airports from "../../models/flights/airports.js";
-import {
-  applyPromoToPrice,
-  parseDurationToMinutes,
-} from "../../services/flights/pricing.js";
-import offersData from "./../offerdata.js";
+import { parseDurationToMinutes } from "../../services/flights/pricing.js";
 import AirlinesMapping from "./airlinesMapping.js";
 const apiRouter = express.Router();
 
@@ -146,7 +142,7 @@ apiRouter.get("/", async (req, res) => {
       flights: {
         ...record.toObject(),
         fares,
-        connectingAirports: connectingAirports || []
+        connectingAirports: connectingAirports || [],
       },
       sourceAirport: sourceAirport || null,
       destinationAirport: destinationAirport || null,

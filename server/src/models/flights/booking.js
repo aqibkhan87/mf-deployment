@@ -45,11 +45,21 @@ const BookingSchema = new mongoose.Schema(
   {
     flightDetail: Object,
     providerId: String,
-
+    date: String,
+    
     sourceIATA: String,
     destinationIATA: String,
     sourceAirport: Object,
     destinationAirport: Object,
+    connectingAirports: [
+      {
+        name: String,
+        city: String,
+        country: String,
+        iata: String,
+        icao: String,
+      },
+    ],
     passengerCount: Number,
 
     passengers: [PassengerSchema],

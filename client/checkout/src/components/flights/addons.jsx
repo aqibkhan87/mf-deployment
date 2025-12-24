@@ -135,7 +135,7 @@ function AddonsPage() {
                             <KeyboardBackspaceIcon /> Back To Passengers Details
                         </Link>
                     </Box>
-                    <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                    <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
                         <Typography align="center" fontWeight="bold">
                             {sourceAirport?.city} to {destinationAirport?.city}
                         </Typography>
@@ -211,14 +211,16 @@ function AddonsPage() {
                                                                 }}
                                                                 onClick={() => toggleAddon(passengerIndex, baggage)}
                                                             >
-                                                                <CardContent>
+                                                                <CardContent sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                                                     <Box display="flex" alignItems="center" >
-                                                                        <Radio checked={added || false} sx={{ pl: 0 }} />
+                                                                        <Radio checked={added || false} />
                                                                         <Typography>{baggage.title}</Typography>
                                                                     </Box>
-                                                                    <Typography variant="caption">
-                                                                        ₹{baggage.price}
-                                                                    </Typography>
+                                                                    <Box>
+                                                                        <Typography fontWeight={600}>
+                                                                            ₹{baggage.price}
+                                                                        </Typography>
+                                                                    </Box>
                                                                 </CardContent>
                                                             </Card>
                                                         </Grid>

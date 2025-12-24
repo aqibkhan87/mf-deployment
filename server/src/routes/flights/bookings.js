@@ -22,6 +22,7 @@ router.get("/:bookingId", async (req, res) => {
     flightDetail: record.flightDetail,
     contact: record.contact,
     passengers: record.passengers,
+    date: record.date,
     priceBreakdown: record.priceBreakdown,
     bookingStatus: record.bookingStatus,
     paymentRequired: record.paymentRequired,
@@ -30,6 +31,7 @@ router.get("/:bookingId", async (req, res) => {
     sourceAirport: record.sourceAirport,
     destinationAirport: record.destinationAirport,
     bookingId: record._id,
+    connectingAirports: record?.connectingAirports,
   };
 
   res.json({ success: true, bookingDetails: response });
@@ -41,10 +43,11 @@ router.post("/", async (req, res) => {
     providerId,
     sourceIATA,
     destinationIATA,
-    departDate,
+    date,
     passengers = [],
     bookingId,
     contact = {},
+    connectingAirports = []
   } = req.body;
 
   if (
@@ -53,7 +56,7 @@ router.post("/", async (req, res) => {
     !providerId ||
     !sourceIATA ||
     !destinationIATA ||
-    !departDate
+    !date
   )
     return res.status(400).json({ message: "Missing details" });
 
@@ -92,12 +95,13 @@ router.post("/", async (req, res) => {
       providerId,
       sourceIATA,
       destinationIATA,
-      departDate,
+      date,
       passengers,
       contact,
       sourceAirport: sourceAirport,
       destinationAirport: destinationAirport,
       priceBreakdown,
+      connectingAirports
     });
   }
 

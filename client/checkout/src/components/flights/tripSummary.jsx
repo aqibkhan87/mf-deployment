@@ -5,25 +5,36 @@ import {
     CardContent,
     Typography,
     Divider,
+    Chip
 } from "@mui/material";
-import SouthIcon from '@mui/icons-material/South';
+import {
+    Timeline,
+    TimelineItem,
+    TimelineSeparator,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot
+} from "@mui/lab";
 import { useBookingStore } from "store/bookingStore";
 import { formatDate, formatTime } from "../../utils/helper";
 
 const TripSummary = ({ priceBreakdown }) => {
-    const { selectedFlight, sourceAirport: fromAirport, destinationAirport: toAirport, bookingDetails } = useBookingStore();
-    const sourceAirport = fromAirport?.name ?
-        fromAirport :
-        bookingDetails?.sourceAirport;
-    const destinationAirport = toAirport?.name ?
-        toAirport :
-        bookingDetails?.destinationAirport;
-
+    const { selectedFlight, bookingDetails } = useBookingStore();
     let segments = [];
+    let connectingAirports = [];
+    let date = "";
+    let duration = "";
+
     if (selectedFlight?.fare?.segments?.length) {
         segments = selectedFlight?.fare?.segments;
+        connectingAirports = selectedFlight?.connectingAirports;
+        date = selectedFlight?.date
+        duration = selectedFlight?.fare?.duration
     } else {
-        segments = bookingDetails?.flightDetail?.segments
+        segments = bookingDetails?.flightDetail?.segments;
+        connectingAirports = bookingDetails?.connectingAirports;
+        date = bookingDetails?.date
+        duration = bookingDetails?.flightDetail?.duration
     }
     const segment = segments?.[0];
     const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
@@ -49,48 +60,81 @@ const TripSummary = ({ priceBreakdown }) => {
                         p: 2
                     }}>
                         <Typography>Flight Details</Typography>
-                        <Typography variant="subtitle1">
-                            {segment?.carrierCode} {segment?.aircraftCode}, {segment?.flightNumber}
-                        </Typography>
                     </Box>
-                    <Box p={1} m={1} sx={{ textAlign: 'center' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <Typography variant="subtitle1" fontWeight="bold">
-                                {segment?.cabin}
-                            </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Box p={1} m={1}>
+
+                        <Box sx={{
+                            border: "3px solid #f7fbff"
+                        }}>
+                            <Box sx={{ display: 'flex', p: 2 }}>
+                                <Chip variant="subtitle1" label={segment?.cabin} fontWeight="bold" />
+                            </Box>
                             {segments?.map((seg, i) => {
+                                const departureAirportObj = connectingAirports?.find(a => a?.iata === seg?.departureAirport);
+                                const arrivalAirportObj = connectingAirports?.find(a => a?.iata === seg?.arrivalAirport);
                                 return (
-                                    <Box key={i}>
-                                        <Typography>
-                                            <Typography mx={1} fontSize={14}>
-                                                {sourceAirport?.city}, {seg?.departureAirport}
-                                            </Typography>
-                                            <Typography mx={1} fontSize={12}>
-                                                {sourceAirport?.name} {seg?.departureTerminal ? `, T${seg?.departureTerminal}` : ""}
-                                            </Typography>
-                                            <Typography mx={1}>
-                                                {formatTime(seg?.departureTime)}
-                                            </Typography>
-                                        </Typography>
-                                        <SouthIcon />
-                                        <Typography>
-                                            <Typography mx={1} fontSize={14}>
-                                                {destinationAirport?.city}, {seg?.arrivalAirport}
-                                            </Typography>
-                                            <Typography mx={1} fontSize={12}>
-                                                {destinationAirport?.name} {seg?.arrivalTerminal ? `, T${seg?.arrivalTerminal}` : ""}
-                                            </Typography>
-                                            <Typography mx={1}>
-                                                {formatTime(seg?.arrivalTime)}
-                                            </Typography>
-                                        </Typography>
-                                        {segments?.length > 1 && segments?.length !== i - 1 &&
-                                            <Box>
-                                                <Typography>Connecting flight</Typography>
-                                            </Box>}
-                                    </Box>
+                                    <Timeline
+                                        key={i}
+                                        position="right"
+                                        sx={{
+                                            width: "100%",
+                                            px: 2,
+                                            "& .MuiTimelineContent-root": {
+                                                flex: 1,
+                                                width: "100%",
+                                                maxWidth: "100%",
+                                            },
+                                            "& .MuiTimelineItem-root:before": {
+                                                flex: 0,
+                                                padding: 0,
+                                            },
+                                        }}
+                                    >
+                                        <TimelineItem>
+                                            <TimelineSeparator>
+                                                <TimelineDot variant="outlined" color={i == 0 ? "secondary" : "grey"} />
+                                                <TimelineConnector />
+                                            </TimelineSeparator>
+                                            <TimelineContent>
+                                                <Typography>
+                                                    <Typography>
+                                                        {formatTime(seg?.departureTime)}
+                                                        <Typography component="span" fontSize={14} sx={{ pl: 1 }}>
+                                                            {departureAirportObj?.city}, {seg?.departureAirport}
+                                                        </Typography>
+                                                    </Typography>
+                                                    <Typography fontSize={12}>
+                                                        {departureAirportObj?.name} {seg?.departureTerminal ? `, T${seg?.departureTerminal}` : ""}
+                                                    </Typography>
+                                                    <Typography fontSize={12}>
+                                                        {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber}
+                                                    </Typography>
+                                                </Typography>
+                                            </TimelineContent>
+                                        </TimelineItem>
+                                        <TimelineItem>
+                                            <TimelineSeparator>
+                                                <TimelineDot
+                                                    variant="outlined"
+                                                    color={segments?.length > 1 && segments?.length - 1 == i ? "primary" : "grey"}
+                                                />
+                                                {segments?.length - 1 !== i && <TimelineConnector />}
+                                            </TimelineSeparator>
+                                            <TimelineContent>
+                                                <Typography>
+                                                    <Typography>
+                                                        {formatTime(seg?.arrivalTime)}
+                                                        <Typography component="span" fontSize={14} sx={{ pl: 1 }}>
+                                                            {arrivalAirportObj?.city}, {seg?.arrivalAirport}
+                                                        </Typography>
+                                                    </Typography>
+                                                    <Typography fontSize={12}>
+                                                        {arrivalAirportObj?.name} {seg?.arrivalTerminal ? `, T${seg?.arrivalTerminal}` : ""}
+                                                    </Typography>
+                                                </Typography>
+                                            </TimelineContent>
+                                        </TimelineItem>
+                                    </Timeline>
                                 )
                             }
                             )}
@@ -100,7 +144,7 @@ const TripSummary = ({ priceBreakdown }) => {
 
                 <Box >
                     <Typography variant="caption" color="text.secondary">
-                        {formatDate(selectedFlight?.date)} | {selectedFlight?.fare?.duration}
+                        {formatDate(date)} | {duration}
                     </Typography>
                 </Box>
 

@@ -89,8 +89,9 @@ function PassengerDetailsPage() {
   const handleNext = async () => {
     const payload = {
       flightDetail: selectedFlight?.fare,
+      connectingAirports: selectedFlight?.connectingAirports,
       providerId,
-      departDate,
+      date: departDate,
       passengers,
       contact,
       sourceIATA: from,
@@ -124,11 +125,15 @@ function PassengerDetailsPage() {
               <KeyboardBackspaceIcon /> Back To Search Flight
             </Link>
           </Box>
-          <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+          <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
             <Typography align="center" fontWeight="bold">
               {sourceAirport?.city} to {destinationAirport?.city}
             </Typography>
           </Paper>
+
+          <Typography variant="h5" fontWeight={600} mb={4}>
+            Passengers
+          </Typography>
 
           {passengers?.map((p, i) => {
             const valid = isPassengerValid(p);
