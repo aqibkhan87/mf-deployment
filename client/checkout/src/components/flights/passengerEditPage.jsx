@@ -14,14 +14,16 @@ import {
   Divider,
   IconButton,
   Container,
-  Paper
+  Paper,
+  Link
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { createBooking } from "../../apis/flights/booking";
 import { searchFlights } from "../../apis/flights/searchflight";
 import { useBookingStore } from "store/bookingStore";
-import { isEmailValid, isMobileValid, formatDate, formatTime } from "../../utils/helper";
+import { isEmailValid, isMobileValid } from "../../utils/helper";
 import TripSummary from "./tripSummary";
 
 
@@ -109,6 +111,19 @@ function PassengerDetailsPage() {
       <Grid container spacing={3}>
         {/* LEFT */}
         <Grid item xs={12} md={8}>
+          <Box >
+            <Link href="/flight-search" sx={{
+              cursor: "pointer",
+              color: "#000",
+              textDecorationColor: "#000",
+              textUnderlineOffset: "4px",
+              "&:hover": {
+                textDecorationColor: "#000",
+              },
+            }}>
+              <KeyboardBackspaceIcon /> Back To Search Flight
+            </Link>
+          </Box>
           <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
             <Typography align="center" fontWeight="bold">
               {sourceAirport?.city} to {destinationAirport?.city}
@@ -179,8 +194,8 @@ function PassengerDetailsPage() {
                               onChange={(e) => updatePassenger(i, "dob", e.target.value)}
                               error={p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2)}
                               helperText={
-                                p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ? 
-                                "Infant must be under 2 years" : ""}
+                                p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ?
+                                  "Infant must be under 2 years" : ""}
                             />
                           </Grid>
                         </Grid>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { Box, Typography, Grid, Chip, CardContent, Button, Paper } from "@mui/material";
+import { Box, Typography, Grid, Chip, Link, Button, Paper } from "@mui/material";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
@@ -7,6 +8,7 @@ import { useBookingStore } from "store/bookingStore";
 import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking";
 import { getSeatMaps } from "../../apis/flights/seatMap";
 import TripSummary from "./tripSummary";
+import { createOrder, verifyPayment } from "../../apis/payment.js";
 
 const LegendItem = ({ color, label }) => (
     <Box display="flex" alignItems="center" gap={1.5}>
@@ -116,7 +118,7 @@ function SeatSelection() {
                         }
                     }
                 }));
-                setSeatPricing(seatPricing - oldSeat?.price);
+                setSeatPricing((prev) => prev - oldSeat?.price);
                 updated[passengerIndex] = {
                     ...updated[passengerIndex],
                     seats: {
@@ -135,7 +137,7 @@ function SeatSelection() {
             const isSeatTaken = updated.some(
                 (p, idx) => idx !== passengerIndex && p?.seats?.[flightKey]?.seatNumber === seatId
             );
-            
+
             if (isSeatTaken) return prev;
 
 
@@ -153,7 +155,7 @@ function SeatSelection() {
                         }
                     }
                 }));
-                setSeatPricing(seatPricing - oldSeat?.price)
+                setSeatPricing((prev) => prev - oldSeat?.price)
             }
 
             /* ---------------------------------
@@ -182,7 +184,7 @@ function SeatSelection() {
                 }
             }));
 
-            setSeatPricing(seatPricing + seatTypeWithPrice?.price)
+            setSeatPricing((prev) => prev + seatTypeWithPrice?.price)
 
             // Move to next passenger
             setActivePassengerIndex(prevIdx =>
@@ -194,14 +196,78 @@ function SeatSelection() {
     };
 
     const handlePayment = async () => {
-        await updateSeatSelectionInBooking({
+        const response = await updateSeatSelectionInBooking({
             bookingId: bookingDetails?.bookingId,
             itineraryKey: itineraryKey?.current,
             passengers: adultPassengers,
         });
 
+        if (response?.status) {
+            proceedToPayment();
+        }
+
         // history.push("/flight/checkout");
     }
+
+    const proceedToPayment = async () => {
+        // 1️⃣ Create Order
+        const data = await createOrder({
+            type: "FLIGHT", // or ECOMMERCE
+            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+        });
+        console.log("order data", data);
+
+        // ✅ ZERO AMOUNT
+        if (data?.skipPayment) {
+            history.push("/dashboard");
+            return;
+        }
+
+        // 2️⃣ Load Razorpay
+        const loaded = await loadRazorpay();
+        if (!loaded) {
+            alert("Payment SDK failed. Try again.");
+            return;
+        }
+        // 3️⃣ Payment Options
+        const options = {
+            key: process.env.RAZORPAY_KEY_ID,
+            order_id: data.orderId,
+            amount: data.amount,
+            currency: "INR",
+
+            handler: async (res) => {
+                try {
+                    const verify = await verifyPayment({
+                        type: "ECOMMERCE",
+                        entityId,
+                        ...res,
+                    });
+
+                    if (verify.success) {
+                        navigate("/dashbaord");
+                    }
+                } catch {
+                    alert("Payment verification failed");
+                }
+            },
+
+            modal: {
+                ondismiss: async () => {
+                    alert("Payment cancelled");
+                },
+            },
+        };
+
+        const rzp = new window.Razorpay(options);
+
+        rzp.on("payment.failed", async () => {
+            alert("Payment failed");
+        });
+
+        rzp.open();
+    }
+
     const adultPassengers = useMemo(
         () => flightPassengers?.filter(p => p.isAdult),
         [flightPassengers]
@@ -222,6 +288,19 @@ function SeatSelection() {
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
+                    <Box >
+                        <Link href="/addons" sx={{
+                            cursor: "pointer",
+                            color: "#000",
+                            textDecorationColor: "#000",
+                            textUnderlineOffset: "4px",
+                            "&:hover": {
+                                textDecorationColor: "#000",
+                            },
+                        }}>
+                            <KeyboardBackspaceIcon /> Back To Addons
+                        </Link>
+                    </Box>
                     <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
                         <Typography align="center" fontWeight="bold">
                             {sourceAirport?.city} to {destinationAirport?.city}

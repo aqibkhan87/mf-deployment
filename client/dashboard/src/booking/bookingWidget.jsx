@@ -357,7 +357,7 @@ const BookingWidget = () => {
               onClick={handleSearch}
               sx={{ px: 2 }}
             >
-              Search
+              {searchEditing ? "Modify" : "Search"}
             </Button>
           </div>
         </Grid>

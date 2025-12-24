@@ -10,8 +10,9 @@ export const searchFlights = async ({
   providerId = "",
 }) => {
   useLoaderStore.getState().setLoading(true);
+  let response;
   try {
-    const response = await httpRequest("get", `/api/flights/search`, {
+    response = await httpRequest("get", `/api/flights/search`, {
       from,
       to,
       date,
@@ -28,6 +29,13 @@ export const searchFlights = async ({
   } catch (error) {
     console.error("Error searching flights:", error);
   } finally {
+    if (response?.data?.destinationAirport || response?.data?.sourceAirport) {
+      useBookingStore.setState((state) => ({
+        ...state,
+        destinationAirport: response.data?.destinationAirport || {},
+        sourceAirport: response.data?.sourceAirport || {},
+      }));
+    }
     useLoaderStore.getState().setLoading(false);
   }
 };

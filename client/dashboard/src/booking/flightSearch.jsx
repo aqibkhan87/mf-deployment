@@ -13,7 +13,7 @@ import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../apis/flights/booking";
 import BookingWidget from "./bookingWidget";
 import "./flightSearch.scss"
-import { eventEmitter } from "../utils/helper"
+import { eventEmitter, formatTime } from "../utils/helper"
 
 export const getAllowedDates = (days = 10) => {
     const today = dayjs().startOf("day");
@@ -33,11 +33,6 @@ export const getAllowedDates = (days = 10) => {
     }
 
     return dates;
-};
-
-const formatTime = (iso) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
 const formatDuration = (duration) => {
@@ -255,12 +250,19 @@ function FlightResults() {
                                     const departureAirportObj = connectingAirports?.find(a => a?.iata === segment?.departureAirport);
                                     const arrivalAirportObj = connectingAirports?.find(a => a?.iata === segment?.arrivalAirport);
                                     return (
-                                        <Box key={index} className="flex items-center space-x-6 justify-between">
+                                        <Box key={index} className="flex items-center justify-between">
                                             <Box className="flex-1">
-                                                <p className="text-xl font-bold">{formatTime(segment?.departureTime)}</p>
-                                                <p className="text-gray-500">{departureAirportObj?.city}, {departureAirportObj?.iata}</p>
+                                                <p className="text-xl font-bold">
+                                                    {formatTime(segment?.departureTime)}
+                                                    <span className="pl-2 text-xs">
+                                                        {departureAirportObj?.iata}, T{segment?.departureTerminal}
+                                                    </span>
+                                                </p>
+                                                <p className="text-gray-500  text-xs">
+                                                    {departureAirportObj?.city} - {departureAirportObj?.name}
+                                                </p>
                                             </Box>
-                                            <Box className="text-gray-500 flex-1">
+                                            <Box className="flex-1">
                                                 <p className="text-gray-600">
                                                     {formatDuration(segment?.duration)}
                                                 </p>
@@ -269,9 +271,12 @@ function FlightResults() {
                                             <Box className="flex-1">
                                                 <p className="text-xl font-bold">
                                                     {formatTime(segment?.arrivalTime)}
+                                                    <span className="pl-2 text-xs">
+                                                        {arrivalAirportObj?.iata}, T{segment?.arrivalTerminal}
+                                                    </span>
                                                 </p>
-                                                <p className="text-gray-500">
-                                                    {arrivalAirportObj?.city}, {arrivalAirportObj?.iata}
+                                                <p className="text-gray-500 text-xs">
+                                                    {arrivalAirportObj?.city} - {arrivalAirportObj?.name}
                                                 </p>
                                             </Box>
 
@@ -294,7 +299,7 @@ function FlightResults() {
                             <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
                                 <Box className="flex text-lg font-semibold items-center">
                                     ₹ {Math.floor(fare?.totalPrice)}
-                                    <Typography className="text-sm"> / adult</Typography>
+                                    <Typography className="text-sm pl-1">/ adult</Typography>
                                 </Box>
                                 <Button
                                     variant="contained"

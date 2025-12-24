@@ -11,7 +11,9 @@ import {
     Paper,
     Radio,
     Stack,
+    Link
 } from "@mui/material";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useBookingStore } from "store/bookingStore";
 import { getAddons } from "../../apis/flights/addons";
 import { getBookingDetails, updateAddonsInPassengers } from "../../apis/flights/booking";
@@ -120,6 +122,19 @@ function AddonsPage() {
             <Grid container spacing={3}>
                 {/* LEFT */}
                 <Grid item xs={12} md={8}>
+                    <Box >
+                        <Link href="/passenger-edit" sx={{
+                            cursor: "pointer",
+                            color: "#000",
+                            textDecorationColor: "#000",
+                            textUnderlineOffset: "4px",
+                            "&:hover": {
+                                textDecorationColor: "#000",
+                            },
+                        }}>
+                            <KeyboardBackspaceIcon /> Back To Passengers Details
+                        </Link>
+                    </Box>
                     <Paper sx={{ my: 2, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
                         <Typography align="center" fontWeight="bold">
                             {sourceAirport?.city} to {destinationAirport?.city}

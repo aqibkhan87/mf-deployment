@@ -36,3 +36,9 @@ export const numberStyle = (active) => ({
     : "0 1px 4px rgba(0,0,0,0.1)",
   border: "1px solid #E0E0E0",
 });
+
+export const formatTime = (iso) =>
+  new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+
+export const formatDate = (iso) =>
+  new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });

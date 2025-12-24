@@ -6,6 +6,7 @@ import {
     Typography,
     Divider,
 } from "@mui/material";
+import SouthIcon from '@mui/icons-material/South';
 import { useBookingStore } from "store/bookingStore";
 import { formatDate, formatTime } from "../../utils/helper";
 
@@ -58,7 +59,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                 {segment?.cabin}
                             </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             {segments?.map((seg, i) => {
                                 return (
                                     <Box key={i}>
@@ -67,25 +68,25 @@ const TripSummary = ({ priceBreakdown }) => {
                                                 {sourceAirport?.city}, {seg?.departureAirport}
                                             </Typography>
                                             <Typography mx={1} fontSize={12}>
-                                                {sourceAirport?.name} {seg?.departureTerminal ? `, Terminal ${seg?.departureTerminal}` : ""}
+                                                {sourceAirport?.name} {seg?.departureTerminal ? `, T${seg?.departureTerminal}` : ""}
                                             </Typography>
                                             <Typography mx={1}>
                                                 {formatTime(seg?.departureTime)}
                                             </Typography>
                                         </Typography>
-                                        <Typography fontWeight="bold">→</Typography>
+                                        <SouthIcon />
                                         <Typography>
                                             <Typography mx={1} fontSize={14}>
                                                 {destinationAirport?.city}, {seg?.arrivalAirport}
                                             </Typography>
                                             <Typography mx={1} fontSize={12}>
-                                                {destinationAirport?.name} {seg?.arrivalTerminal ? `, Terminal ${seg?.arrivalTerminal}` : ""}
+                                                {destinationAirport?.name} {seg?.arrivalTerminal ? `, T${seg?.arrivalTerminal}` : ""}
                                             </Typography>
                                             <Typography mx={1}>
                                                 {formatTime(seg?.arrivalTime)}
                                             </Typography>
                                         </Typography>
-                                        {segments?.length > 1 && segments?.length !== index - 1 &&
+                                        {segments?.length > 1 && segments?.length !== i - 1 &&
                                             <Box>
                                                 <Typography>Connecting flight</Typography>
                                             </Box>}
