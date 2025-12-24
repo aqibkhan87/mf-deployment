@@ -3,61 +3,75 @@ import express from "express";
 import crypto from "crypto";
 import { razorpay } from "../razorpayService.js";
 import CartModel from "../models/ecommerce/e-cart.js";
+import BookingModel from "../models/flights/booking.js";
 import EcommercePayment from "../models/ecommerce/e-payment.js";
 
 const router = express.Router();
 
 router.post("/create", async (req, res) => {
   try {
-    const { entityId } = req.body;
-    const cart = await CartModel.findOne({ _id: entityId });
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+    const { entityId, type } = req.body;
+    let cart;
+    let booking;
+    if (type === "ECOMMERCE") {
+      cart = await CartModel.findOne({ _id: entityId });
+      if (!cart) return res.status(404).json({ message: "Cart not found" });
+    } else if (type === "FLIGHT") {
+      booking = await BookingModel.findOne({ _id: entityId });
+      if (!booking) return res.status(404).json({ message: "Booking not found" });
+    }
 
-    const amount = cart?.totalAmount || 0;
+    let order;
+    let payment;
 
-    // ✅ ZERO AMOUNT ORDER
-    if (amount <= 0) {
-      const payment = await EcommercePayment.create({
-        userId: cart?.userId,
-        amount: 0,
-        status: "PAID",
-        paidAt: new Date(),
-        notes: { freeOrder: true },
+    if(cart) {
+      const amount = cart?.totalAmount || 0;
+  
+      // ✅ ZERO AMOUNT ORDER
+      if (amount <= 0) {
+        const payment = await EcommercePayment.create({
+          userId: cart?.userId,
+          amount: 0,
+          status: "PAID",
+          paidAt: new Date(),
+          notes: { freeOrder: true },
+        });
+  
+        cart.paymentId = payment._id;
+        await cart.save();
+  
+        return res.json({ skipPayment: true, success: true });
+      }
+
+      // ✅ Create payment record
+      payment = await EcommercePayment.create({
+        userId: cart.userId,
+        amount,
+        currency: "INR",
+        status: "CREATED",
+        notes: { cartId: cart._id },
       });
-
+  
+      // ✅ Create Razorpay order
+      order = await razorpay.orders.create({
+        amount: Math.round(amount * 100),
+        currency: "INR",
+        receipt: cart ? `Ecommerce_${cart?._id}` : `Avition_${booking?._id}`,
+      });
+  
+      payment.razorpay_order_id = order.id;
+      await payment.save();
+  
       cart.paymentId = payment._id;
       await cart.save();
-
-      return res.json({ skipPayment: true, success: true });
     }
-   
-    // ✅ Create payment record
-    const payment = await EcommercePayment.create({
-      userId: cart.userId,
-      amount,
-      currency: "INR",
-      status: "CREATED",
-      notes: { cartId: cart._id },
-    });
 
-    // ✅ Create Razorpay order
-    const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100),
-      currency: "INR",
-      receipt: `CART_${cart._id}`,
-    });
-
-    payment.razorpay_order_id = order.id;
-    await payment.save();
-
-    cart.paymentId = payment._id;
-    await cart.save();
 
     res.json({
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      paymentId: payment._id,
+      orderId: order?.id,
+      amount: order?.amount,
+      currency: order?.currency,
+      paymentId: payment?._id,
     });
   } catch (err) {
     console.error("create-order error:", err);
@@ -68,7 +82,7 @@ router.post("/create", async (req, res) => {
 /* ============================
    VERIFY PAYMENT
 ============================= */
-router.post("/verify", async (req, res) => {
+router.post("/verify-payment", async (req, res) => {
   try {
     const {
       type,
@@ -129,7 +143,7 @@ async function markFailed(type, id) {
     await CartModel.findByIdAndUpdate(id, { "payment.status": "FAILED" });
   }
   if (type === "FLIGHT") {
-    await Booking.findByIdAndUpdate(id, {
+    await BookingModel.findByIdAndUpdate(id, {
       bookingStatus: "FAILED",
       "payment.status": "FAILED",
     });

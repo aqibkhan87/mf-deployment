@@ -236,7 +236,7 @@ function SeatSelection() {
             handler: async (res) => {
                 try {
                     const verify = await verifyPayment({
-                        type: "ECOMMERCE",
+                        type: "FLIGHT",
                         entityId,
                         ...res,
                     });
