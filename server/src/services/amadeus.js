@@ -97,7 +97,8 @@ const addDays = (date, days) => {
 
 // Save Amadeus data in MongoDB
 async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
-  for (let day = 0; day <= 10; day++) {
+  let day = 10;
+  // for (let day = 0; day <= 10; day++) {
     const date = addDays(baseDate, day);
     const fares = amadeusData?.map((offer) => {
       const firstItinerary = offer.itineraries[0];
@@ -164,7 +165,7 @@ async function saveAmadeusData(origin, destination, baseDate, amadeusData) {
       },
       { upsert: true }
     );
-  }
+  // }
 
   console.log(
     `✅ Saved ${origin}-${destination} (${

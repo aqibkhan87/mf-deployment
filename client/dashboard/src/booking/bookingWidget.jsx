@@ -96,8 +96,6 @@ const BookingWidget = () => {
   const { searchEditing } = useBookingStore();
   const history = useHistory();
   const [anchors, setAnchors] = useState({
-    fromAnchor: null,
-    toAnchor: null,
     passengerAnchor: null,
     dateAnchor: null,
   });
@@ -121,6 +119,12 @@ const BookingWidget = () => {
   const [fromInput, setFromInput] = useState("");
   const [toInput, setToInput] = useState("");
   const [tripType, setTripType] = useState("one-way");
+
+  const searchDisabled = useMemo(() => {
+    if(to && from && departDate && passengers) {
+      return false;
+    } else return true;
+  },[to, from, departDate, passengers])
 
   useEffect(() => {
     const handler = async (event) => {
@@ -151,7 +155,7 @@ const BookingWidget = () => {
   }, []);
 
   const handleAirportSearch = async (q, type) => {
-    if (!q || q.length < 2) return;
+    if (!q || q.length < 1) return;
     try {
       const results = await searchAirports(q);
       if (type === "from") setFromOptions(results?.queryResults || []);
@@ -216,17 +220,13 @@ const BookingWidget = () => {
               value={from}
               placeholder="Select Source City"
               options={fromOptions}
-              anchorEl={anchors.fromAnchor}
               inputValue={fromInput}
-              onOpen={(e) => setAnchors({ ...anchors, fromAnchor: e.currentTarget })}
-              onClose={() => setAnchors({ ...anchors, fromAnchor: null })}
               onInputChange={(v) => {
                 setFromInput(v);
                 debouncedSearch(v, "from");
               }}
               onSelect={(v) => {
                 setFrom(v);
-                setAnchors({ ...anchors, fromAnchor: null });
               }}
             />
             <IconButton onClick={handleSwitch} sx={{ position: "absolute", right: -26 }}>
@@ -240,17 +240,13 @@ const BookingWidget = () => {
               placeholder="Select Destination City"
               value={to}
               options={toOptions}
-              anchorEl={anchors.toAnchor}
               inputValue={toInput}
-              onOpen={(e) => setAnchors({ ...anchors, toAnchor: e.currentTarget })}
-              onClose={() => setAnchors({ ...anchors, toAnchor: null })}
               onInputChange={(v) => {
                 setToInput(v);
                 debouncedSearch(v, "to");
               }}
               onSelect={(v) => {
                 setTo(v);
-                setAnchors({ ...anchors, toAnchor: null });
               }}
             />
           </Grid>
@@ -313,10 +309,6 @@ const BookingWidget = () => {
                   onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}
                   sx={{
                     cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "#F5F7FA",
-                      borderRadius: "12px"
-                    },
                     p: 2
                   }}
                 >
@@ -356,6 +348,7 @@ const BookingWidget = () => {
               variant="contained"
               onClick={handleSearch}
               sx={{ px: 2 }}
+              disabled={searchDisabled}
             >
               {searchEditing ? "Modify" : "Search"}
             </Button>

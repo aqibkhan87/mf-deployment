@@ -1,14 +1,16 @@
 import cron from "node-cron";
 import fetchTodayFlights from "../services/amadeus.js";
-import { deleteAllFlightData, deleteAllSeatMapData } from "./deleteFlightData.js";
+import { deleteAllFlightData, deleteAllSeatMapData, deleteYesterdayFlightData, deleteYesterdaySeatMapData } from "./deleteFlightData.js";
 
 cron.schedule(
   "0 6 * * *",
   async () => {
     console.log("🛫 Delete All SeatMap Data.....");
-    await deleteAllSeatMapData();
+    // await deleteAllSeatMapData();
+    await deleteYesterdaySeatMapData();
     console.log("🛫 Delete All Flight data.....");
-    await deleteAllFlightData();
+    // await deleteAllFlightData();
+    await deleteYesterdayFlightData();
     console.log("🛫 Fetching flights for Today.....");
     await fetchTodayFlights();
     console.log("🎯 Flight data for Today updated.");
