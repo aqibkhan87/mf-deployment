@@ -182,8 +182,8 @@ function SeatSelection() {
                     }
                 }
             }));
-            if(activeSegmentIndex === 1) setActiveSegmentIndex(0)
-            if(segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
+            if (activeSegmentIndex === 1) setActiveSegmentIndex(0)
+            if (segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
 
             setSeatPricing((prev) => prev + seatTypeWithPrice?.price)
 
@@ -231,16 +231,17 @@ function SeatSelection() {
 
             handler: async (res) => {
                 try {
-                    const verify = await verifyPayment({
+                    const response = await verifyPayment({
                         type: "FLIGHT",
                         entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
                         ...res,
                     });
+                    const { orderId, status, PNR } = response;
 
-                    if (verify?.success) {
-                        history.push("/itinerary");
+                    if (response?.success) {
+                        history.push(`/itinerary?orderId=${orderId}&status=${status}&PNR=${PNR}`);
                     }
-                } catch(err) {
+                } catch (err) {
                     alert("Payment verification failed");
                     console.log("err: Payment verification failed", err)
                 }
@@ -306,7 +307,7 @@ function SeatSelection() {
                                     label={`${segment?.departureAirport} - ${segment?.arrivalAirport}`}
                                     color={idx === activeSegmentIndex ? "primary" : "default"}
                                     onClick={() => setActiveSegmentIndex(idx)}
-                                    sx={{ width: `${Math.floor(100/segments?.length)}%`, p: 2 }}
+                                    sx={{ width: `${Math.floor(100 / segments?.length)}%`, p: 2 }}
                                 />
                             )
                         })}
@@ -354,7 +355,7 @@ function SeatSelection() {
                             )
                         })}
                     </Box>
-                    
+
                     {seatStatusMap?.ECONOMY && seatStatusMap?.BUSINESS && <Box>
                         <Box
                             sx={{

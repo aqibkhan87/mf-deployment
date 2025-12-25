@@ -5,9 +5,10 @@ const CheckoutMFApp = lazy(() => import("./mfs/CheckoutMFApp"));
 import OrdersPage from "./components/order/orderHistory";
 import ProductWishlist from "./components/wishlist/wishlistPage";
 import MainNav from "./components/mainNav";
-import FlightResults from "./booking/flightSearch";
+import FlightResults from "./booking/flightSearch/flightSearch";
 import DashboardPage from "./components/dashboard/dashboard";
 import AddressList from "./components/address/addressList";
+import DestinationFlights from "./booking/destinationFlights/destinationFlights";
 // import LoginSummary from "./mfs/authComponent/loginSummary";
 // import AddressForm from "./mfs/authComponent/addressForm";
 import LoginSummary from "./common/loginSummary";
@@ -110,6 +111,7 @@ const App = () => {
             <Route path="/addresses" component={AddressList} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/flight-search" component={FlightResults} />
+            <Route path="/destination-flights" component={DestinationFlights} />
             <Route path="/" component={DashboardPage} />
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>

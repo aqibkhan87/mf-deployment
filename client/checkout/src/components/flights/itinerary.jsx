@@ -1,260 +1,285 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
-Box,
-Paper,
-Typography,
-Divider,
-Grid,
-Avatar,
+    Box,
+    Paper,
+    Typography,
+    Divider,
+    Grid,
+    Avatar,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FlightIcon from "@mui/icons-material/Flight";
+import { useBookingStore } from "store/bookingStore";
+import { getItineraryDetails } from "../../apis/flights/itinerary";
+import { formatDate, formatTime, formatDuration } from "../../utils/helper";
 
 const booking = {
-  bannerImage: "/images/flight-banner.jpg",
-  pnr: "AB3X9Q",
-  email: "user@email.com",
+    bannerImage: "/images/flight-banner.jpg",
+    pnr: "AB3X9Q",
+    email: "user@email.com",
 
-  segments: [
-    {
-      airline: "IndiGo",
-      flightNumber: "6E-203",
-      from: { city: "Delhi", iata: "DEL" },
-      to: { city: "Mumbai", iata: "BOM" },
-      departureTime: "08:00",
-      arrivalTime: "10:05",
-      date: "25 Dec 2025",
-      duration: "2h 05m",
-      baggage: {
-        cabin: "7 Kg",
-        checkin: "15 Kg",
-      },
+    segments: [
+        {
+            airline: "IndiGo",
+            flightNumber: "6E-203",
+            from: { city: "Delhi", iata: "DEL" },
+            to: { city: "Mumbai", iata: "BOM" },
+            departureTime: "08:00",
+            arrivalTime: "10:05",
+            date: "25 Dec 2025",
+            duration: "2h 05m",
+            baggage: {
+                cabin: "7 Kg",
+                checkin: "15 Kg",
+            },
+        },
+        {
+            airline: "IndiGo",
+            flightNumber: "6E-412",
+            from: { city: "Mumbai", iata: "BOM" },
+            to: { city: "Bengaluru", iata: "BLR" },
+            departureTime: "11:30",
+            arrivalTime: "13:00",
+            date: "25 Dec 2025",
+            duration: "1h 30m",
+            baggage: {
+                cabin: "7 Kg",
+                checkin: "15 Kg",
+            },
+        },
+    ],
+
+    passengers: [
+        {
+            title: "Mr",
+            name: "Rahul Sharma",
+            seat: "12A",
+            meal: "Veg",
+        },
+    ],
+
+    payment: {
+        mode: "Razorpay",
+        txnId: "TXN982734",
+        total: 8450,
     },
-    {
-      airline: "IndiGo",
-      flightNumber: "6E-412",
-      from: { city: "Mumbai", iata: "BOM" },
-      to: { city: "Bengaluru", iata: "BLR" },
-      departureTime: "11:30",
-      arrivalTime: "13:00",
-      date: "25 Dec 2025",
-      duration: "1h 30m",
-      baggage: {
-        cabin: "7 Kg",
-        checkin: "15 Kg",
-      },
+
+    contact: {
+        name: "Rahul Sharma",
+        email: "rahul@email.com",
+        phone: "+91 9876543210",
     },
-  ],
-
-  passengers: [
-    {
-      title: "Mr",
-      name: "Rahul Sharma",
-      seat: "12A",
-      meal: "Veg",
-    },
-  ],
-
-  payment: {
-    mode: "Razorpay",
-    txnId: "TXN982734",
-    total: 8450,
-  },
-
-  contact: {
-    name: "Rahul Sharma",
-    email: "rahul@email.com",
-    phone: "+91 9876543210",
-  },
 };
 
-const ItineraryPage = ({  }) => {
+const ItineraryPage = () => {
+    const { itineraryDetails } = useBookingStore();
+    const params = new URLSearchParams(window.location.search);
+    const PNR = params.get("PNR");
+    const status = params.get("status");
+    const orderId = params.get("orderId");
+    const bookingDetails = itineraryDetails?.bookingDetails;
+    const contact = bookingDetails?.contact;
+    const segments = bookingDetails?.flightDetail?.segments;
+    const sourceAirport = bookingDetails?.sourceAirport;
+    const destinationAirport = bookingDetails?.destinationAirport;
+    const connectingAirports = bookingDetails?.connectingAirports;
+    console.log("params params params", itineraryDetails)
+    console.log("bookingDetails", bookingDetails, "segments", segments)
+
     const firstSegment = booking.segments[0];
     const lastSegment = booking.segments[booking.segments.length - 1];
 
-  return (
-    <Box sx={{ maxWidth: 900, mx: "auto", my: 3 }}>
-      {/* ===================== CONFIRMATION BANNER ===================== */}
-      <Paper
-        sx={{
-          position: "relative",
-          height: 260,
-          backgroundImage: `url(${booking.bannerImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          borderRadius: 3,
-          overflow: "hidden",
-        }}
-      >
-        <Box sx={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
+    useEffect(() => {
+        if (PNR && status && orderId) {
+            getItineraryDetails({ orderId, status, PNR });
+        }
+    }, [])
 
-        <Box
-          sx={{
-            position: "relative",
-            zIndex: 1,
-            height: "100%",
-            color: "#fff",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
-          }}
-        >
-          <Avatar sx={{ bgcolor: "#2e7d32", mb: 1 }}>
-            <CheckCircleIcon />
-          </Avatar>
+    return (
+        <Box sx={{ maxWidth: 900, mx: "auto", my: 3 }}>
+            {/* ===================== CONFIRMATION BANNER ===================== */}
+            <Paper
+                sx={{
+                    position: "relative",
+                    height: 260,
+                    backgroundImage: `url(${process.env.API_BASE_URL}/images/${destinationAirport?.iata}.png)`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    borderRadius: 3,
+                    overflow: "hidden",
+                }}
+            >
+                <Box sx={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
 
-          <Typography variant="h6" fontWeight={700}>
-            Booking Confirmed
-          </Typography>
+                <Box
+                    sx={{
+                        position: "relative",
+                        zIndex: 1,
+                        height: "100%",
+                        color: "#fff",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                    }}
+                >
+                    <Avatar sx={{ bgcolor: "#2e7d32", mb: 1 }}>
+                        <CheckCircleIcon />
+                    </Avatar>
 
-          <Typography sx={{ mt: 1 }}>
-            {firstSegment.from.iata} → {lastSegment.to.iata}
-          </Typography>
+                    <Typography variant="h6" fontWeight={700}>
+                        Booking Confirmed
+                    </Typography>
 
-          <Typography variant="body2">
-            {firstSegment.date}
-          </Typography>
+                    <Typography sx={{ mt: 1 }}>
+                        {sourceAirport?.iata} → {destinationAirport?.iata}
+                    </Typography>
 
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            PNR: <strong>{booking.pnr}</strong>
-          </Typography>
-        </Box>
-      </Paper>
+                    <Typography variant="body2">
+                        {firstSegment.date}
+                    </Typography>
 
-      {/* ===================== CONFIRMATION MESSAGE ===================== */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography>
-          Your booking is confirmed. Confirmation has been sent to:
-        </Typography>
-        <Typography fontWeight={600}>{booking.email}</Typography>
-      </Paper>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                        PNR: <strong>{PNR}</strong>
+                    </Typography>
+                </Box>
+            </Paper>
 
-      {/* ===================== FLIGHT SEGMENTS ===================== */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-          Flight Details
-        </Typography>
-
-        {booking.segments.map((segment, index) => (
-          <Box key={index}>
-            {index > 0 && (
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", my: 2, textAlign: "center" }}
-              >
-                Layover at {segment.from.city}
-              </Typography>
-            )}
-
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12}>
-                <Typography fontWeight={600}>
-                  {segment.airline} • {segment.flightNumber}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={5}>
-                <Typography variant="body2" color="text.secondary">
-                  Departure
-                </Typography>
-                <Typography fontWeight={600}>
-                  {segment.from.iata} – {segment.departureTime}
-                </Typography>
-                <Typography variant="body2">{segment.from.city}</Typography>
-              </Grid>
-
-              <Grid item xs={2} textAlign="center">
-                <FlightIcon color="action" />
-                <Typography variant="body2">{segment.duration}</Typography>
-              </Grid>
-
-              <Grid item xs={5}>
-                <Typography variant="body2" color="text.secondary">
-                  Arrival
-                </Typography>
-                <Typography fontWeight={600}>
-                  {segment.to.iata} – {segment.arrivalTime}
-                </Typography>
-                <Typography variant="body2">{segment.to.city}</Typography>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="body2" color="text.secondary">
-                  Baggage Allowance
-                </Typography>
+            {/* ===================== CONFIRMATION MESSAGE ===================== */}
+            <Paper sx={{ p: 3, mt: 3 }}>
                 <Typography>
-                  {segment.baggage.cabin} Cabin • {segment.baggage.checkin} Check-in
+                    Your booking is confirmed. Confirmation has been sent to:
                 </Typography>
-              </Grid>
-            </Grid>
+                <Typography variant="span" fontWeight={600}>{contact?.email}</Typography>
+            </Paper>
 
-            {index !== booking.segments.length - 1 && <Divider sx={{ my: 3 }} />}
-          </Box>
-        ))}
-      </Paper>
+            {/* ===================== FLIGHT SEGMENTS ===================== */}
+            <Paper sx={{ p: 3, mt: 3 }}>
+                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+                    Flight Details
+                </Typography>
 
-      {/* ===================== PASSENGERS & ADDONS ===================== */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-          Passengers & Add-ons
-        </Typography>
+                {segments?.map((seg, index) => {
+                    const departureAirportObj = connectingAirports?.find(a => a?.iata === seg?.departureAirport);
+                    const arrivalAirportObj = connectingAirports?.find(a => a?.iata === seg?.arrivalAirport);
+                    return (
+                        <Box key={index}>
+                            {index > 0 && (
+                                <Typography
+                                    variant="body2"
+                                    sx={{ color: "text.secondary", my: 2, textAlign: "center" }}
+                                >
+                                    Layover at {departureAirportObj?.city}
+                                </Typography>
+                            )}
 
-        {booking.passengers.map((p, i) => (
-          <Box key={i} sx={{ mb: 1 }}>
-            <Typography fontWeight={600}>
-              {p.title} {p.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Seat: {p.seat || "Not assigned"} | Meal: {p.meal || "Standard"}
-            </Typography>
-          </Box>
-        ))}
-      </Paper>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={12}>
+                                    <Typography fontWeight={600}>
+                                       <FlightIcon color="action" /> {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber} ({formatDate(seg?.departureTime)})
+                                    </Typography>
+                                </Grid>
 
-      {/* ===================== PAYMENT SUMMARY ===================== */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-          Payment Details
-        </Typography>
+                                <Grid item xs={5}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Departure
+                                    </Typography>
+                                    <Typography fontWeight={600}>
+                                        {seg?.departureAirport} – {formatTime(seg?.departureTime)}
+                                    </Typography>
+                                    <Typography variant="body2">{departureAirportObj?.city}</Typography>
+                                </Grid>
 
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              Payment Mode
-            </Typography>
-            <Typography>{booking.payment.mode}</Typography>
-          </Grid>
+                                <Grid item xs={2} textAlign="center">
+                                    <FlightIcon color="action" />
+                                    <Typography variant="body2">{formatDuration(seg?.duration)}</Typography>
+                                </Grid>
 
-          <Grid item xs={6}>
-            <Typography variant="body2" color="text.secondary">
-              Transaction ID
-            </Typography>
-            <Typography>{booking.payment.txnId}</Typography>
-          </Grid>
+                                <Grid item xs={5}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Arrival
+                                    </Typography>
+                                    <Typography fontWeight={600}>
+                                        {seg?.arrivalAirport} – {formatTime(seg?.arrivalTime)}
+                                    </Typography>
+                                    <Typography variant="body2">{arrivalAirportObj?.city}</Typography>
+                                </Grid>
 
-          <Grid item xs={12}>
-            <Divider sx={{ my: 1 }} />
-            <Typography fontWeight={700}>
-              Total Paid: ₹{booking.payment.total}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
+                                <Grid item xs={12}>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Typography variant="body2" color="text.secondary">
+                                        Baggage Allowance
+                                    </Typography>
+                                    <Typography>
+                                        {seg?.baggage?.cabin} Cabin • {seg?.baggage?.checkin} Check-in
+                                    </Typography>
+                                </Grid>
+                            </Grid>
 
-      {/* ===================== CONTACT DETAILS ===================== */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-          Contact Details
-        </Typography>
-        <Typography>{booking.contact.name}</Typography>
-        <Typography>{booking.contact.email}</Typography>
-        <Typography>{booking.contact.phone}</Typography>
-      </Paper>
-    </Box>
-  );
+                        </Box>
+                    )
+                })}
+            </Paper>
+
+            {/* ===================== PASSENGERS & ADDONS ===================== */}
+            <Paper sx={{ p: 3, mt: 3 }}>
+                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+                    Passengers & Add-ons
+                </Typography>
+
+                {bookingDetails?.passengers?.map((p, i) => (
+                    <Box key={i} sx={{ mb: 1 }}>
+                        <Typography fontWeight={600}>
+                            {p?.firstName} {p?.lastName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Seat: {p?.seat || "Not assigned"} | Meal: {p?.meal || "Standard"}
+                        </Typography>
+                    </Box>
+                ))}
+            </Paper>
+
+            {/* ===================== PAYMENT SUMMARY ===================== */}
+            <Paper sx={{ p: 3, mt: 3 }}>
+                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+                    Payment Details
+                </Typography>
+
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                            Payment Mode
+                        </Typography>
+                        <Typography>{itineraryDetails?.gateway}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                            Transaction ID
+                        </Typography>
+                        <Typography>{itineraryDetails?.receipt}</Typography>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Divider sx={{ my: 1 }} />
+                        <Typography fontWeight={700}>
+                            Total Paid: ₹{itineraryDetails?.amount}
+                        </Typography>
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            {/* ===================== CONTACT DETAILS ===================== */}
+            <Paper sx={{ p: 3, mt: 3 }}>
+                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
+                    Contact Details
+                </Typography>
+                <Typography>{contact?.email}</Typography>
+                <Typography>{contact?.mobile}</Typography>
+            </Paper>
+        </Box>
+    );
 };
 
 export default ItineraryPage;

@@ -12,6 +12,8 @@ export const useBookingStore = create((set, get) => ({
   addons: [],
   seatMaps: [],
   searchEditing: false,
+  itineraryDetails: {},
+  destinationListDetails: {},
 
   setSearchEditing: (val) => set({ searchEditing: val }),
   setAddons: (addons) => set({ addons: addons }),

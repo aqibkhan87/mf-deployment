@@ -22,7 +22,7 @@ const EcommercePaymentSchema = new mongoose.Schema(
       enum: [
         "IN_PROGRESS",
         "AUTHORIZED",
-        "PAID",
+        "COMPLETED",
         "FAILED",
         "REFUND_INITIATED",
         "REFUNDED",

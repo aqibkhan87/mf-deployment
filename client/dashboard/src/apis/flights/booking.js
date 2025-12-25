@@ -59,3 +59,21 @@ export const searchFlights = async ({ from, to, date, promo }) => {
     }
   }
 };
+
+export const getDestinationList = async () => {
+  useLoaderStore.getState().setLoading(true);
+  try {
+    const response = await httpRequest("get", `/api/flights/search/list`);
+    if (response?.status) {
+      useBookingStore.setState((state) => ({
+        ...state,
+        destinationListDetails: response.data || {},
+      }));
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error while search Airports:", error);
+  } finally {
+    useLoaderStore.getState().setLoading(false);
+  }
+};

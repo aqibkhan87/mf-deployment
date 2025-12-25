@@ -159,4 +159,56 @@ apiRouter.get("/", async (req, res) => {
   }
 });
 
+apiRouter.get("/list", async (req, res) => {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const startDate = new Date(`${today}T00:00:00.000Z`);
+    const endDate = new Date(`${today}T23:59:59.999Z`);
+
+    // 1️⃣ Fetch all flights for today
+    const records = await FlightPrice.find({
+      date: { $gte: startDate, $lte: endDate }
+    }).lean();
+
+    if (!records || records.length === 0) {
+      return res.json({ flights: [], connectingAirports: [] });
+    }
+
+    const uniqueAirportCodes = new Set();
+
+    // 2️⃣ Build flights array with ONLY first fare
+    const flights = records.map((flight) => {
+      const firstFare = flight.fares?.[0];
+
+      // Collect airports from first fare only
+      firstFare?.segments?.forEach((seg) => {
+        if (seg.departureAirport) uniqueAirportCodes.add(seg.departureAirport);
+        if (seg.arrivalAirport) uniqueAirportCodes.add(seg.arrivalAirport);
+      });
+
+      return {
+        _id: flight._id,
+        origin: flight.origin,
+        destination: flight.destination,
+        date: flight.date,
+        fare: firstFare
+      };
+    });
+
+    // 3️⃣ Fetch unique connecting airports
+    const connectingAirports = await Airports.find({
+      iata: { $in: [...uniqueAirportCodes] }
+    }).lean();
+
+    return res.json({
+      flights,
+      connectingAirports,
+    });
+
+  } catch (err) {
+    console.error("Flight list error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export default apiRouter;

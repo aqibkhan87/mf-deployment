@@ -10,10 +10,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import { IconButton } from '@mui/material';
 import dayjs from "dayjs";
 import { useBookingStore } from "store/bookingStore";
-import { searchFlights } from "../apis/flights/booking";
-import BookingWidget from "./bookingWidget";
+import { searchFlights } from "../../apis/flights/booking";
+import BookingWidget from "../bookingwidget/bookingWidget";
 import "./flightSearch.scss"
-import { eventEmitter, formatTime } from "../utils/helper"
+import { eventEmitter, formatTime } from "../../utils/helper"
 
 export const getAllowedDates = (days = 10) => {
     const today = dayjs().startOf("day");

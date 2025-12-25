@@ -31,6 +31,7 @@ const cartSchema = new Schema(
         "CONFIRMED",
         "CANCELLED",
         "FAILED",
+        "COMPLETED"
       ],
       default: "IN_PROGRESS",
     },

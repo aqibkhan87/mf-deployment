@@ -1,0 +1,80 @@
+.destination-container {
+  width: 100%;
+  padding: 16px;
+
+  .swiper {
+    height: 100%;
+  }
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    box-shadow: 0 0.25rem 1.875rem 0 rgba(0, 0, 0, 0.5);
+    color: #009;
+    width: 2rem;
+    align-items: center;
+    background: hsla(0, 0%, 100%, 0.5);
+    border-radius: 50%;
+    display: flex;
+    font-size: 1rem;
+    font-weight: 800;
+    height: 2rem;
+    justify-content: center;
+    opacity: 0.75;
+    padding: 0.75rem;
+  }
+}
+
+/* GRID */
+.grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ROWS */
+.row {
+  display: grid;
+  gap: 16px;
+}
+
+.row-1 {
+  grid-template-columns: 29% 39% 29%;
+}
+
+.row-2 {
+  grid-template-columns: 32% 33% 32%;
+}
+
+/* CARD */
+.destination-card {
+  position: relative;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.destination-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.destination-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  color: #fff;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.overlay span {
+  font-size: 14px;
+}
+
+.overlay p {
+  display: inline;
+  font-weight: 600;
+  margin-left: 4px;
+}

@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useProductStore } from "store/productStore";
 import { getAllProductsCategoryies } from "../../apis/products.js";
-import BookingWidget from "../../booking/bookingWidget";
+import BookingWidget from "../../booking/bookingwidget/bookingWidget";
 import "./dashboard.scss";
 import bannerImage from "../../assets/images/booking-banner.png";
 

@@ -110,7 +110,7 @@ apiRouter.post("/verify-payment", async (req, res) => {
       razorpay_signature,
     });
 
-    res.json({ success: true });
+    res.json({ success: true, orderId: razorpay_order_id, status: "COMPLETED" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -122,7 +122,7 @@ async function markSuccess(type, id, payment) {
     await EcommercePayment.findOneAndUpdate(
       { razorpay_order_id: payment.razorpay_order_id },
       {
-        status: "PAID",
+        status: "COMPLETED",
         razorpay_payment_id: payment.razorpay_payment_id,
         razorpay_signature: payment.razorpay_signature,
         paidAt: new Date(),
@@ -133,7 +133,7 @@ async function markSuccess(type, id, payment) {
         _id: id,
       },
       {
-        cartStatus: "CONFIRMED",
+        cartStatus: "COMPLETED",
       }
     );
   }
@@ -145,7 +145,7 @@ async function markSuccess(type, id, payment) {
         razorpay_order_id: payment.razorpay_order_id,
       },
       {
-        status: "PAID",
+        status: "COMPLETED",
         razorpay_payment_id: payment.razorpay_payment_id,
         razorpay_signature: payment.razorpay_signature,
         paidAt: new Date(),
@@ -157,7 +157,7 @@ async function markSuccess(type, id, payment) {
         _id: id,
       },
       {
-        bookingStatus: "CONFIRMED",
+        bookingStatus: "COMPLETED",
       }
     );
   }

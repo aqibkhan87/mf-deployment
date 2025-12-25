@@ -16,13 +16,13 @@ import {
 } from "@mui/material";
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import dayjs from "dayjs";
-import { fetchAirports, searchAirports } from "./../apis/flights/booking";
-import { debounce, numberStyle } from "../utils/helper";
-import AirportSelector from "./bookingwidget/airportSelector";
-import DateSelector from "./bookingwidget/dateSelector";
+import { fetchAirports, searchAirports } from "../../apis/flights/booking";
+import { debounce, numberStyle } from "../../utils/helper";
+import AirportSelector from "./airportSelector";
+import DateSelector from "./dateSelector";
 import "./bookingWidget.scss";
 import { useBookingStore } from "store/bookingStore";
-import { eventEmitter } from "../utils/helper";
+import { eventEmitter } from "../../utils/helper";
 
 const PillSelector = ({ values, selected, onSelect }) => (
   <Stack direction="row" spacing={1}>

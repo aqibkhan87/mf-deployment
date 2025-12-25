@@ -42,3 +42,9 @@ export const formatTime = (iso) =>
 
 export const formatDate = (iso) =>
   new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+export const formatDuration = (duration) => {
+    const hrs = duration.match(/(\d+)H/);
+    const mins = duration.match(/(\d+)M/);
+    return `${hrs ? hrs[1] + "h " : ""}${mins ? mins[1] + "m" : ""}`.trim();
+};
