@@ -9,6 +9,12 @@ import http from "http";
 import cors from "cors";
 import Redis from "ioredis";
 import jwt from "jsonwebtoken";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Fix __dirname in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import typeDefs from "./src/grapghql/schemas/index.js";
 import resolvers from "./src/grapghql/resolvers/index.js";
@@ -83,6 +89,9 @@ app.use(cors(corsOptions), express.json());
 app.options(/.*/, cors(corsOptions));
 
 app.use("/api", apiRouter);
+
+// Serve static files from "public" folder
+app.use(express.static(path.join(__dirname, "public")));
 
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 console.log("🚀 Server ready at http://localhost:4000");

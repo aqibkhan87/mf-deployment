@@ -255,7 +255,7 @@ function FlightResults() {
                                                 <p className="text-xl font-bold">
                                                     {formatTime(segment?.departureTime)}
                                                     <span className="pl-2 text-xs">
-                                                        {departureAirportObj?.iata}, T{segment?.departureTerminal}
+                                                        {departureAirportObj?.iata} {segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""} 
                                                     </span>
                                                 </p>
                                                 <p className="text-gray-500  text-xs">
@@ -272,7 +272,7 @@ function FlightResults() {
                                                 <p className="text-xl font-bold">
                                                     {formatTime(segment?.arrivalTime)}
                                                     <span className="pl-2 text-xs">
-                                                        {arrivalAirportObj?.iata}, T{segment?.arrivalTerminal}
+                                                        {arrivalAirportObj?.iata} {segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""} 
                                                     </span>
                                                 </p>
                                                 <p className="text-gray-500 text-xs">

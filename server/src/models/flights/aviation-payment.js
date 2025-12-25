@@ -37,4 +37,6 @@ const AviationPaymentSchema = new mongoose.Schema(
   { collection: "AviationPayment" }
 );
 
-export default mongoose.model("AviationPayment", AviationPaymentSchema);
+const AviationPaymentModel = mongoose.model("AviationPayment", AviationPaymentSchema);
+
+export default AviationPaymentModel;

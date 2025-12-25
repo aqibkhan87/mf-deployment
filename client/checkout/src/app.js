@@ -7,6 +7,7 @@ import CheckoutPage from "./components/ecommerce/eCommerceCheckoutPage";
 import PassengerEditPage from "./components/flights/passengerEditPage";
 import AddonsPage from "./components/flights/addons";
 import SeatSelection from "./components/flights/seatSelection";
+import Itinerary from "./components/flights/itinerary";
 
 const App = ({ history }) => {
   
@@ -20,6 +21,7 @@ const App = ({ history }) => {
         <Route exact path="/passenger-edit" component={PassengerEditPage} />
         <Route exact path="/addons" component={AddonsPage} />
         <Route exact path="/seat-selection" component={SeatSelection} />
+        <Route exact path="/itinerary" component={Itinerary} />
       </Switch>
     </Router>
   );

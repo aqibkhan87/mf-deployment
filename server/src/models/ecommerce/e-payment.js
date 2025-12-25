@@ -41,4 +41,6 @@ const EcommercePaymentSchema = new mongoose.Schema(
   { collection: "EcommercePayment" }
 );
 
-export default mongoose.model("EcommercePayment", EcommercePaymentSchema);
+const EcommercePaymentModel = mongoose.model("EcommercePayment", EcommercePaymentSchema);
+
+export default EcommercePaymentModel;

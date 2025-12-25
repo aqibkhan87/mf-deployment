@@ -40,19 +40,18 @@ const SeatPreview = ({ seatId, status, seatTypeWithPrice, passengerName }) => {
                     {seatTypeWithPrice.cabin === "ECONOMY" ? "Economy" : "Business"}
                 </Typography>
             </Box>
-            {seatTypeWithPrice.cabin === "ECONOMY" && <img src={EconomySeat} height={100} width={150} />}
-            {seatTypeWithPrice.cabin === "BUSINESS" && <img src={BusinessSeat} height={100} width={150} />}
+            {seatTypeWithPrice.cabin === "ECONOMY" && <img src={EconomySeat} height={100} width={150} className="rounded-2xl"/>}
+            {seatTypeWithPrice.cabin === "BUSINESS" && <img src={BusinessSeat} height={100} width={150} className="rounded-2xl"/>}
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1, mt: 2 }}>
                 {status == "selected" && (
                     <Typography fontSize={12}>
                         {passengerName}
                     </Typography>
                 )}
-                <Typography fontSize={13}>
+                <Typography fontSize={13} fontWeight={600}>
                     ₹{seatTypeWithPrice?.price}
                 </Typography>
-
             </Box>
         </Box>
     );

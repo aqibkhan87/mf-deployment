@@ -23,9 +23,20 @@ const cartSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    cartStatus: {
+      type: String,
+      enum: [
+        "IN_PROGRESS",
+        "PENDING_PAYMENT",
+        "CONFIRMED",
+        "CANCELLED",
+        "FAILED",
+      ],
+      default: "IN_PROGRESS",
+    },
   },
   {
-    collection: "cart", 
+    collection: "cart",
   }
 );
 

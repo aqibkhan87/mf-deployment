@@ -63,7 +63,7 @@ apiRouter.post("/create", async (req, res) => {
         amount,
         bookingId: booking?._id,
         razorpay_order_id: order.id,
-        receipt: order?.receipt
+        receipt: order?.receipt,
       });
 
       await payment.save();
@@ -128,6 +128,14 @@ async function markSuccess(type, id, payment) {
         paidAt: new Date(),
       }
     );
+    await CartModel.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        cartStatus: "CONFIRMED",
+      }
+    );
   }
 
   if (type === "FLIGHT") {
@@ -141,7 +149,15 @@ async function markSuccess(type, id, payment) {
         razorpay_payment_id: payment.razorpay_payment_id,
         razorpay_signature: payment.razorpay_signature,
         paidAt: new Date(),
-        PNR: PNR
+        PNR: PNR,
+      }
+    );
+    await BookingModel.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        bookingStatus: "CONFIRMED",
       }
     );
   }

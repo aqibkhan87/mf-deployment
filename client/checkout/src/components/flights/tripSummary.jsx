@@ -59,7 +59,7 @@ const TripSummary = ({ priceBreakdown }) => {
                         alignItems: 'center',
                         p: 2
                     }}>
-                        <Typography>Flight Details</Typography>
+                        <Typography>Flight Summary</Typography>
                     </Box>
                     <Box p={1} m={1}>
 

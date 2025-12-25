@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Box, Typography, Grid, Chip, Link, Button, Paper } from "@mui/material";
+import { useHistory } from "react-router-dom"
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ExitGap from "../../common/flights/seatSelection/exitGap";
 import SeatBlock from "../../common/flights/seatSelection/seatBlock";
@@ -28,6 +29,7 @@ const LegendItem = ({ color, label }) => (
 
 function SeatSelection() {
     const itineraryKey = useRef(null);
+    const history = useHistory();
     const { bookingDetails, seatMaps } = useBookingStore();
     const [seatStatusBySegment, setSeatStatusBySegment] = useState({});
     const [flightPassengers, setFlightPassengers] = useState([]);
@@ -38,8 +40,6 @@ function SeatSelection() {
     const ECONONMY_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout.cabin === "ECONOMY") || {};
     const BUSINESS_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout.cabin === "BUSINESS") || {};
     const segments = bookingDetails?.flightDetail?.segments || [];
-    const sourceAirport = bookingDetails?.sourceAirport;
-    const destinationAirport = bookingDetails?.destinationAirport;
 
     const flightKey = activeSeatMap?.flightInstanceKey;
     const seatStatusMap = seatStatusBySegment?.[flightKey] || {};
@@ -238,7 +238,7 @@ function SeatSelection() {
                     });
 
                     if (verify?.success) {
-                        navigate("/dashbaord");
+                        history.push("/itinerary");
                     }
                 } catch(err) {
                     alert("Payment verification failed");
@@ -297,7 +297,7 @@ function SeatSelection() {
                             {sourceAirport?.city} to {destinationAirport?.city}
                         </Typography>
                     </Paper> */}
-                    <Box display="flex" gap={2} mb={2} sx={{ py: 2 }}>
+                    <Box display="flex" gap={2} mb={2} sx={{ mt: 4, py: 2 }}>
                         {seatMaps?.map((seg, idx) => {
                             const segment = segments[idx]
                             return (
@@ -328,7 +328,8 @@ function SeatSelection() {
                                     borderRadius: "10px",
                                     padding: 1,
                                     color: "#000",
-                                    width: 200
+                                    width: 200,
+                                    minHeight: 100
                                 }}
                                     onClick={() => setActivePassengerIndex(index)}
                                 >

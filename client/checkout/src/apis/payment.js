@@ -9,12 +9,16 @@ export const createOrder = async (payload) => {
 };
 
 export const verifyPayment = async (payload) => {
-  const response = await httpRequest(
-    "post",
-    `/api/payment/verify-payment`,
-    payload
-  );
-  if (response?.data && response?.status === 200) {
-    return response.data;
+  try {
+    const response = await httpRequest(
+      "post",
+      `/api/payment/verify-payment`,
+      payload
+    );
+    if (response?.data && response?.status === 200) {
+      return response.data;
+    }
+  } catch(err) {
+    console.log("error in verify Payment", err);
   }
 };

@@ -211,47 +211,48 @@ function PassengerDetailsPage() {
               </Card>
             );
           })}
-          <Card sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h6" mb={2}>
-                Contact Details
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Email"
-                    type="email"
-                    fullWidth
-                    required
-                    value={contact.email}
-                    onChange={(e) => handleContactChange("email", e.target.value)}
-                    error={contact.email && !isEmailValid(contact.email)}
-                    helperText={
-                      contact.email && !isEmailValid(contact.email)
-                        ? "Invalid email"
-                        : ""
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="Mobile Number"
-                    type="tel"
-                    fullWidth
-                    required
-                    value={contact.mobile}
-                    onChange={(e) => handleContactChange("mobile", e.target.value)}
-                    error={contact.mobile && !isMobileValid(contact.mobile)}
-                    helperText={
-                      contact.mobile && !isMobileValid(contact.mobile)
-                        ? "Enter 10-digit mobile number"
-                        : ""
-                    }
-                  />
-                </Grid>
+          <Grid sx={{ mt: 6 }}>
+            <Typography variant="h6" mb={2}>
+              Contact Details
+            </Typography>
+            <Typography sx={{ mb: 2}}>
+              Booking Confirmation will be sent to this contact
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  required
+                  value={contact.email}
+                  onChange={(e) => handleContactChange("email", e.target.value)}
+                  error={contact.email && !isEmailValid(contact.email)}
+                  helperText={
+                    contact.email && !isEmailValid(contact.email)
+                      ? "Invalid email"
+                      : ""
+                  }
+                />
               </Grid>
-            </CardContent>
-          </Card>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Mobile Number"
+                  type="tel"
+                  fullWidth
+                  required
+                  value={contact.mobile}
+                  onChange={(e) => handleContactChange("mobile", e.target.value)}
+                  error={contact.mobile && !isMobileValid(contact.mobile)}
+                  helperText={
+                    contact.mobile && !isMobileValid(contact.mobile)
+                      ? "Enter 10-digit mobile number"
+                      : ""
+                  }
+                />
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
 
         {/* RIGHT */}
