@@ -16,7 +16,7 @@ import {
     TimelineDot
 } from "@mui/lab";
 import { useBookingStore } from "store/bookingStore";
-import { formatDate, formatTime } from "../../utils/helper";
+import { formatDate, formatTime, getTimeDifference } from "../../utils/helper";
 
 const TripSummary = ({ priceBreakdown }) => {
     const { selectedFlight, bookingDetails } = useBookingStore();
@@ -72,6 +72,7 @@ const TripSummary = ({ priceBreakdown }) => {
                             {segments?.map((seg, i) => {
                                 const departureAirportObj = connectingAirports?.find(a => a?.iata === seg?.departureAirport);
                                 const arrivalAirportObj = connectingAirports?.find(a => a?.iata === seg?.arrivalAirport);
+                                const arrivalTime = segments?.length > 1 ? segments[i - 1]?.arrivalTime : ""
                                 return (
                                     <Timeline
                                         key={i}
@@ -90,6 +91,19 @@ const TripSummary = ({ priceBreakdown }) => {
                                             },
                                         }}
                                     >
+                                        {arrivalTime && <TimelineItem>
+                                            <TimelineSeparator>
+                                                <TimelineDot variant="outlined" color={i == 0 ? "secondary" : "grey"} />
+                                                <TimelineConnector />
+                                            </TimelineSeparator>
+                                            <TimelineContent>
+                                                <Box className="flex">
+                                                    <Typography sx={{ px: 2, py: 1, bgcolor: "#d0e5ff", borderRadius: 20, fontSize: 14 }}>
+                                                        Layover at {departureAirportObj?.city} {getTimeDifference(seg?.departureTime, arrivalTime)}
+                                                    </Typography>
+                                                </Box>
+                                            </TimelineContent>
+                                        </TimelineItem>}
                                         <TimelineItem>
                                             <TimelineSeparator>
                                                 <TimelineDot variant="outlined" color={i == 0 ? "secondary" : "grey"} />

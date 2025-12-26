@@ -74,7 +74,7 @@ function PassengerDetailsPage() {
 
   const toggleCard = (idx) => {
     setPassengers((prev) =>
-      prev.map((p, i) => ({ ...p, open: i === idx ? !p.open : p.open }))
+      prev.map((p, i) => ({ ...p, open: i === idx ? true : false }))
     );
   };
 

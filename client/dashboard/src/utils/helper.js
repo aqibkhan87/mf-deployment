@@ -50,7 +50,6 @@ export const formatDuration = (duration) => {
 };
 
 export const getTimeDifference = (smallerDate, largerDate) => {
-  console.log("smallerDate, largerDate", smallerDate, largerDate)
   const start = new Date(smallerDate);
   const end = new Date(largerDate);
 

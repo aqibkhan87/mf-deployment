@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import fetchTodayFlights from "../services/amadeus.js";
-import { deleteAllFlightData, deleteAllSeatMapData, deleteYesterdayFlightData, deleteYesterdaySeatMapData } from "./deleteFlightData.js";
+import { deleteYesterdayFlightData, deleteYesterdaySeatMapData } from "./deleteFlightData.js";
 
 cron.schedule(
   "0 6 * * *",
