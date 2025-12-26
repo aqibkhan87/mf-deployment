@@ -22,6 +22,7 @@ import connectDB from "./db.js";
 import apiRouter from "./src/apiRouter.js";
 import "./src/cron/updateFlightData.js";
 import { createSeatMapsForFlight } from "./src/utils/flightSeatMap/importSeatMap.js";
+import { findAllUniqueAircraftCode } from "./src/utils/flightSeatMap/findUniqueAircraftCode.js";
 
 const redis = new Redis({ host: "localhost", port: 6379 });
 const app = express();
@@ -96,3 +97,4 @@ app.use(express.static(path.join(__dirname, "public")));
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 console.log("🚀 Server ready at http://localhost:4000");
 connectDB();
+// findAllUniqueAircraftCode();

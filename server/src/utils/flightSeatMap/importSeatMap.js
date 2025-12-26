@@ -4,13 +4,13 @@ import SeatMapModel from "../../models/flights/seatMap.js";
 
 const getAircraftLayout = (aircraftCode) => {
   // Find family for this code
-  const familyCode = AIRCRAFT_FAMILY_MAP[aircraftCode] || aircraftCode;
+  const familyCode = AIRCRAFT_FAMILY_MAP[aircraftCode] || "A320";
   // Return layout from aircraft data
   return AIRCRAFT_DATA.find((a) => a.code === familyCode);
 };
 
 const createSeatMapForSegment = (segment) => {
-  const layout = getAircraftLayout(segment.aircraftCode);
+  const layout = getAircraftLayout(segment?.aircraftCode);
   if (!layout) return null; // fallback if layout not found
 
   const seatStatus = {};

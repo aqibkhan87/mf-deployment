@@ -173,4 +173,150 @@ export const AIRCRAFT_DATA = [
       },
     ],
   },
+  {
+    code: "A340",
+    family: "Airbus A340",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 38,
+        columns: ["A", "B", "C", "D", "E", "F", "G", "H", "J"],
+        seatPricing: {
+          window: 1200,
+          aisle: 1100,
+          middle: 1000,
+          extraLegroom: 1800,
+        },
+      },
+      {
+        cabin: "BUSINESS",
+        rows: 10,
+        columns: ["A", "C", "D", "F", "G", "J"],
+        seatPricing: {
+          window: 3600,
+          aisle: 3300,
+          middle: 0,
+          extraLegroom: 4200,
+        },
+      },
+    ],
+  },
+  {
+    code: "A350",
+    family: "Airbus A350",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 40,
+        columns: ["A", "B", "C", "D", "E", "F", "G", "H", "J"],
+        seatPricing: {
+          window: 1300,
+          aisle: 1200,
+          middle: 1100,
+          extraLegroom: 1900,
+        },
+      },
+      {
+        cabin: "BUSINESS",
+        rows: 12,
+        columns: ["A", "C", "D", "F", "G", "J"],
+        seatPricing: {
+          window: 3800,
+          aisle: 3500,
+          middle: 0,
+          extraLegroom: 4500,
+        },
+      },
+    ],
+  },
+  {
+    code: "A380",
+    family: "Airbus A380",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 50,
+        columns: ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"],
+        seatPricing: {
+          window: 1400,
+          aisle: 1300,
+          middle: 1200,
+          extraLegroom: 2000,
+        },
+      },
+      {
+        cabin: "BUSINESS",
+        rows: 15,
+        columns: ["A", "C", "D", "F", "G", "J", "K"],
+        seatPricing: {
+          window: 4200,
+          aisle: 3900,
+          middle: 0,
+          extraLegroom: 4800,
+        },
+      },
+    ],
+  },
+  {
+    code: "B747",
+    family: "Boeing 747",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 45,
+        columns: ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"],
+        seatPricing: {
+          window: 1350,
+          aisle: 1250,
+          middle: 1150,
+          extraLegroom: 1950,
+        },
+      },
+      {
+        cabin: "BUSINESS",
+        rows: 12,
+        columns: ["A", "C", "D", "F", "G", "J"],
+        seatPricing: {
+          window: 4000,
+          aisle: 3700,
+          middle: 0,
+          extraLegroom: 4600,
+        },
+      },
+    ],
+  },
+  {
+    code: "E-JET",
+    family: "Embraer E-Jet",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 22,
+        columns: ["A", "B", "C", "D"],
+        seatPricing: {
+          window: 700,
+          aisle: 650,
+          middle: 0,
+          extraLegroom: 1000,
+        },
+      },
+    ],
+  },
+  {
+    code: "ATR42",
+    family: "ATR 42",
+    cabins: [
+      {
+        cabin: "ECONOMY",
+        rows: 18,
+        columns: ["A", "B", "C", "D"],
+        seatPricing: {
+          window: 450,
+          aisle: 400,
+          middle: 0,
+          extraLegroom: 750,
+        },
+      },
+    ],
+  },
 ];
