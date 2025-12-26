@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -24,8 +25,8 @@ const DestinationSwiper = () => {
     <div className="destination-container">
       <Swiper
         navigation={true}
-        modules={[Navigation]} 
-        spaceBetween={20} 
+        modules={[Navigation]}
+        spaceBetween={20}
         slidesPerView={1}>
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
@@ -60,12 +61,25 @@ const DestinationSwiper = () => {
 
 const DestinationCard = ({ item }) => {
   const { destinationListDetails } = useBookingStore();
+  const history = useHistory();
   const connectingAirports = destinationListDetails?.connectingAirports;
   const sourceAirport = connectingAirports?.find(airport => airport?.iata === item?.origin)
   const destinationAirport = connectingAirports?.find(airport => airport?.iata === item?.destination)
-  console.log("connectingAirportsconnectingAirports", item, sourceAirport, destinationAirport)
+
+  const handleNavigation = (sourceAirport, destinationAirport) => {
+    const payload = {
+      from: sourceAirport.iata, to: destinationAirport.iata, date: new Date().toISOString().split("T")[0],
+      passengers: { adult: 1, infant: 0 }
+    }
+    localStorage.setItem("search-info", JSON.stringify(payload))
+    history.push(`/flight-search`);
+  }
+
   return (
-    <div className="destination-card" key={`${sourceAirport?.iata}-${destinationAirport?.iata}`} >
+    <div
+      className="destination-card"
+      key={`${sourceAirport?.iata}-${destinationAirport?.iata}`}
+      onClick={() => handleNavigation(sourceAirport, destinationAirport)}>
       <img src={`${process.env.API_BASE_URL}/images/${item?.destination}.png`} alt={item?.city} />
       <div className="overlay">
         <span>{sourceAirport?.city} - {destinationAirport?.city}</span>

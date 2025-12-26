@@ -42,3 +42,24 @@ export const formatTime = (iso) =>
 
 export const formatDate = (iso) =>
   new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+export const formatDuration = (duration) => {
+    const hrs = duration?.match(/(\d+)H/);
+    const mins = duration?.match(/(\d+)M/);
+    return `${hrs ? hrs[1] + "h " : ""}${mins ? mins[1] + "m" : ""}`.trim();
+};
+
+export const getTimeDifference = (smallerDate, largerDate) => {
+  console.log("smallerDate, largerDate", smallerDate, largerDate)
+  const start = new Date(smallerDate);
+  const end = new Date(largerDate);
+
+  const diffMs = Math.abs(end - start); // in milliseconds
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  console.log(hours, "minutes", minutes)
+
+  return `${hours ? `${hours}h` : ""} ${minutes ? `${minutes}m` : ""}`;
+}

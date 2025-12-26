@@ -179,6 +179,8 @@ apiRouter.get("/list", async (req, res) => {
     // 2️⃣ Build flights array with ONLY first fare
     const flights = records.map((flight) => {
       const firstFare = flight.fares?.[0];
+      if (flight.origin) uniqueAirportCodes.add(flight.origin);
+      if (flight.destination) uniqueAirportCodes.add(flight.destination);
 
       // Collect airports from first fare only
       firstFare?.segments?.forEach((seg) => {
