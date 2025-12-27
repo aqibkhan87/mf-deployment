@@ -24,18 +24,22 @@ const TripSummary = ({ priceBreakdown }) => {
     let connectingAirports = [];
     let date = "";
     let duration = "";
+    let travelerPricing = {};
 
     if (selectedFlight?.fare?.segments?.length) {
         segments = selectedFlight?.fare?.segments;
         connectingAirports = selectedFlight?.connectingAirports;
         date = selectedFlight?.date
         duration = selectedFlight?.fare?.duration
+        travelerPricing = selectedFlight?.fare?.travelerPricing?.[0]
     } else {
         segments = bookingDetails?.flightDetail?.segments;
         connectingAirports = bookingDetails?.connectingAirports;
         date = bookingDetails?.date
         duration = bookingDetails?.flightDetail?.duration
+        travelerPricing = bookingDetails?.flightDetail?.travelerPricing?.[0]
     }
+    
     const segment = segments?.[0];
     const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
     const { passengers: paxObj } = searchInfo;
@@ -157,9 +161,22 @@ const TripSummary = ({ priceBreakdown }) => {
                 </Box>
 
                 <Box >
+                    <Box>
+                        <Typography color="text.secondary" fontSize={13}>
+                            {formatDate(date)} | {duration}
+                        </Typography>
+                    </Box>
                     <Typography variant="caption" color="text.secondary">
-                        {formatDate(date)} | {duration}
+                        {travelerPricing?.includedCabinBags?.weight ?
+                            `Hand: Up to ${travelerPricing?.includedCabinBags?.weight}${travelerPricing?.includedCabinBags?.weightUnit}`
+                            : ``}
                     </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        {travelerPricing?.includedCheckedBags?.weight ?
+                            ` | Check-in: ${travelerPricing?.includedCheckedBags?.weight}${travelerPricing?.includedCheckedBags?.weightUnit}`
+                            : ``}
+                    </Typography>
+
                 </Box>
 
 

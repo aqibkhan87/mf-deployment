@@ -207,11 +207,12 @@ router.put("/update-seats-in-booking", async (req, res) => {
     priceBreakdown.seatsPrice = 0;
 
     passengers.forEach((p) => {
-      // Calculate seat price
-      const [key, value] = Object.entries(p?.seats);
-      if (p?.seats?.[key?.[0]]) {
-        const seatPrice = value?.[1]?.price || 0;
-        priceBreakdown.seatsPrice += seatPrice;
+      for (let [key, value] of Object.entries(p?.seats)) {
+        if (p?.seats?.[key]) {
+          // Calculate seat price
+          const seatPrice = value?.price || 0;
+          priceBreakdown.seatsPrice += Number(seatPrice);
+        }
       }
     });
 
@@ -223,7 +224,7 @@ router.put("/update-seats-in-booking", async (req, res) => {
     priceBreakdown.finalPrice = Math.round(finalPrice);
 
     // 4️⃣ Return updated booking
-    const updatedBooking = await BookingModel.findByIdAndUpdate(
+    await BookingModel.findByIdAndUpdate(
       { _id: bookingId },
       { passengers: passengers, priceBreakdown: priceBreakdown },
       { new: true }

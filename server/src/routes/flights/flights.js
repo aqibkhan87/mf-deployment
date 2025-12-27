@@ -47,6 +47,17 @@ apiRouter.get("/", async (req, res) => {
         if (seg.arrivalAirport) segmentCodes.add(seg.arrivalAirport);
         if (seg.departureAirport) segmentCodes.add(seg.departureAirport);
       });
+      const travelerPricings = fare?.travelerPricings?.flatMap((travelerPrice) => {
+        return travelerPrice?.fareDetailsBySegment?.map(
+          (fareDetailsBySegment) => {
+            return {
+              includedCheckedBags: fareDetailsBySegment?.includedCheckedBags,
+              includedCabinBags: fareDetailsBySegment?.includedCabinBags,
+              cabin: fareDetailsBySegment?.cabin,
+            };
+          }
+        );
+      });
 
       // Fetch all connecting airports from DB
       const connectingAirports = await Airports.find({
@@ -71,6 +82,7 @@ apiRouter.get("/", async (req, res) => {
             currency: fare.currency,
             duration: parseDurationToMinutes(fare.duration),
             segments: fare.segments,
+            travelerPricing: travelerPricings,
           },
           connectingAirports: connectingAirports || [],
         },
@@ -109,6 +121,17 @@ apiRouter.get("/", async (req, res) => {
         code: f.validatingAirline,
         logo: "https://via.placeholder.com/48?text=?",
       };
+      const travelerPricings = f?.travelerPricings?.flatMap((travelerPrice) => {
+        return travelerPrice?.fareDetailsBySegment?.map(
+          (fareDetailsBySegment) => {
+            return {
+              includedCheckedBags: fareDetailsBySegment?.includedCheckedBags,
+              includedCabinBags: fareDetailsBySegment?.includedCabinBags,
+              cabin: fareDetailsBySegment?.cabin,
+            };
+          }
+        );
+      });
 
       return {
         providerOfferId: f.providerOfferId,
@@ -122,6 +145,7 @@ apiRouter.get("/", async (req, res) => {
         currency: f.currency,
         duration: f.duration,
         segments: f.segments,
+        travelerPricings: travelerPricings,
       };
     });
 
@@ -167,7 +191,7 @@ apiRouter.get("/list", async (req, res) => {
 
     // 1️⃣ Fetch all flights for today
     const records = await FlightPrice.find({
-      date: { $gte: startDate, $lte: endDate }
+      date: { $gte: startDate, $lte: endDate },
     }).lean();
 
     if (!records || records.length === 0) {
@@ -193,20 +217,19 @@ apiRouter.get("/list", async (req, res) => {
         origin: flight.origin,
         destination: flight.destination,
         date: flight.date,
-        fare: firstFare
+        fare: firstFare,
       };
     });
 
     // 3️⃣ Fetch unique connecting airports
     const connectingAirports = await Airports.find({
-      iata: { $in: [...uniqueAirportCodes] }
+      iata: { $in: [...uniqueAirportCodes] },
     }).lean();
 
     return res.json({
       flights,
       connectingAirports,
     });
-
   } catch (err) {
     console.error("Flight list error:", err);
     res.status(500).json({ message: "Internal server error" });

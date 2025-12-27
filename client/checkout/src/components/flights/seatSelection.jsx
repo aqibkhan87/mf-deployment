@@ -46,10 +46,25 @@ function SeatSelection() {
 
     useEffect(() => {
         if (!activeSeatMap) return;
+        let updatedSeatStatus = {
+            BUSINESS: {
+                ...activeSeatMap.seatStatus.BUSINESS
+            },
+            ECONOMY: {
+                ...activeSeatMap.seatStatus.ECONOMY
+            }
+        };
+        flightPassengers.forEach((passenger) => {
+            const seatNumber = passenger?.seats?.[flightKey]?.seatNumber;
+            const cabin = passenger?.seats?.[flightKey]?.cabin;
+            if (seatNumber) {
+                updatedSeatStatus[cabin][seatNumber] = "selected";
+            }
+        });
         setSeatStatusBySegment(prev => ({
             ...prev,
             [activeSeatMap.flightInstanceKey]:
-                prev[activeSeatMap.flightInstanceKey] || activeSeatMap.seatStatus
+                prev[activeSeatMap.flightInstanceKey] || updatedSeatStatus
         }));
     }, [activeSeatMap]);
 
@@ -58,6 +73,18 @@ function SeatSelection() {
             fetchSeatMaps();
             if (bookingDetails?.passengers) {
                 setFlightPassengers(bookingDetails?.passengers || [])
+                if (bookingDetails?.passengers?.length) {
+                    let seatPrices = 0;
+                    bookingDetails.passengers.forEach((p) => {
+                        for (let [key, value] of Object.entries(p?.seats)) {
+                            if (p?.seats?.[key]) {
+                                const seatPrice = value?.price || 0;
+                                seatPrices += Number(seatPrice);
+                            }
+                        }
+                    });
+                    setSeatPricing(seatPrices);
+                }
             };
         }
     }, [bookingDetails])
@@ -205,8 +232,6 @@ function SeatSelection() {
         if (response?.success) {
             proceedToPayment();
         }
-
-        // history.push("/flight/checkout");
     }
 
     const proceedToPayment = async () => {
@@ -239,6 +264,9 @@ function SeatSelection() {
                     const { orderId, status, PNR } = response;
 
                     if (response?.success) {
+                        localStorage.setItem("bookingId", "");
+                        localStorage.setItem("search-info", "{}");
+                        sessionStorage.setItem("selectedFlight", "{}");
                         history.push(`/itinerary?orderId=${orderId}&status=${status}&PNR=${PNR}`);
                     }
                 } catch (err) {
@@ -415,7 +443,7 @@ function SeatSelection() {
                                     backgroundColor: "#eef7ff",
                                 }}
                             >
-                                <Box display="flex" sx={{ paddingTop: 1, paddingBottom: 1,}}>
+                                <Box display="flex" sx={{ paddingTop: 1, paddingBottom: 1, }}>
                                     <SeatBlock
                                         layout={BUSINESS_SEAT_MAP}
                                         seatState={seatStatusMap["BUSINESS"]}

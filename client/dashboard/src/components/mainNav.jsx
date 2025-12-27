@@ -82,7 +82,7 @@ const MainNav = () => {
           </Link>
         </Box>
         <Box>
-          <Link to="/check-in" className="p-2">
+          <Link to="/check-in" className="p-2 text-black">
             Check-in
           </Link>
           <Link to="/cart/view" className="p-2">

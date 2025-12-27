@@ -13,63 +13,6 @@ import { useBookingStore } from "store/bookingStore";
 import { getItineraryDetails } from "../../apis/flights/itinerary";
 import { formatDate, formatTime, formatDuration } from "../../utils/helper";
 
-const booking = {
-    bannerImage: "/images/flight-banner.jpg",
-    pnr: "AB3X9Q",
-    email: "user@email.com",
-
-    segments: [
-        {
-            airline: "IndiGo",
-            flightNumber: "6E-203",
-            from: { city: "Delhi", iata: "DEL" },
-            to: { city: "Mumbai", iata: "BOM" },
-            departureTime: "08:00",
-            arrivalTime: "10:05",
-            date: "25 Dec 2025",
-            duration: "2h 05m",
-            baggage: {
-                cabin: "7 Kg",
-                checkin: "15 Kg",
-            },
-        },
-        {
-            airline: "IndiGo",
-            flightNumber: "6E-412",
-            from: { city: "Mumbai", iata: "BOM" },
-            to: { city: "Bengaluru", iata: "BLR" },
-            departureTime: "11:30",
-            arrivalTime: "13:00",
-            date: "25 Dec 2025",
-            duration: "1h 30m",
-            baggage: {
-                cabin: "7 Kg",
-                checkin: "15 Kg",
-            },
-        },
-    ],
-
-    passengers: [
-        {
-            title: "Mr",
-            name: "Rahul Sharma",
-            seat: "12A",
-            meal: "Veg",
-        },
-    ],
-
-    payment: {
-        mode: "Razorpay",
-        txnId: "TXN982734",
-        total: 8450,
-    },
-
-    contact: {
-        name: "Rahul Sharma",
-        email: "rahul@email.com",
-        phone: "+91 9876543210",
-    },
-};
 
 const ItineraryPage = () => {
     const { itineraryDetails } = useBookingStore();
@@ -78,14 +21,13 @@ const ItineraryPage = () => {
     const status = params.get("status");
     const orderId = params.get("orderId");
     const bookingDetails = itineraryDetails?.bookingDetails;
+    const priceBreakdown = itineraryDetails?.bookingDetails?.priceBreakdown;
     const contact = bookingDetails?.contact;
     const segments = bookingDetails?.flightDetail?.segments;
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
     const connectingAirports = bookingDetails?.connectingAirports;
-
-    const firstSegment = booking.segments[0];
-    const lastSegment = booking.segments[booking.segments.length - 1];
+    const orderedDate = itineraryDetails?.paidAt;
 
     useEffect(() => {
         if (PNR && status && orderId) {
@@ -95,7 +37,6 @@ const ItineraryPage = () => {
 
     return (
         <Box sx={{ maxWidth: 900, mx: "auto", my: 3 }}>
-            {/* ===================== CONFIRMATION BANNER ===================== */}
             <Paper
                 sx={{
                     position: "relative",
@@ -135,7 +76,7 @@ const ItineraryPage = () => {
                     </Typography>
 
                     <Typography variant="body2">
-                        {firstSegment.date}
+                        {formatDate(orderedDate)}
                     </Typography>
 
                     <Typography variant="body2" sx={{ mt: 1 }}>
@@ -148,8 +89,11 @@ const ItineraryPage = () => {
             <Paper sx={{ p: 3, mt: 3 }}>
                 <Typography>
                     Your booking is confirmed. Confirmation has been sent to:
+                    <Typography variant="span" fontWeight={600}>
+                        {contact?.email}
+                    </Typography>
                 </Typography>
-                <Typography variant="span" fontWeight={600}>{contact?.email}</Typography>
+
             </Paper>
 
             {/* ===================== FLIGHT SEGMENTS ===================== */}
@@ -175,7 +119,7 @@ const ItineraryPage = () => {
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={12}>
                                     <Typography fontWeight={600}>
-                                       <FlightIcon color="action" /> {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber} ({formatDate(seg?.departureTime)})
+                                        <FlightIcon color="action" /> {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber} ({formatDate(seg?.departureTime)})
                                     </Typography>
                                 </Grid>
 
@@ -245,6 +189,34 @@ const ItineraryPage = () => {
                 </Typography>
 
                 <Grid container spacing={2}>
+                    {priceBreakdown?.basePrice &&
+                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Adults
+                            </Typography>
+                            <Typography>₹ {priceBreakdown?.basePrice}</Typography>
+                        </Grid>}
+                    {priceBreakdown?.seatsPrice &&
+                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Seats
+                            </Typography>
+                            <Typography>₹ {priceBreakdown?.seatsPrice}</Typography>
+                        </Grid>}
+                    {priceBreakdown?.addonsPrice &&
+                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Addons
+                            </Typography>
+                            <Typography>₹ {priceBreakdown?.addonsPrice}</Typography>
+                        </Grid>}
+                    {priceBreakdown?.taxes &&
+                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Taxes
+                            </Typography>
+                            <Typography>₹ {priceBreakdown?.taxes}</Typography>
+                        </Grid>}
                     <Grid item xs={6}>
                         <Typography variant="body2" color="text.secondary">
                             Payment Mode
