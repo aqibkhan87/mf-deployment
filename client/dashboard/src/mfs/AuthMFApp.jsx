@@ -9,9 +9,9 @@ const AuthApp = () => {
 
   // 🔹 Child → Parent
   const updateParentHistory = (childLocation) => {
-    const { pathname: childPath } = childLocation?.location ?? childLocation;
+    const { pathname: childPath, search } = childLocation?.location ?? childLocation;
     if (childPath !== history.location.pathname) {
-      history.push(childPath);
+      history.push({ pathname: childPath, search: search || "" }); // ✅ no prefixing here
     }
   };
 

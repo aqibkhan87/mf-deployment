@@ -83,8 +83,6 @@ const ItineraryPage = () => {
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
     const connectingAirports = bookingDetails?.connectingAirports;
-    console.log("params params params", itineraryDetails)
-    console.log("bookingDetails", bookingDetails, "segments", segments)
 
     const firstSegment = booking.segments[0];
     const lastSegment = booking.segments[booking.segments.length - 1];

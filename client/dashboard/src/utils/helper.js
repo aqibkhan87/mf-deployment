@@ -58,7 +58,5 @@ export const getTimeDifference = (smallerDate, largerDate) => {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  console.log(hours, "minutes", minutes)
-
   return `${hours ? `${hours}h` : ""} ${minutes ? `${minutes}m` : ""}`;
 }

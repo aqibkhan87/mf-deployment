@@ -111,7 +111,7 @@ const App = () => {
             <Route path="/addresses" component={AddressList} />
             <Route path="/order-history" component={OrdersPage} />
             <Route path="/flight-search" component={FlightResults} />
-            <Route path="/destination-flights" component={DestinationFlights} />
+            <Route path="/destination" component={DestinationFlights} />
             <Route path="/" component={DashboardPage} />
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>

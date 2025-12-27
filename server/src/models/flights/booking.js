@@ -10,15 +10,21 @@ const PassengerSchema = new mongoose.Schema(
     isInfant: { type: Boolean, default: false },
     addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
     seats: {
-      seatNumber: String, // "12A"
-      cabin: String, // ECONOMY
-      price: Number,
-      seatType: { type: String, enum: ["window", "aisle", "middle"] },
+      type: Map,
+      of: new mongoose.Schema(
+        {
+          seatNumber: String, // "12A"
+          cabin: String, // ECONOMY
+          price: String,
+          seatType: {
+            type: String,
+            enum: ["window", "aisle", "middle"],
+          },
+        },
+        { _id: false }
+      ),
     },
   },
-  {
-    _id: false,
-  }
 );
 
 const BookingSchema = new mongoose.Schema(
@@ -26,7 +32,7 @@ const BookingSchema = new mongoose.Schema(
     flightDetail: Object,
     providerId: String,
     date: String,
-    
+
     sourceIATA: String,
     destinationIATA: String,
     sourceAirport: Object,
@@ -66,7 +72,7 @@ const BookingSchema = new mongoose.Schema(
         "CONFIRMED",
         "CANCELLED",
         "FAILED",
-        "COMPLETED"
+        "COMPLETED",
       ],
       default: "IN_PROGRESS",
     },

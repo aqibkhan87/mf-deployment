@@ -1,29 +1,46 @@
 import React from "react";
 import { Box, Tooltip, Typography } from "@mui/material";
-import { useBookingStore } from "store/bookingStore";
 import Seat from "./seat";
 import EconomySeat from "../../../assets/economy-seat.jpg";
 import BusinessSeat from "../../../assets/business-seat.jpg";
 
-const getSeatType = (column, columns, seatPricing, seatId, seatLayoutType) => {
-    if (column === columns[0] || column === columns[columns.length - 1]) return {
+const getGapAfter = (columns) => {
+    if (columns?.length === 5 || columns?.length === 6) {
+        return [2]
+    } else if (columns?.length === 7) {
+        return [1, 4]
+    } else if (columns?.length === 8) {
+        return [1, 5]
+    } else if (columns?.length === 9) {
+        return [1, 6]
+    } else if (columns?.length === 4) {
+        return [0,2]
+    }
+}
+const getSeatType = (columns, seatPricing, seatId, seatLayoutType, index) => {
+    const gaps = getGapAfter(columns)
+    const isWindow =
+        index === 0 || index === columns.length - 1;
+
+    const isAisle =
+        gaps.includes(index) || gaps.includes(index - 1);
+    if (isWindow) return {
         seatType: "window",
         price: seatPricing?.window,
         seatNumber: seatId,
         cabin: seatLayoutType,
     };
-    const middleIndex = Math.floor(columns.length / 2);
-    if (column === columns[middleIndex]) return {
-        seatType: "middle",
-        price: seatPricing?.middle,
-        seatNumber: seatId,
+    if (isAisle) return {
         cabin: seatLayoutType,
-    };
-    return {
         seatType: "aisle",
         price: seatPricing?.aisle,
         seatNumber: seatId,
+    };
+    return {
         cabin: seatLayoutType,
+        seatType: "middle",
+        price: seatPricing?.middle,
+        seatNumber: seatId,
     };
 };
 
@@ -40,8 +57,8 @@ const SeatPreview = ({ seatId, status, seatTypeWithPrice, passengerName }) => {
                     {seatTypeWithPrice.cabin === "ECONOMY" ? "Economy" : "Business"}
                 </Typography>
             </Box>
-            {seatTypeWithPrice.cabin === "ECONOMY" && <img src={EconomySeat} height={100} width={150} className="rounded-2xl"/>}
-            {seatTypeWithPrice.cabin === "BUSINESS" && <img src={BusinessSeat} height={100} width={150} className="rounded-2xl"/>}
+            {seatTypeWithPrice.cabin === "ECONOMY" && <img src={EconomySeat} height={100} width={150} className="rounded-2xl" />}
+            {seatTypeWithPrice.cabin === "BUSINESS" && <img src={BusinessSeat} height={100} width={150} className="rounded-2xl" />}
 
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1, mt: 2 }}>
                 {status == "selected" && (
@@ -70,8 +87,8 @@ const SeatBlock = ({ layout, seatState, onSelect, seatPricing = {}, seatLayoutTy
                     {columns?.map((col, i) => {
                         const seatId = `${row}${col}`;
                         const status = seatState[seatId] || "available";
-                        const gapAfter = Math.ceil((columns?.length / 2));
-                        const seatTypeWithPrice = getSeatType(col, columns, seatPricing, seatId, seatLayoutType);
+                        const gapAfter = getGapAfter(columns).includes(i);
+                        const seatTypeWithPrice = getSeatType(columns, seatPricing, seatId, seatLayoutType, i);
 
                         return (
                             <Tooltip

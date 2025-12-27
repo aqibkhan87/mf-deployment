@@ -6,6 +6,7 @@ import CartModel from "../models/ecommerce/e-cart.js";
 import BookingModel from "../models/flights/booking.js";
 import EcommercePayment from "../models/ecommerce/e-payment.js";
 import AviationPaymentModel from "../models/flights/aviation-payment.js";
+import SeatMapModel from "../models/flights/seatMap.js";
 
 const apiRouter = express.Router();
 
@@ -104,13 +105,26 @@ apiRouter.post("/verify-payment", async (req, res) => {
       return res.status(400).json({ success: false });
     }
 
-    await markSuccess(type, entityId, {
+    const { PNR } = await markSuccess(type, entityId, {
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
     });
 
-    res.json({ success: true, orderId: razorpay_order_id, status: "COMPLETED" });
+    if(type === "FLIGHT") {
+      return res.json({
+        success: true,
+        orderId: razorpay_order_id,
+        status: "COMPLETED",
+        PNR: PNR
+      });
+    }
+
+    res.json({
+      success: true,
+      orderId: razorpay_order_id,
+      status: "COMPLETED",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -152,14 +166,22 @@ async function markSuccess(type, id, payment) {
         PNR: PNR,
       }
     );
-    await BookingModel.findOneAndUpdate(
-      {
-        _id: id,
-      },
-      {
-        bookingStatus: "COMPLETED",
+    const booking = await BookingModel.findById(id);
+    booking.bookingStatus = "COMPLETED";
+    for (const passenger of booking.passengers) {
+      for (const [segmentKey, seat] of Object.entries(passenger.seats || {})) {
+        await SeatMapModel.updateOne(
+          { flightInstanceKey: segmentKey },
+          {
+            $set: {
+              [`seatStatus.${seat.cabin}.${seat.seatNumber}`]: "reserved",
+            },
+          }
+        );
       }
-    );
+    }
+    await booking.save();
+    return { PNR: PNR}
   }
 }
 

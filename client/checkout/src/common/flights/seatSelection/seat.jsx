@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 
-const Seat = ({ seatId, status, index, onSelect, gapAfter = 3, seatTypeWithPrice }) => {
+const Seat = ({ seatId, status, index, onSelect, gapAfter, seatTypeWithPrice }) => {
     const styles = {
         available: {
             bg: "#fff",
@@ -27,7 +27,7 @@ const Seat = ({ seatId, status, index, onSelect, gapAfter = 3, seatTypeWithPrice
             sx={{
                 width: 30,
                 height: 30,
-                marginBottom: (index + 1) === gapAfter ? 2 : 0,
+                marginBottom: gapAfter ? 2 : 0,
                 borderRadius: 2,
                 border: `2px solid ${styles[status].border}`,
                 backgroundColor: `${styles[status].bg} !important`,

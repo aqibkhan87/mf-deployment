@@ -34,14 +34,14 @@ const createSeatMapForSegment = (segment) => {
     code: layout?.code,
     seatLayout: layout?.cabins,
     seatStatus,
-    flightInstanceKey: `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime}-${segment.departureAirport}-${segment.arrivalAirport}`,
+    flightInstanceKey: `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime.split(".")[0]}-${segment.departureAirport}-${segment.arrivalAirport}`,
     itineraryKey: segment?.itineraryKey,
   };
 };
 
 export const createSeatMapsForFare = (fare) => {
   let itineraryKey = fare?.segments
-    ?.map((s) => `${s?.carrierCode}-${s?.flightNumber}-${s?.departureTime}`)
+    ?.map((s) => `${s?.carrierCode}-${s?.flightNumber}-${s?.departureTime.split(".")[0]}`)
     .join("_");
   const seatMapForFare =
     fare?.segments?.flatMap((seg) =>

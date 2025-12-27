@@ -20,3 +20,4 @@ cron.schedule(
     timezone: "Asia/Kolkata",
   }
 );
+// setTimeout(async () => await fetchTodayFlights(), 10000)

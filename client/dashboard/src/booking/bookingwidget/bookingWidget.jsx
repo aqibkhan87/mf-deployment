@@ -6,6 +6,7 @@ import {
   Paper,
   Button,
   Typography,
+  Link,
   Popover,
   Radio,
   RadioGroup,
@@ -93,6 +94,7 @@ const TravellerPopOver = ({ onApply }) => {
 }
 
 const BookingWidget = () => {
+  const PAGE_TYPE = document.querySelector("[data-page-type]")?.dataset?.pageType;
   const { searchEditing } = useBookingStore();
   const history = useHistory();
   const [anchors, setAnchors] = useState({
@@ -121,10 +123,10 @@ const BookingWidget = () => {
   const [tripType, setTripType] = useState("one-way");
 
   const searchDisabled = useMemo(() => {
-    if(to && from && departDate && passengers) {
+    if (to && from && departDate && passengers) {
       return false;
     } else return true;
-  },[to, from, departDate, passengers])
+  }, [to, from, departDate, passengers])
 
   useEffect(() => {
     const handler = async (event) => {
@@ -194,168 +196,179 @@ const BookingWidget = () => {
   }
 
   return (
-    <Paper elevation={0} className="booking-widget">
-      <Box sx={{ pb: 4, pt: 3, px: 3 }}>
-        <Box sx={{ display: "flex" }}>
-          <Grid item xs={12} md={3} mb={2}>
-            <FormControl>
-              <RadioGroup
-                value={tripType}
-                onChange={handleTripType}
-                row // optional: makes them horizontal
-              >
-                <FormControlLabel
-                  value="one-way"
-                  control={<Radio />}
-                  label="One Way"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-        </Box>
-        <Grid container spacing={2} alignItems="center" className="inputs-row">
-          <Grid item xs={12} md={3} className="item-card" display="flex" alignItems={"center"} sx={{ position: "relative" }}>
-            <AirportSelector
-              label="From"
-              value={from}
-              placeholder="Select Source City"
-              options={fromOptions}
-              inputValue={fromInput}
-              onInputChange={(v) => {
-                setFromInput(v);
-                debouncedSearch(v, "from");
-              }}
-              onSelect={(v) => {
-                setFrom(v);
-              }}
-            />
-            <IconButton onClick={handleSwitch} sx={{ position: "absolute", right: -26 }}>
-              <SyncAltIcon sx={{ fontSize: "20px", color: "#1976d2" }} />
-            </IconButton>
-          </Grid>
-
-          <Grid item xs={12} md={3} className="item-card">
-            <AirportSelector
-              label="To"
-              placeholder="Select Destination City"
-              value={to}
-              options={toOptions}
-              inputValue={toInput}
-              onInputChange={(v) => {
-                setToInput(v);
-                debouncedSearch(v, "to");
-              }}
-              onSelect={(v) => {
-                setTo(v);
-              }}
-            />
-          </Grid>
-          {/* Dates */}
-          <Grid item xs={12} md={3} className="item-card">
-            <Paper sx={{
-              borderRadius: "8px",
-              border: "1px solid #E0E0E0",
-              backgroundColor: "#fff"
-            }}>
-              <Grid container alignItems="center" sx={{ padding: 2 }} onClick={(e) =>
-                setAnchors({ ...anchors, dateAnchor: e.currentTarget })
-              } className="date-selector">
-                <Grid item >
-                  <Typography variant="caption" color="text.secondary">
-                    Departure Date
-                  </Typography>
-                  <Typography variant="h6" color="#1976d2">
-                    {dayjs(departDate).format("DD MMM YYYY")}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-            {/* DATE POPOVER */}
-            <Popover
-              open={Boolean(anchors.dateAnchor)}
-              anchorEl={anchors.dateAnchor}
-              onClose={() =>
-                setAnchors({ ...anchors, dateAnchor: null })
-              }
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              transformOrigin={{ vertical: "top", horizontal: "left" }}
-              PaperProps={{
-                sx: { width: 320, borderRadius: "12px", mt: 1, p: 2 },
-              }}
-            >
-              <DateSelector
-                label="Departure Date"
-                value={departDate}
-                minDate={new Date().toISOString().split("T")[0]}
-                onChange={(date) => {
-                  setDepartDate(date);
-                  setAnchors({ ...anchors, dateAnchor: null });
+    <Box className="booking-widget">
+      <Paper elevation={0} className="booking-widget-container">
+        <Box sx={{ pb: 4, pt: 3, px: 3 }}>
+          <Box sx={{ display: "flex" }}>
+            <Grid item xs={12} md={3} mb={2}>
+              <FormControl>
+                <RadioGroup
+                  value={tripType}
+                  onChange={handleTripType}
+                  row // optional: makes them horizontal
+                >
+                  <FormControlLabel
+                    value="one-way"
+                    control={<Radio />}
+                    label="One Way"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+          </Box>
+          <Grid container spacing={2} alignItems="center" className="inputs-row">
+            <Grid item xs={12} md={3} className="item-card" display="flex" alignItems={"center"} sx={{ position: "relative" }}>
+              <AirportSelector
+                label="From"
+                value={from}
+                placeholder="Select Source City"
+                options={fromOptions}
+                inputValue={fromInput}
+                onInputChange={(v) => {
+                  setFromInput(v);
+                  debouncedSearch(v, "from");
+                }}
+                onSelect={(v) => {
+                  setFrom(v);
                 }}
               />
-            </Popover>
-          </Grid>
-          {/* Passengers */}
-          <Grid item xs={12} md={3} className="item-card">
-            <Paper sx={{
-              borderRadius: "8px",
-              border: "1px solid #E0E0E0",
-              backgroundColor: "#fff",
-            }}
-              className="passenger-selector"
-            >
-              <Grid container alignItems="center" >
-                <Grid
-                  item
-                  onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}
-                  sx={{
-                    cursor: "pointer",
-                    p: 2
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary">
-                    Passenger
-                  </Typography>
-                  <Typography variant="h6" color={"#1976d2"}>
-                    {`${passengers?.adult > 1 ? `${passengers?.adult} Adults` : `${passengers?.adult} Adult`}`} {`${passengers?.infant ? `, ${passengers?.infant} Infant` : ""}`}
-                  </Typography>
+              <IconButton onClick={handleSwitch} sx={{ position: "absolute", right: -26 }}>
+                <SyncAltIcon sx={{ fontSize: "20px", color: "#1976d2" }} />
+              </IconButton>
+            </Grid>
+
+            <Grid item xs={12} md={3} className="item-card">
+              <AirportSelector
+                label="To"
+                placeholder="Select Destination City"
+                value={to}
+                options={toOptions}
+                inputValue={toInput}
+                onInputChange={(v) => {
+                  setToInput(v);
+                  debouncedSearch(v, "to");
+                }}
+                onSelect={(v) => {
+                  setTo(v);
+                }}
+              />
+            </Grid>
+            {/* Dates */}
+            <Grid item xs={12} md={3} className="item-card">
+              <Paper sx={{
+                borderRadius: "8px",
+                border: "1px solid #E0E0E0",
+                backgroundColor: "#fff"
+              }}>
+                <Grid container alignItems="center" sx={{ padding: 2 }} onClick={(e) =>
+                  setAnchors({ ...anchors, dateAnchor: e.currentTarget })
+                } className="date-selector">
+                  <Grid item >
+                    <Typography variant="caption" color="text.secondary">
+                      Departure Date
+                    </Typography>
+                    <Typography variant="h6" color="#1976d2">
+                      {dayjs(departDate).format("DD MMM YYYY")}
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-              {/* PASSENGER POPOVER */}
+              </Paper>
+              {/* DATE POPOVER */}
               <Popover
-                open={Boolean(anchors.passengerAnchor)}
-                anchorEl={anchors.passengerAnchor}
-                onClose={() => setAnchors({ ...anchors, passengerAnchor: null })}
+                open={Boolean(anchors.dateAnchor)}
+                anchorEl={anchors.dateAnchor}
+                onClose={() =>
+                  setAnchors({ ...anchors, dateAnchor: null })
+                }
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
                 transformOrigin={{ vertical: "top", horizontal: "left" }}
                 PaperProps={{
-                  sx: { width: 360, borderRadius: "12px", mt: 1 }
+                  sx: { width: 320, borderRadius: "12px", mt: 1, p: 2 },
                 }}
               >
-                <TravellerPopOver onApply={(data) => {
-                  setPassengers(data);
-                  setAnchors({ ...anchors, passengerAnchor: null });
-                }} />
+                <DateSelector
+                  label="Departure Date"
+                  value={departDate}
+                  minDate={new Date().toISOString().split("T")[0]}
+                  onChange={(date) => {
+                    setDepartDate(date);
+                    setAnchors({ ...anchors, dateAnchor: null });
+                  }}
+                />
               </Popover>
-            </Paper>
-          </Grid>
+            </Grid>
+            {/* Passengers */}
+            <Grid item xs={12} md={3} className="item-card">
+              <Paper sx={{
+                borderRadius: "8px",
+                border: "1px solid #E0E0E0",
+                backgroundColor: "#fff",
+              }}
+                className="passenger-selector"
+              >
+                <Grid container alignItems="center" >
+                  <Grid
+                    item
+                    onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}
+                    sx={{
+                      cursor: "pointer",
+                      p: 2
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      Passenger
+                    </Typography>
+                    <Typography variant="h6" color={"#1976d2"}>
+                      {`${passengers?.adult > 1 ? `${passengers?.adult} Adults` : `${passengers?.adult} Adult`}`} {`${passengers?.infant ? `, ${passengers?.infant} Infant` : ""}`}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                {/* PASSENGER POPOVER */}
+                <Popover
+                  open={Boolean(anchors.passengerAnchor)}
+                  anchorEl={anchors.passengerAnchor}
+                  onClose={() => setAnchors({ ...anchors, passengerAnchor: null })}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  transformOrigin={{ vertical: "top", horizontal: "left" }}
+                  PaperProps={{
+                    sx: { width: 360, borderRadius: "12px", mt: 1 }
+                  }}
+                >
+                  <TravellerPopOver onApply={(data) => {
+                    setPassengers(data);
+                    setAnchors({ ...anchors, passengerAnchor: null });
+                  }} />
+                </Popover>
+              </Paper>
+            </Grid>
 
-        </Grid>
-      </Box>
-      <Box sx={{ pb: 4, px: 3, display: "flex", justifyContent: "flex-end" }}>
-        <Grid item xs={12} md={3}>
-          <div className="bottom-row">
-            <Button
-              variant="contained"
-              onClick={handleSearch}
-              sx={{ px: 2 }}
-              disabled={searchDisabled}
-            >
-              {searchEditing ? "Modify" : "Search"}
-            </Button>
-          </div>
-        </Grid>
-      </Box>
-    </Paper>
+          </Grid>
+        </Box>
+        <Box sx={{ pb: 4, px: 3, display: "flex", justifyContent: "flex-end" }}>
+          <Grid item xs={12} md={3}>
+            <div className="bottom-row">
+              <Button
+                variant="contained"
+                onClick={handleSearch}
+                sx={{ px: 2 }}
+                disabled={searchDisabled}
+              >
+                {searchEditing ? "Modify" : "Search"}
+              </Button>
+            </div>
+          </Grid>
+        </Box>
+      </Paper>
+      {PAGE_TYPE === "dashboard" && <Paper className="destination-container">
+        <Box>
+          <Link href="/destination">
+            <Typography>
+              Allowed Destination
+            </Typography>
+          </Link>
+        </Box>
+      </Paper>}
+    </Box>
   );
 };
 

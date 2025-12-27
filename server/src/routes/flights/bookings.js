@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
     passengers = [],
     bookingId,
     contact = {},
-    connectingAirports = []
+    connectingAirports = [],
   } = req.body;
 
   if (
@@ -101,7 +101,7 @@ router.post("/", async (req, res) => {
       sourceAirport: sourceAirport,
       destinationAirport: destinationAirport,
       priceBreakdown,
-      connectingAirports
+      connectingAirports,
     });
   }
 
@@ -197,7 +197,7 @@ router.put("/update-seats-in-booking", async (req, res) => {
 
     const seatMap = await SeatMapModel.findOne({
       itineraryKey: itineraryKey,
-    }).lean();
+    });
 
     if (!seatMap) {
       return res.status(404).json({ message: "Seat map not found" });
@@ -208,8 +208,9 @@ router.put("/update-seats-in-booking", async (req, res) => {
 
     passengers.forEach((p) => {
       // Calculate seat price
-      if (p?.seat?.seatNumber) {
-        const seatPrice = p?.seat?.price || 0;
+      const [key, value] = Object.entries(p?.seats);
+      if (p?.seats?.[key?.[0]]) {
+        const seatPrice = value?.[1]?.price || 0;
         priceBreakdown.seatsPrice += seatPrice;
       }
     });

@@ -41,4 +41,5 @@ const SeatMapSchema = new mongoose.Schema(
 
 SeatMapSchema.index({ createdAt: 1 }, { expireAfterSeconds: 24 * 60 * 60 }); // 1 day
 
-export default mongoose.model("seatmap", SeatMapSchema);
+const SeatMapModel = mongoose.model("seatmap", SeatMapSchema);
+export default SeatMapModel;

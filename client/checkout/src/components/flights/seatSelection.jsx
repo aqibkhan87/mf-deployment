@@ -74,7 +74,7 @@ function SeatSelection() {
         const segments = bookingDetails?.flightDetail?.segments || [];
         itineraryKey.current = segments
             .map(seg =>
-                `${seg.carrierCode}-${seg.flightNumber}-${seg.departureTime}`
+                `${seg.carrierCode}-${seg.flightNumber}-${seg.departureTime?.split(".")[0]}`
             )
             .join("_");
         await getSeatMaps(itineraryKey.current);
@@ -380,7 +380,7 @@ function SeatSelection() {
                             sx={{
                                 overflow: "hidden",
                                 position: "relative",
-                                height: 350,
+                                minHeight: 350,
                                 display: "flex",
                                 overflowX: "auto",
                                 overflowY: "hidden",
@@ -399,8 +399,8 @@ function SeatSelection() {
                                 src={PlaneNose}
                                 alt="Plane Nose"
                                 sx={{
-                                    width: 300,
-                                    height: 300,
+                                    minWidth: 300,
+                                    minHeight: 300,
                                     mr: -6,
                                     zIndex: 2,
                                 }}
@@ -409,13 +409,13 @@ function SeatSelection() {
                                 style={{
                                     paddingLeft: 60,
                                     paddingRight: 30,
-                                    height: 300,
+                                    minHeight: 300,
                                     borderBottomRightRadius: 10,
                                     borderTopRightRadius: 10,
                                     backgroundColor: "#eef7ff",
                                 }}
                             >
-                                <Box display="flex">
+                                <Box display="flex" sx={{ paddingTop: 1, paddingBottom: 1,}}>
                                     <SeatBlock
                                         layout={BUSINESS_SEAT_MAP}
                                         seatState={seatStatusMap["BUSINESS"]}

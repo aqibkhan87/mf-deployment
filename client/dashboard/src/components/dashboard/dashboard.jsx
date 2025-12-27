@@ -33,7 +33,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <Box className="dashboard-page">
+    <Box className="dashboard-page" data-page-type="dashboard">
       
       <Box>
         <img src={bannerImage} alt="banner1" className="banner-image" />
