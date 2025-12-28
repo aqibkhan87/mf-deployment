@@ -75,11 +75,13 @@ function SeatSelection() {
                 setFlightPassengers(bookingDetails?.passengers || [])
                 if (bookingDetails?.passengers?.length) {
                     let seatPrices = 0;
-                    bookingDetails.passengers.forEach((p) => {
-                        for (let [key, value] of Object.entries(p?.seats)) {
-                            if (p?.seats?.[key]) {
-                                const seatPrice = value?.price || 0;
-                                seatPrices += Number(seatPrice);
+                    bookingDetails?.passengers?.forEach((p) => {
+                        if(p?.isAdult && p?.seats && Object.values(p?.seats)) {
+                            for (let [key, value] of Object.entries(p?.seats)) {
+                                if (p?.seats?.[key]) {
+                                    const seatPrice = value?.price || 0;
+                                    seatPrices += Number(seatPrice);
+                                }
                             }
                         }
                     });
@@ -100,10 +102,10 @@ function SeatSelection() {
     const fetchSeatMaps = async () => {
         const segments = bookingDetails?.flightDetail?.segments || [];
         itineraryKey.current = segments
-            .map(seg =>
-                `${seg.carrierCode}-${seg.flightNumber}-${seg.departureTime?.split(".")[0]}`
+            ?.map(seg =>
+                `${seg?.carrierCode}-${seg?.flightNumber}-${seg?.departureTime?.split(".")[0]}`
             )
-            .join("_");
+            ?.join("_");
         await getSeatMaps(itineraryKey.current);
     }
 
@@ -209,14 +211,24 @@ function SeatSelection() {
                     }
                 }
             }));
-            if (activeSegmentIndex === 1) setActiveSegmentIndex(0)
-            if (segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
-
             setSeatPricing((prev) => prev + seatTypeWithPrice?.price)
 
+//             if (activeSegmentIndex === 1) setActiveSegmentIndex(0)
+//             if (segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
+
+// console.log("seatStatusBySegment", seatStatusBySegment)
             // Move to next passenger
-            setActivePassengerIndex(prevIdx =>
-                prevIdx < adultPassengers.length - 1 ? prevIdx + 1 : prevIdx
+            setActivePassengerIndex(prevIdx => {
+                let currentInd = prevIdx;
+                if(currentInd === adultPassengers?.length - 1) {
+                    if (segments?.length > 1) {
+                        debugger
+                        setActiveSegmentIndex(prev => segments?.length - 1 >= prev + 1 ? prev + 1 : prev)
+                        return 0;
+                    }
+                }
+                return currentInd < adultPassengers.length - 1 ? currentInd + 1 : currentInd
+            }
             );
 
             return updated;
@@ -300,7 +312,7 @@ function SeatSelection() {
         return {
             ...bookingDetails?.priceBreakdown,
             seatsPrice: seatPricing,
-            finalPrice: bookingDetails?.priceBreakdown?.finalPrice + seatPricing,
+            totalPrice: bookingDetails?.priceBreakdown?.totalPrice + seatPricing,
         }
     }, [bookingDetails, seatPricing]);
 
@@ -363,7 +375,7 @@ function SeatSelection() {
                                     onClick={() => setActivePassengerIndex(index)}
                                 >
                                     <Typography variant="h6">
-                                        {passenger.firstName} {passenger.lastName}
+                                        {passenger?.firstName} {passenger?.lastName}
                                     </Typography>
                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         {passenger?.seats?.[flightKey] ? (

@@ -38,8 +38,49 @@ router.get("/", async (req, res) => {
  */
 router.get("/search", async (req, res) => {
   try {
-    const q = (req.query.q || "").trim();
-    if (!q) return res.json([]);
+    let q = (req.query.q || "").trim();
+    if (!q) {
+      q = "d";
+      const regex = new RegExp(q, "i");
+      const matchedAirports = await Airport.aggregate([
+        {
+          $match: {
+            $or: [
+              { iata: { $regex: regex } },
+              { name: { $regex: regex } },
+              { city: { $regex: regex } },
+            ],
+          },
+        },
+        {
+          $addFields: {
+            // Higher score = higher priority
+            matchScore: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $regexMatch: { input: "$iata", regex } },
+                    then: 100,
+                  },
+                  {
+                    case: { $regexMatch: { input: "$name", regex } },
+                    then: 75,
+                  },
+                  {
+                    case: { $regexMatch: { input: "$city", regex } },
+                    then: 50,
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        { $sort: { matchScore: -1, name: 1, iata: 1 } },
+        { $limit: 5 },
+      ]);
+      return res.json({ queryResults: matchedAirports });
+    }
 
     const regex = new RegExp(q, "i");
 
@@ -111,8 +152,6 @@ router.get("/search", async (req, res) => {
       },
     ]);
 
-    console.log("nearestAirportsnearestAirports", nearestAirports)
-
     const combined = [
       ...matchedAirports.slice(0, 1),
       ...nearestAirports,
@@ -124,7 +163,7 @@ router.get("/search", async (req, res) => {
       iata: a.iata,
       icao: a.icao,
       coords: a.location?.coordinates,
-      distanceInKm: a?.distanceInKm
+      distanceInKm: a?.distanceInKm,
     }));
 
     // ✅ Remove duplicates by IATA/ICAO
@@ -135,7 +174,7 @@ router.get("/search", async (req, res) => {
 
     // Step 4️⃣ Return combined response
     return res.status(200).json({
-      queryResults: queryResults
+      queryResults: queryResults,
     });
   } catch (error) {
     console.error("❌ Airport search error:", error);

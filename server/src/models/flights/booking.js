@@ -2,10 +2,12 @@ import mongoose from "mongoose";
 
 const PassengerSchema = new mongoose.Schema(
   {
+    id: String,
     firstName: String,
     lastName: String,
     age: Number,
     gender: String,
+    infantTagged: Object,
     isAdult: { type: Boolean, default: true },
     isInfant: { type: Boolean, default: false },
     addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
@@ -58,7 +60,7 @@ const BookingSchema = new mongoose.Schema(
       basePrice: { type: Number, default: 0 },
       taxes: { type: Number, default: 0 },
       addonsPrice: { type: Number, default: 0 },
-      finalPrice: { type: Number, default: 0 },
+      totalPrice: { type: Number, default: 0 },
       seatsPrice: { type: Number, default: 0 },
     },
 

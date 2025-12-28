@@ -77,16 +77,16 @@ router.post("/", async (req, res) => {
       basePrice: 0,
       taxes: 0,
       addonsPrice: 0,
-      finalPrice: 0,
+      totalPrice: 0,
     };
 
     passengers?.forEach((p) => {
       if (p.type === "adult") {
-        priceBreakdown.basePrice += Math.round(flightDetail?.basePrice) || 0;
+        priceBreakdown.basePrice += Number(flightDetail?.basePrice) || 0;
         priceBreakdown.taxes += Math.round(
           flightDetail?.totalPrice - flightDetail?.basePrice
         );
-        priceBreakdown.finalPrice += Math.round(flightDetail?.totalPrice);
+        priceBreakdown.totalPrice += Number(flightDetail?.totalPrice);
       }
     });
 
@@ -154,7 +154,7 @@ router.put("/update-addons-in-passengers", async (req, res) => {
       }
     });
 
-    priceBreakdown.finalPrice =
+    priceBreakdown.totalPrice =
       priceBreakdown.basePrice +
       priceBreakdown.taxes +
       priceBreakdown.addonsPrice;
@@ -216,12 +216,12 @@ router.put("/update-seats-in-booking", async (req, res) => {
       }
     });
 
-    const finalPrice =
+    const totalPrice =
       priceBreakdown.basePrice +
       priceBreakdown.taxes +
       priceBreakdown.addonsPrice +
       priceBreakdown.seatsPrice;
-    priceBreakdown.finalPrice = Math.round(finalPrice);
+    priceBreakdown.totalPrice = Math.round(totalPrice);
 
     // 4️⃣ Return updated booking
     await BookingModel.findByIdAndUpdate(

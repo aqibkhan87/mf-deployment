@@ -170,16 +170,23 @@ const ItineraryPage = () => {
                     Passengers & Add-ons
                 </Typography>
 
-                {bookingDetails?.passengers?.map((p, i) => (
-                    <Box key={i} sx={{ mb: 1 }}>
-                        <Typography fontWeight={600}>
-                            {p?.firstName} {p?.lastName}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Seat: {p?.seat || "Not assigned"} | Meal: {p?.meal || "Standard"}
-                        </Typography>
-                    </Box>
-                ))}
+                {bookingDetails?.passengers?.map((p, i) => {
+                    const seats = Object.values(p?.seats);
+                    let seatNumbers = seats?.map((seat, i) => {
+                        return (
+                            <Typography variant="span" color="text.secondary">
+                                Seat: {seat?.seatNumber || "Not assigned"} {seat?.seatType || ""} {seats?.length - 1 !== i ? " | " : ""}
+                            </Typography>)
+                    })
+                    return (
+                        <Box key={i} sx={{ mb: 1 }}>
+                            <Typography fontWeight={600}>
+                                {p?.firstName} {p?.lastName} ({p?.gender})
+                            </Typography>
+                            {seatNumbers}
+                        </Box>
+                    )
+                })}
             </Paper>
 
             {/* ===================== PAYMENT SUMMARY ===================== */}
@@ -215,8 +222,19 @@ const ItineraryPage = () => {
                             <Typography variant="body2" color="text.secondary">
                                 Taxes
                             </Typography>
-                            <Typography>₹ {priceBreakdown?.taxes}</Typography>
+                            <Typography>₹ {Math.round(priceBreakdown?.taxes)}</Typography>
                         </Grid>}
+
+                    {itineraryDetails?.amount &&
+                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography fontWeight={700}>
+                                Total Paid:
+                            </Typography>
+                            <Typography>₹ {itineraryDetails?.amount}</Typography>
+                        </Grid>}
+                    <Grid item xs={12}>
+                        <Divider sx={{ my: 1 }} />
+                    </Grid>
                     <Grid item xs={6}>
                         <Typography variant="body2" color="text.secondary">
                             Payment Mode
@@ -231,12 +249,7 @@ const ItineraryPage = () => {
                         <Typography>{itineraryDetails?.receipt}</Typography>
                     </Grid>
 
-                    <Grid item xs={12}>
-                        <Divider sx={{ my: 1 }} />
-                        <Typography fontWeight={700}>
-                            Total Paid: ₹{itineraryDetails?.amount}
-                        </Typography>
-                    </Grid>
+
                 </Grid>
             </Paper>
 

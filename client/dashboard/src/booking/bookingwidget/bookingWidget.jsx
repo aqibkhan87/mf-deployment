@@ -16,6 +16,7 @@ import {
   IconButton
 } from "@mui/material";
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import FlightIcon from "@mui/icons-material/Flight";
 import dayjs from "dayjs";
 import { fetchAirports, searchAirports } from "../../apis/flights/booking";
 import { debounce, numberStyle } from "../../utils/helper";
@@ -25,23 +26,24 @@ import "./bookingWidget.scss";
 import { useBookingStore } from "store/bookingStore";
 import { eventEmitter } from "../../utils/helper";
 
-const PillSelector = ({ values, selected, onSelect }) => (
+const PillSelector = ({ values, selected, onSelect, disabledRange }) => (
   <Stack direction="row" spacing={1}>
     {values?.map((val) => (
-      <Box
+      <Button
         key={val}
         sx={numberStyle(val === selected)}
         onClick={() => onSelect(val)}
+        disabled={disabledRange && (disabledRange >= val ? false : true)}
       >
         {val}
-      </Box>
+      </Button>
     ))}
   </Stack>
 )
 
-const TravellerPopOver = ({ onApply }) => {
-  const [adult, setAdult] = useState(1);
-  const [infant, setInfant] = useState(0);
+const TravellerPopOver = ({ onApply, passengers }) => {
+  const adult = passengers?.adult;
+  const infant = passengers?.adult > passengers.infant ?? passengers?.adult;
 
   return (
     <Paper sx={{ p: 3, width: 560, borderRadius: "16px" }}>
@@ -53,7 +55,7 @@ const TravellerPopOver = ({ onApply }) => {
         <PillSelector
           values={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
           selected={adult}
-          onSelect={(adult) => setAdult(adult)}
+          onSelect={(adu) => onApply({ ...passengers, adult: adu })}
         />
       </Box>
 
@@ -64,30 +66,10 @@ const TravellerPopOver = ({ onApply }) => {
         </Typography>
         <PillSelector
           values={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          disabledRange={passengers?.adult}
           selected={infant}
-          onSelect={(infant) => setInfant(infant)}
+          onSelect={(inf) => onApply({ ...passengers, infant: inf })}
         />
-      </Box>
-
-      {/* APPLY */}
-      <Box display="flex" justifyContent="flex-start">
-        <Button
-          variant="contained"
-          sx={{
-            borderRadius: "24px",
-            px: 4,
-            py: 1.5,
-            fontSize: "16px"
-          }}
-          onClick={() =>
-            onApply({
-              adult,
-              infant,
-            })
-          }
-        >
-          APPLY
-        </Button>
       </Box>
     </Paper>
   )
@@ -157,9 +139,8 @@ const BookingWidget = () => {
   }, []);
 
   const handleAirportSearch = async (q, type) => {
-    if (!q || q.length < 1) return;
     try {
-      const results = await searchAirports(q);
+      const results = await searchAirports(q?.split(",")[0]);
       if (type === "from") setFromOptions(results?.queryResults || []);
       else setToOptions(results?.queryResults || []);
     } catch (err) {
@@ -167,7 +148,8 @@ const BookingWidget = () => {
     }
   };
 
-  const debouncedSearch = useMemo(() => debounce(handleAirportSearch, 400), []);
+  const debouncedFromSearch = useMemo(() => debounce(handleAirportSearch, 400), []);
+  const debouncedToSearch = useMemo(() => debounce(handleAirportSearch, 400), []);
 
   const handleSearch = async () => {
     if (!from || !to || !departDate) {
@@ -191,8 +173,11 @@ const BookingWidget = () => {
   }
 
   const handleSwitch = (e) => {
+    e?.preventDefault()
     setTo(from);
     setFrom(to);
+    setFromInput(toInput)
+    setToInput(fromInput)
   }
 
   return (
@@ -217,7 +202,8 @@ const BookingWidget = () => {
             </Grid>
           </Box>
           <Grid container spacing={2} alignItems="center" className="inputs-row">
-            <Grid item xs={12} md={3} className="item-card" display="flex" alignItems={"center"} sx={{ position: "relative" }}>
+            <Grid item xs={12} md={3} className="item-card !block md:!flex items-center"
+              sx={{ position: "relative" }}>
               <AirportSelector
                 label="From"
                 value={from}
@@ -226,15 +212,27 @@ const BookingWidget = () => {
                 inputValue={fromInput}
                 onInputChange={(v) => {
                   setFromInput(v);
-                  debouncedSearch(v, "from");
+                  debouncedFromSearch(v, "from");
                 }}
                 onSelect={(v) => {
                   setFrom(v);
                 }}
               />
-              <IconButton onClick={handleSwitch} sx={{ position: "absolute", right: -26 }}>
-                <SyncAltIcon sx={{ fontSize: "20px", color: "#1976d2" }} />
-              </IconButton>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <IconButton onClick={handleSwitch} sx={{
+                  right: -26,
+                  position: { xs: "static", md: "absolute" },
+                  margin: "auto",
+                  paddingTop: { xs: 2, md: 0 },
+                  paddingBottom: { xs: 0, }
+                }}>
+                  <SyncAltIcon sx={{
+                    fontSize: "20px",
+                    transform: { xs: "rotate(90deg)", md: "rotate(0deg)" }, // rotate the icon
+                    color: "#1976d2",
+                  }} />
+                </IconButton>
+              </Box>
             </Grid>
 
             <Grid item xs={12} md={3} className="item-card">
@@ -246,7 +244,7 @@ const BookingWidget = () => {
                 inputValue={toInput}
                 onInputChange={(v) => {
                   setToInput(v);
-                  debouncedSearch(v, "to");
+                  debouncedToSearch(v, "to");
                 }}
                 onSelect={(v) => {
                   setTo(v);
@@ -337,7 +335,7 @@ const BookingWidget = () => {
                   <TravellerPopOver onApply={(data) => {
                     setPassengers(data);
                     setAnchors({ ...anchors, passengerAnchor: null });
-                  }} />
+                  }} passengers={passengers} />
                 </Popover>
               </Paper>
             </Grid>
@@ -359,15 +357,30 @@ const BookingWidget = () => {
           </Grid>
         </Box>
       </Paper>
-      {PAGE_TYPE === "dashboard" && <Paper className="destination-container">
-        <Box>
-          <Link href="/destination">
-            <Typography>
-              Allowed Destination
-            </Typography>
-          </Link>
-        </Box>
-      </Paper>}
+      {PAGE_TYPE === "dashboard" &&
+        <Paper className="destination-container">
+          <Box>
+            <Link href="/destination"
+              sx={{
+                textDecorationLine: "none",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
+              <Box>
+                <Typography>
+                  Operating Routes
+                </Typography>
+                <Typography color="text.secondary">
+                  Find flights at lowest fare
+                </Typography>
+              </Box>
+              <Box>
+                <FlightIcon />
+              </Box>
+            </Link>
+          </Box>
+        </Paper>}
     </Box>
   );
 };

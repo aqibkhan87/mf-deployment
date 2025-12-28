@@ -15,7 +15,11 @@ import {
   IconButton,
   Container,
   Paper,
-  Link
+  Link,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -27,20 +31,27 @@ import { isEmailValid, isMobileValid } from "../../utils/helper";
 import TripSummary from "./tripSummary";
 
 
-const createPassenger = (type, open = false) => ({
-  type, // "adult" or "infant"
-  firstName: "",
-  lastName: "",
-  gender: "",
-  dob: "",
-  taggedTo: null,
-  open,
-});
+const createPassenger = (type) => {
+  const passenger = {
+    type, // "adult" or "infant" or "child later" 
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dob: "",
+    taggedTo: null,
+    id: crypto.randomUUID()
+  }
+  if (type === "adult") {
+    passenger.infantTagged = null; // or [] if you want multiple links
+  }
+
+  return passenger;
+};
 
 const isPassengerValid = (p) => {
   if (!p.firstName || !p.lastName || !p.gender) return false;
   if (p.type === "infant") {
-    if (!p.dob) return false;
+    if (!p.dob || !p.taggedTo) return false;
     const dobDate = new Date(p.dob);
     const depDate = new Date();
     const ageInYears = (depDate - dobDate) / (1000 * 60 * 60 * 24 * 365);
@@ -56,6 +67,7 @@ function PassengerDetailsPage() {
   const { from, to, date: departDate, passengers: paxObj, providerId, flightId } = searchInfo;
   const adults = paxObj?.adult || 0;
   const infants = paxObj?.infant || 0;
+  const [selectedPassenger, setSelectedPassenger] = useState(0);
 
   const [passengers, setPassengers] = useState(() => [
     ...Array.from({ length: adults }, (_, i) => createPassenger("adult", i === 0)),
@@ -73,26 +85,40 @@ function PassengerDetailsPage() {
   };
 
   const toggleCard = (idx) => {
-    setPassengers((prev) =>
-      prev.map((p, i) => ({ ...p, open: i === idx ? true : false }))
-    );
+    setSelectedPassenger(idx);
   };
 
   const updatePassenger = (idx, field, value) => {
-    setPassengers((prev) =>
-      prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p))
+    setPassengers((prev) => {
+      let updated = prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p));
+      if (updated[idx]?.type === "infant" && field === "taggedTo") {
+        return updated?.map((updateAdult) => {
+          if (updateAdult?.id === value) {
+            updateAdult.infantTagged = updated[idx];
+            return updateAdult;
+          }
+          return updateAdult
+        })
+      }
+      return updated;
+    }
     );
   };
 
   const isFormValid = useMemo(() => passengers.every(isPassengerValid) && isEmailValid(contact.email) && isMobileValid(contact.mobile), [passengers, contact]);
 
   const handleNext = async () => {
+    const adultsWithInfants = passengers?.filter((p) => p?.type === "adult")?.map((adult) => ({
+      ...adult,
+      infantTagged: passengers.find(child => child?.type === "infant" && child?.taggedTo === adult?.id)
+    }));
+    debugger
     const payload = {
       flightDetail: selectedFlight?.fare,
       connectingAirports: selectedFlight?.connectingAirports,
       providerId,
       date: departDate,
-      passengers,
+      passengers: adultsWithInfants,
       contact,
       sourceIATA: from,
       destinationIATA: to
@@ -106,6 +132,8 @@ function PassengerDetailsPage() {
   const handleContactChange = (field, value) => {
     setContact((prev) => ({ ...prev, [field]: value }));
   };
+
+  console.log("passengerspassengers", passengers)
 
   return (
     <Container sx={{ py: 3 }}>
@@ -156,10 +184,10 @@ function PassengerDetailsPage() {
                         {valid ? "Completed" : "Incomplete"}
                       </Typography>
                     </Box>
-                    <IconButton>{p.open ? <ExpandLessIcon /> : <ExpandMoreIcon />}</IconButton>
+                    <IconButton>{selectedPassenger === i ? <ExpandLessIcon /> : <ExpandMoreIcon />}</IconButton>
                   </Box>
 
-                  {p.open && (
+                  {selectedPassenger === i && (
                     <>
                       <Divider sx={{ mb: 2 }} />
                       <Box sx={{ p: 2, pt: 0 }}>
@@ -197,12 +225,33 @@ function PassengerDetailsPage() {
                               required={p.type === "infant"}
                               value={p.dob}
                               onChange={(e) => updatePassenger(i, "dob", e.target.value)}
-                              error={p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2)}
+                              error={Boolean(p.type === "infant" && p?.dob && ((new Date(departDate) - new Date(p?.dob)) / (1000 * 60 * 60 * 24 * 365) > 2))}
                               helperText={
-                                p.type === "infant" && p.dob && ((new Date(departDate) - new Date(p.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ?
+                                p?.type === "infant" && p?.dob && ((new Date(departDate) - new Date(p?.dob)) / (1000 * 60 * 60 * 24 * 365) > 2) ?
                                   "Infant must be under 2 years" : ""}
                             />
                           </Grid>
+                          {p?.type === "infant" &&
+                            <Grid item xs={12} sm={6}>
+                              <FormControl fullWidth>
+                                <InputLabel id="taggedTo-label">Infant Tagged To</InputLabel>
+                                <Select
+                                  labelId="taggedTo-label"
+                                  label="Tagged To"
+                                  name="taggedTo"
+                                  required
+                                  value={`${p?.taggedTo || ""}`}
+                                  onChange={(e) => updatePassenger(i, "taggedTo", e.target.value)}
+                                  sx={{ width: "100%" }}
+                                >
+                                  {passengers?.filter(p => p.type === "adult")?.map((adult, idx) => (
+                                    <MenuItem key={adult?.id} value={`${adult?.id}`} disabled={adult?.infantTagged && p?.id !== adult?.infantTagged?.id}>
+                                      Adult {idx + 1} – {adult?.firstName || "Unnamed"}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Grid>}
                         </Grid>
                       </Box>
                     </>
@@ -215,7 +264,7 @@ function PassengerDetailsPage() {
             <Typography variant="h6" mb={2}>
               Contact Details
             </Typography>
-            <Typography sx={{ mb: 2}}>
+            <Typography sx={{ mb: 2 }}>
               Booking Confirmation will be sent to this contact
             </Typography>
             <Grid container spacing={2}>
@@ -225,11 +274,11 @@ function PassengerDetailsPage() {
                   type="email"
                   fullWidth
                   required
-                  value={contact.email}
+                  value={contact?.email}
                   onChange={(e) => handleContactChange("email", e.target.value)}
-                  error={contact.email && !isEmailValid(contact.email)}
+                  error={Boolean(contact?.email?.length && !isEmailValid(contact?.email))}
                   helperText={
-                    contact.email && !isEmailValid(contact.email)
+                    contact?.email && !isEmailValid(contact?.email)
                       ? "Invalid email"
                       : ""
                   }
@@ -243,9 +292,9 @@ function PassengerDetailsPage() {
                   required
                   value={contact.mobile}
                   onChange={(e) => handleContactChange("mobile", e.target.value)}
-                  error={contact.mobile && !isMobileValid(contact.mobile)}
+                  error={Boolean(contact?.mobile && !isMobileValid(contact?.mobile))}
                   helperText={
-                    contact.mobile && !isMobileValid(contact.mobile)
+                    contact?.mobile && !isMobileValid(contact?.mobile)
                       ? "Enter 10-digit mobile number"
                       : ""
                   }
@@ -261,7 +310,7 @@ function PassengerDetailsPage() {
             priceBreakdown={{
               basePrice: selectedFlight?.fare?.basePrice * adults || 0,
               taxes: (selectedFlight?.fare?.totalPrice - selectedFlight?.fare?.basePrice) * adults,
-              finalPrice: selectedFlight?.fare?.totalPrice * adults || 0,
+              totalPrice: selectedFlight?.fare?.totalPrice * adults || 0,
             }}
           />
           <Button

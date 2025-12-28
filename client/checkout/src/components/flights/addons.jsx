@@ -113,7 +113,7 @@ function AddonsPage() {
             basePrice,
             taxes,
             addonsPrice,
-            finalPrice: basePrice + taxes + addonsPrice,
+            totalPrice: basePrice + taxes + addonsPrice,
         }
     }, [bookingDetails, addonsPrice]);
 

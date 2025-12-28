@@ -46,19 +46,21 @@ const AirportSelector = ({
 
             <Autocomplete
                 fullWidth
+                clearOnBlur={false}
+                handleHomeEndKeys
+                autoHighlight
                 PopperComponent={CustomPopper}
                 options={options || []}
                 value={value}
                 openOnFocus
-                disableClearable
                 forcePopupIcon={false}
                 inputValue={inputValue}
                 filterOptions={(x) => x} // show all backend options
-                onInputChange={(e, newInputValue, reason) => {
+                onInputChange={(e, newInputValue) => {
                     onInputChange(newInputValue);
                 }}
                 onChange={(e, newValue) => onSelect(newValue)}
-                getOptionLabel={(option) => option ? `${option.city} (${option.iata})` : ""}
+                getOptionLabel={(option) => option ? `${option.city}, ${option.iata}` : ""}
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -74,7 +76,7 @@ const AirportSelector = ({
                 renderOption={(props, option) => (
                     <Box component="li" {...props}>
                         <Box>
-                            <Typography variant="body1">{option.city} ({option.iata})</Typography>
+                            <Typography variant="body1">{option.city}, {option.iata}</Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {option.name}{option.distanceInKm ? ` • ${Math.floor(option.distanceInKm)} Km` : ""}
                             </Typography>

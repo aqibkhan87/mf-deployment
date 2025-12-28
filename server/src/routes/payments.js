@@ -49,7 +49,7 @@ apiRouter.post("/create", async (req, res) => {
     }
 
     if (type === "FLIGHT") {
-      const amount = booking?.flightDetail?.totalPrice || 0;
+      const amount = booking?.priceBreakdown?.totalPrice || 0;
       if (!booking)
         return res.status(404).json({ message: "Booking not found" });
 

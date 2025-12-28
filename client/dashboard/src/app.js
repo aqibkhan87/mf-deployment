@@ -117,7 +117,7 @@ const App = () => {
           </Switch>
         </main>
         <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-          Built with ♥ as a micro-frontend demo project.
+          Built with ♥ as a micro-frontend demo project by <span className="text-black font-semibold">Aqib Khan</span>
         </footer>
         {loading && (<Loader />)}
       </BrowserRouter>

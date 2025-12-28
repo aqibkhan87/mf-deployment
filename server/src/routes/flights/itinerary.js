@@ -13,7 +13,13 @@ apiRouter.get("/", async (req, res) => {
       status: status,
       razorpay_order_id: orderId,
       PNR: PNR,
-    }).populate('bookingId');
+    }).populate({
+      path: "bookingId",
+      populate: {
+        path: "passengers.addons",
+        model: "addons",
+      },
+    });
     if (!itineraryDetails)
       return res.status(404).json({ message: "Itinerary not found" });
 

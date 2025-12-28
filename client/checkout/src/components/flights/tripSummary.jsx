@@ -25,6 +25,7 @@ const TripSummary = ({ priceBreakdown }) => {
     let date = "";
     let duration = "";
     let travelerPricing = {};
+    let searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
 
     if (selectedFlight?.fare?.segments?.length) {
         segments = selectedFlight?.fare?.segments;
@@ -37,11 +38,23 @@ const TripSummary = ({ priceBreakdown }) => {
         connectingAirports = bookingDetails?.connectingAirports;
         date = bookingDetails?.date
         duration = bookingDetails?.flightDetail?.duration
-        travelerPricing = bookingDetails?.flightDetail?.travelerPricing?.[0]
+        travelerPricing = bookingDetails?.flightDetail?.travelerPricing?.[0];
+        searchInfo.passengers = bookingDetails?.passengers?.reduce((p, obj) => {
+            if (obj?.infantTagged?.id) {
+                return {
+                    adult: p?.adult + 1,
+                    infant: p?.infant + 1,
+                }
+            }
+            return {
+                adult: p?.adult + 1,
+                infant: p?.infant,
+            };
+        }, { adult: 0, infant: 0 }
+        ) || { adult: 0, infant: 0 }
     }
-    
+
     const segment = segments?.[0];
-    const searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
     const { passengers: paxObj } = searchInfo;
     const adults = paxObj?.adult || 0;
     const infants = paxObj?.infant || 0;
@@ -114,7 +127,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                                 <TimelineConnector />
                                             </TimelineSeparator>
                                             <TimelineContent>
-                                                <Typography>
+                                                <Box>
                                                     <Typography>
                                                         {formatTime(seg?.departureTime)}
                                                         <Typography component="span" fontSize={14} sx={{ pl: 1 }}>
@@ -127,7 +140,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                                     <Typography fontSize={12}>
                                                         {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber}
                                                     </Typography>
-                                                </Typography>
+                                                </Box>
                                             </TimelineContent>
                                         </TimelineItem>
                                         <TimelineItem>
@@ -139,7 +152,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                                 {segments?.length - 1 !== i && <TimelineConnector />}
                                             </TimelineSeparator>
                                             <TimelineContent>
-                                                <Typography>
+                                                <Box>
                                                     <Typography>
                                                         {formatTime(seg?.arrivalTime)}
                                                         <Typography component="span" fontSize={14} sx={{ pl: 1 }}>
@@ -149,7 +162,7 @@ const TripSummary = ({ priceBreakdown }) => {
                                                     <Typography fontSize={12}>
                                                         {arrivalAirportObj?.name} {seg?.arrivalTerminal ? `, T${seg?.arrivalTerminal}` : ""}
                                                     </Typography>
-                                                </Typography>
+                                                </Box>
                                             </TimelineContent>
                                         </TimelineItem>
                                     </Timeline>
@@ -167,6 +180,11 @@ const TripSummary = ({ priceBreakdown }) => {
                         </Typography>
                     </Box>
                     <Typography variant="caption" color="text.secondary">
+                        {travelerPricing?.includedCabinBags?.quantity ?
+                            `Hand: Up to ${travelerPricing?.includedCabinBags?.quantity}PC`
+                            : ``}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
                         {travelerPricing?.includedCabinBags?.weight ?
                             `Hand: Up to ${travelerPricing?.includedCabinBags?.weight}${travelerPricing?.includedCabinBags?.weightUnit}`
                             : ``}
@@ -174,6 +192,11 @@ const TripSummary = ({ priceBreakdown }) => {
                     <Typography variant="caption" color="text.secondary">
                         {travelerPricing?.includedCheckedBags?.weight ?
                             ` | Check-in: ${travelerPricing?.includedCheckedBags?.weight}${travelerPricing?.includedCheckedBags?.weightUnit}`
+                            : ``}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        {travelerPricing?.includedCheckedBags?.quantity ?
+                            ` | Check-in: ${travelerPricing?.includedCheckedBags?.quantity}PC`
                             : ``}
                     </Typography>
 
@@ -213,7 +236,7 @@ const TripSummary = ({ priceBreakdown }) => {
                     </Box>
                 )}
                 <Typography align="right" variant="h6">
-                    Total: ₹ {Math.floor(priceBreakdown?.finalPrice)}
+                    Total: ₹ {Math.floor(priceBreakdown?.totalPrice)}
                 </Typography>
             </CardContent>
         </Card>
