@@ -113,7 +113,29 @@ connectDB();
 //   sourceAirport: {
 //     city: "New York",
 //     iata: "DEL"
-//   }
+//   },
+//   flightDetail: {
+//     priceBreakdown: {
+//       finalPrice: 10000,
+//       seatsPrice: 4000,
+//       addonsPrice: 2000,
+//       taxes: 3000,
+//       basePrice: 5000
+//     },
+//     travelerPricing: [{
+//       includedCabinBags: {
+//         quantity: 2
+//       },
+//       includedCheckedBags: {
+//         weightUnit: "KG",
+//         weight: 10
+//       }
+//     }]
+//   },
+//   passengers: [
+//     {firstName: "Aqib", lastName: "Khan", type: "Adult"},
+//     {firstName: "Dana", lastName: "Khan", type: "Adult"},
+//   ]
 // }
 // const PNR = "110BCD"
 // sendMail({

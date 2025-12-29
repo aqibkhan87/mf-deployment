@@ -2,13 +2,13 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Box, Typography, Grid, Chip, Link, Button, Paper } from "@mui/material";
 import { useHistory } from "react-router-dom"
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import ExitGap from "../../common/flights/seatSelection/exitGap";
-import SeatBlock from "../../common/flights/seatSelection/seatBlock";
+import ExitGap from "../../common/flights/seatSelection/exitGap.jsx";
+import SeatBlock from "../../common/flights/seatSelection/seatBlock.jsx";
 import PlaneNose from "../../assets/plane-nose.png";
 import { useBookingStore } from "store/bookingStore";
-import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking";
-import { getSeatMaps } from "../../apis/flights/seatMap";
-import TripSummary from "./tripSummary";
+import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking.js";
+import { getSeatMaps } from "../../apis/flights/seatMap.js";
+import TripSummary from "../../common/flights/tripSummary.jsx";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
 import { loadRazorpay } from "../../utils/loadRazorpay.js";
 
@@ -365,7 +365,7 @@ function SeatSelection() {
                                         ? "0 6px 16px rgba(25,118,210,0.25)"
                                         : "0 2px 6px rgba(0,0,0,0.08)",
                                     border: isActive ? "2px solid #d0e5ff" : "1px solid #e0e0e0",
-                                    background: isActive ? "rgb(238, 247, 255)" : "#fff",
+                                    background: isActive ? "#EEF7FF" : "#fff",
                                     borderRadius: "10px",
                                     padding: 1,
                                     color: "#000",

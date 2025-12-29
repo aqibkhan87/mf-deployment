@@ -28,7 +28,7 @@ import { createBooking } from "../../apis/flights/booking";
 import { searchFlights } from "../../apis/flights/searchflight";
 import { useBookingStore } from "store/bookingStore";
 import { isEmailValid, isMobileValid } from "../../utils/helper";
-import TripSummary from "./tripSummary";
+import TripSummary from "../../common/flights/tripSummary";
 
 
 const createPassenger = (type) => {

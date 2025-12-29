@@ -17,7 +17,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useBookingStore } from "store/bookingStore";
 import { getAddons } from "../../apis/flights/addons";
 import { getBookingDetails, updateAddonsInPassengers } from "../../apis/flights/booking";
-import TripSummary from "./tripSummary";
+import TripSummary from "../../common/flights/tripSummary";
 
 function AddonsPage() {
     const history = useHistory();
