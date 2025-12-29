@@ -23,3 +23,6 @@ export const calculateCartSummary = (cart) => {
 
   return cart;
 };
+
+export const formatDate = (iso) =>
+  new Date(iso).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });

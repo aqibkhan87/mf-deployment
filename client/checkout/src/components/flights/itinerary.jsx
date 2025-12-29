@@ -11,7 +11,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FlightIcon from "@mui/icons-material/Flight";
 import { useBookingStore } from "store/bookingStore";
 import { getItineraryDetails } from "../../apis/flights/itinerary";
-import { formatDate, formatTime, formatDuration } from "../../utils/helper";
+import { formatDate, formatTime, formatDuration, getTimeDifference } from "../../utils/helper";
 
 
 const ItineraryPage = () => {
@@ -27,7 +27,7 @@ const ItineraryPage = () => {
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
     const connectingAirports = bookingDetails?.connectingAirports;
-    const orderedDate = itineraryDetails?.paidAt;
+    const deperatureDate = segments?.[0]?.departureTime;
 
     useEffect(() => {
         if (PNR && status && orderId) {
@@ -76,7 +76,7 @@ const ItineraryPage = () => {
                     </Typography>
 
                     <Typography variant="body2">
-                        {formatDate(orderedDate)}
+                        {formatDate(deperatureDate)}
                     </Typography>
 
                     <Typography variant="body2" sx={{ mt: 1 }}>
@@ -89,7 +89,7 @@ const ItineraryPage = () => {
             <Paper sx={{ p: 3, mt: 3 }}>
                 <Typography>
                     Your booking is confirmed. Confirmation has been sent to:
-                    <Typography variant="span" fontWeight={600}>
+                    <Typography variant="span" fontWeight={600} sx={{ paddingLeft: 1 }}>
                         {contact?.email}
                     </Typography>
                 </Typography>
@@ -105,14 +105,15 @@ const ItineraryPage = () => {
                 {segments?.map((seg, index) => {
                     const departureAirportObj = connectingAirports?.find(a => a?.iata === seg?.departureAirport);
                     const arrivalAirportObj = connectingAirports?.find(a => a?.iata === seg?.arrivalAirport);
+                    let arrivalTime = segments?.length > 1 ? segments[index - 1]?.arrivalTime : ""
                     return (
                         <Box key={index}>
                             {index > 0 && (
                                 <Typography
                                     variant="body2"
-                                    sx={{ color: "text.secondary", my: 2, textAlign: "center" }}
+                                    sx={{ color: "text.secondary", mt: 2, mb: 4, textAlign: "center" }}
                                 >
-                                    Layover at {departureAirportObj?.city}
+                                    Layover at {departureAirportObj?.city} {getTimeDifference(seg?.departureTime, arrivalTime)}
                                 </Typography>
                             )}
 
@@ -124,13 +125,24 @@ const ItineraryPage = () => {
                                 </Grid>
 
                                 <Grid item xs={5}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Departure
-                                    </Typography>
-                                    <Typography fontWeight={600}>
-                                        {seg?.departureAirport} – {formatTime(seg?.departureTime)}
-                                    </Typography>
-                                    <Typography variant="body2">{departureAirportObj?.city}</Typography>
+                                    <Box>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Departure
+                                        </Typography>
+                                        <Typography fontWeight={600}>
+                                            {formatTime(seg?.departureTime)}
+                                            <Typography variant="span">
+                                                {" "} {departureAirportObj?.iata}
+                                                {seg?.departureTerminal
+                                                    ? `, T${seg?.departureTerminal}`
+                                                    : ""}
+                                            </Typography>
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            {departureAirportObj?.city} - {departureAirportObj?.name},
+                                            {departureAirportObj?.country}
+                                        </Typography>
+                                    </Box>
                                 </Grid>
 
                                 <Grid item xs={2} textAlign="center">
@@ -138,14 +150,25 @@ const ItineraryPage = () => {
                                     <Typography variant="body2">{formatDuration(seg?.duration)}</Typography>
                                 </Grid>
 
-                                <Grid item xs={5}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Arrival
-                                    </Typography>
-                                    <Typography fontWeight={600}>
-                                        {seg?.arrivalAirport} – {formatTime(seg?.arrivalTime)}
-                                    </Typography>
-                                    <Typography variant="body2">{arrivalAirportObj?.city}</Typography>
+                                <Grid item xs={5} sx={{ display: "flex", justifyContent: "flex-end" }}>
+                                    <Box>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Arrival
+                                        </Typography>
+                                        <Typography fontWeight={600}>
+                                            {formatTime(seg?.arrivalTime)}
+                                            <Typography variant="span">
+                                                {" "} {arrivalAirportObj?.iata}
+                                                {seg?.arrivalTerminal
+                                                    ? `, T${seg?.arrivalTerminal}`
+                                                    : ""}
+                                            </Typography>
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            {arrivalAirportObj?.city} - {arrivalAirportObj?.name},
+                                            {arrivalAirportObj?.country}
+                                        </Typography>
+                                    </Box>
                                 </Grid>
 
                                 <Grid item xs={12}>
@@ -174,16 +197,40 @@ const ItineraryPage = () => {
                     const seats = Object.values(p?.seats);
                     let seatNumbers = seats?.map((seat, i) => {
                         return (
-                            <Typography variant="span" color="text.secondary">
+                            <Typography variant="span" color="text.secondary" key={i}>
                                 Seat: {seat?.seatNumber || "Not assigned"} {seat?.seatType || ""} {seats?.length - 1 !== i ? " | " : ""}
-                            </Typography>)
+                            </Typography>
+                        )
                     })
                     return (
-                        <Box key={i} sx={{ mb: 1 }}>
+                        <Box key={i} sx={{ mt: i > 0 ? 2 : 1, mb: 1 }}>
                             <Typography fontWeight={600}>
                                 {p?.firstName} {p?.lastName} ({p?.gender})
                             </Typography>
                             {seatNumbers}
+                            {p?.infantTagged &&
+                                <Box>
+                                    <Typography variant="span" color="text.secondary" >
+                                        Infant Tagged: {p?.infantTagged?.firstName} {p?.infantTagged?.lastName}
+                                    </Typography>
+                                </Box>
+                            }
+                            {p?.addons?.length > 0 &&
+                                <Box sx={{ marginTop: 2 }}>
+                                    <Typography fontWeight={600} className="">
+                                        Addons
+                                    </Typography>
+                                </Box>}
+                            {p?.addons?.length > 0 && p?.addons?.map((addon, aIndex) => {
+                                return (
+                                    <Box key={aIndex}>
+                                        <Typography color="text.secondary">{aIndex + 1}: {addon?.title}</Typography>
+                                        <Typography color="text.secondary" className="" sx={{ paddingLeft: 2 }}>
+                                            {addon?.description}
+                                        </Typography>
+                                    </Box>
+                                )
+                            })}
                         </Box>
                     )
                 })}
@@ -201,7 +248,7 @@ const ItineraryPage = () => {
                             <Typography variant="body2" color="text.secondary">
                                 Adults
                             </Typography>
-                            <Typography>₹ {priceBreakdown?.basePrice}</Typography>
+                            <Typography>₹ {Math.round(priceBreakdown?.basePrice)}</Typography>
                         </Grid>}
                     {priceBreakdown?.seatsPrice &&
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>

@@ -21,10 +21,12 @@ import resolvers from "./src/grapghql/resolvers/index.js";
 import connectDB from "./db.js";
 import apiRouter from "./src/apiRouter.js";
 import "./src/cron/updateFlightData.js";
-import { createSeatMapsForFlight } from "./src/utils/flightSeatMap/importSeatMap.js";
-import { findAllUniqueAircraftCode } from "./src/utils/flightSeatMap/findUniqueAircraftCode.js";
-import { deleteYesterdaySeatMapData, deleteYesterdayFlightData } from "./src/cron/deleteFlightData.js";
-import updateFlightKeys from "./src/utils/flightSeatMap/updateFlightKeys.js"
+// import { createSeatMapsForFlight } from "./src/utils/flightSeatMap/importSeatMap.js";
+// import { findAllUniqueAircraftCode } from "./src/utils/flightSeatMap/findUniqueAircraftCode.js";
+// import { deleteYesterdaySeatMapData, deleteYesterdayFlightData } from "./src/cron/deleteFlightData.js";
+// import updateFlightKeys from "./src/utils/flightSeatMap/updateFlightKeys.js"
+// import { sendMail } from "./src/services/mailService.js";
+// import { flightConfirmationTemplate } from "./src/utils/template.js";
 
 const redis = new Redis({ host: "localhost", port: 6379 });
 const app = express();
@@ -103,3 +105,20 @@ connectDB();
 // setTimeout(async() => await deleteYesterdaySeatMapData(), 10000)
 // setTimeout(async() => await deleteYesterdayFlightData(), 10000)
 // setTimeout(async() => await updateFlightKeys(), 10000)
+// const booking = {
+//   destinationAirport: {
+//     city: "Chicago",
+//     iata: "BOM"
+//   },
+//   sourceAirport: {
+//     city: "New York",
+//     iata: "DEL"
+//   }
+// }
+// const PNR = "110BCD"
+// sendMail({
+//   to: "aqibkhan8433@gmail.com", 
+//   subject: "Flight Booking Confirmation", 
+//   html: flightConfirmationTemplate(booking, PNR),
+//   text: "Need to check it will get attached in mAIL"
+// })

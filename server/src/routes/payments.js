@@ -7,6 +7,8 @@ import BookingModel from "../models/flights/booking.js";
 import EcommercePayment from "../models/ecommerce/e-payment.js";
 import AviationPaymentModel from "../models/flights/aviation-payment.js";
 import SeatMapModel from "../models/flights/seatMap.js";
+import { sendMail } from "../services/mailService.js";
+import { flightConfirmationTemplate } from "../utils/template.js";
 
 const apiRouter = express.Router();
 
@@ -111,12 +113,12 @@ apiRouter.post("/verify-payment", async (req, res) => {
       razorpay_signature,
     });
 
-    if(type === "FLIGHT") {
+    if (type === "FLIGHT") {
       return res.json({
         success: true,
         orderId: razorpay_order_id,
         status: "COMPLETED",
-        PNR: PNR
+        PNR: PNR,
       });
     }
 
@@ -181,7 +183,14 @@ async function markSuccess(type, id, payment) {
       }
     }
     await booking.save();
-    return { PNR: PNR}
+
+    await sendMail({
+      to: booking?.contact?.email,
+      subject: "Your Flight Booking is Confirmed ✈️",
+      html: flightConfirmationTemplate(booking, PNR)
+    });
+
+    return { PNR: PNR };
   }
 }
 
