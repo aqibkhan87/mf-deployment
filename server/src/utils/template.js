@@ -132,7 +132,7 @@ export const flightConfirmationTemplate = (booking, PNR) => {
                     <tr>
                         <td><b>Total Paid</b></td>
                         <td align="right">
-                            ₹ ${priceBreakdown?.finalPrice}</b>
+                            ₹ ${priceBreakdown?.totalPrice}</b>
                         </td>
                     </tr>
                 </table>

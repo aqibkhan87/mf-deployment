@@ -118,7 +118,7 @@ connectDB();
 //   },
 //   flightDetail: {
 //     priceBreakdown: {
-//       finalPrice: 10000,
+//       totalPrice: 10000,
 //       seatsPrice: 4000,
 //       addonsPrice: 2000,
 //       taxes: 3000,

@@ -1,13 +1,12 @@
 import express from "express";
-const router = express.Router();
-import crypto from "crypto";
+const apiRouter = express.Router();
+
 import BookingModel from "../../models/flights/booking.js";
 import AirportModel from "../../models/flights/airports.js";
 import AddonModel from "../../models/flights/addons.js";
 import SeatMapModel from "../../models/flights/seatMap.js";
-import { razorpay } from "../../razorpayService.js";
 
-router.get("/:bookingId", async (req, res) => {
+apiRouter.get("/:bookingId", async (req, res) => {
   const { bookingId } = req.params;
   if (!bookingId) {
     return res.status(400).json({ message: "Missing required fields" });
@@ -37,7 +36,7 @@ router.get("/:bookingId", async (req, res) => {
   res.json({ success: true, bookingDetails: response });
 });
 
-router.post("/", async (req, res) => {
+apiRouter.post("/", async (req, res) => {
   const {
     flightDetail,
     providerId,
@@ -111,7 +110,7 @@ router.post("/", async (req, res) => {
   });
 });
 
-router.put("/update-addons-in-passengers", async (req, res) => {
+apiRouter.put("/update-addons-in-passengers", async (req, res) => {
   const { bookingId, passengers = [] } = req.body;
 
   try {
@@ -176,7 +175,7 @@ router.put("/update-addons-in-passengers", async (req, res) => {
   }
 });
 
-router.put("/update-seats-in-booking", async (req, res) => {
+apiRouter.put("/update-seats-in-booking", async (req, res) => {
   const { bookingId, passengers = [], itineraryKey } = req.body;
 
   try {
@@ -240,4 +239,4 @@ router.put("/update-seats-in-booking", async (req, res) => {
   }
 });
 
-export default router;
+export default apiRouter;

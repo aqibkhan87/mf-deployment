@@ -64,6 +64,15 @@ const BookingSchema = new mongoose.Schema(
       seatsPrice: { type: Number, default: 0 },
     },
 
+    checkinAmount: {
+      type: Map,
+      of: {
+        addonsPrice: { type: Number, default: 0 },
+        seatsPrice: { type: Number, default: 0 },
+        totalPrice: { type: Number, default: 0 },
+      }
+    },
+
     paymentRequired: { type: Boolean, default: true },
 
     bookingStatus: {
