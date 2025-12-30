@@ -17,14 +17,26 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useBookingStore } from "store/bookingStore";
 import { getAddons } from "../../apis/flights/addons";
 import { getBookingDetails, updateAddonsInPassengers } from "../../apis/flights/booking";
+import { getCheckinBookingDetails } from "../../apis/flights/checkin";
 import TripSummary from "../../common/flights/tripSummary";
 
-function AddonsPage() {
+const AddonsPage = () => {
     const history = useHistory();
-    const { addons, bookingDetails } = useBookingStore();
+    const { addons, bookingDetails, checkinDetails } = useBookingStore();
     const [passengerAddons, setPassengerAddons] = useState([]);
-    const sourceAirport = bookingDetails?.sourceAirport;
-    const destinationAirport = bookingDetails?.destinationAirport;
+    const isCheckin = history?.location?.pathname?.includes("/check-in/addons")
+
+    const flowData = useMemo(() => {
+        return isCheckin ? checkinDetails : bookingDetails;
+    }, [isCheckin, bookingDetails, checkinDetails]);
+
+    const {
+        sourceAirport,
+        destinationAirport,
+        passengers = [],
+        bookingId,
+        priceBreakdown
+    } = flowData || {};
 
     const meals = useMemo(
         () => addons?.filter((a) => a.type === "meal") || [],
@@ -37,13 +49,18 @@ function AddonsPage() {
     );
 
     useEffect(() => {
-        if (!bookingDetails?.passengers?.length) return;
-        setPassengerAddons(bookingDetails?.passengers);
-    }, [bookingDetails?.passengers]);
+        if (!bookingDetails?.passengers?.length && !checkinDetails?.passengers?.length) return;
+        if (isCheckin) setPassengerAddons(checkinDetails?.passengers);
+        else setPassengerAddons(bookingDetails?.passengers);
+    }, [bookingDetails?.passengers, checkinDetails?.passengers]);
 
     useEffect(() => {
         fetchAddons();
-        fetchBooking();
+        if (isCheckin) {
+            fetchCheckinBooking();
+        } else {
+            fetchBooking();
+        }
     }, [])
 
     const fetchAddons = async () => {
@@ -52,6 +69,10 @@ function AddonsPage() {
 
     const fetchBooking = async () => {
         await getBookingDetails();
+    }
+
+    const fetchCheckinBooking = async () => {
+        await getCheckinBookingDetails();
     }
 
     const toggleAddon = (passengerId, addon) => {
@@ -90,25 +111,45 @@ function AddonsPage() {
     const handleSeatSelection = async () => {
         const passengersWithAddons = assemblePassengersWithAddons();
         const response = await updateAddonsInPassengers({
-            bookingId: bookingDetails?.bookingId,
+            bookingId: bookingId,
             passengers: passengersWithAddons,
         });
         if (!response?.success) return;
         history.push("/seat-selection");
     }
 
-    const addonsPrice = useMemo(() => {
-        return passengerAddons.reduce((sum, p) => {
-            return (
-                sum +
-                p.addons.reduce((s, a) => s + (a.price || 0), 0)
+    const calculateAddonsPrice = (passengers, isCheckin, originalPassengers) => {
+        if (!isCheckin) {
+            return passengers.reduce(
+                (sum, p) => sum + p.addons.reduce((s, a) => s + a.price, 0),
+                0
             );
+        }
+
+        // check-in: charge only newly added addons
+        return passengers.reduce((sum, p, idx) => {
+            const originalAddonIds =
+                originalPassengers?.[idx]?.addons?.map(a => a._id) || [];
+
+            const newAddons = p.addons.filter(
+                a => !originalAddonIds.includes(a._id)
+            );
+
+            return sum + newAddons.reduce((s, a) => s + a.price, 0);
         }, 0);
+    };
+
+    const addonsPrice = useMemo(() => {
+        return calculateAddonsPrice(
+            passengerAddons,
+            isCheckin,
+            flowData?.passengers
+        );
     }, [passengerAddons]);
 
     const priceBreakdownDetails = useMemo(() => {
-        const basePrice = bookingDetails?.priceBreakdown?.basePrice || 0;
-        const taxes = bookingDetails?.priceBreakdown?.taxes || 0;
+        const basePrice = priceBreakdown?.basePrice || 0;
+        const taxes = priceBreakdown?.taxes || 0;
         return {
             basePrice,
             taxes,
@@ -123,7 +164,7 @@ function AddonsPage() {
                 {/* LEFT */}
                 <Grid item xs={12} md={8}>
                     <Box >
-                        <Link href="/passenger-edit" sx={{
+                        <Link href={isCheckin ? "check-in" : "/passenger-edit"} sx={{
                             cursor: "pointer",
                             color: "#000",
                             textDecorationColor: "#000",
@@ -132,7 +173,7 @@ function AddonsPage() {
                                 textDecorationColor: "#000",
                             },
                         }}>
-                            <KeyboardBackspaceIcon /> Back To Passengers Details
+                            <KeyboardBackspaceIcon /> Back To {isCheckin ? "Check-in" : "Passengers Details"}
                         </Link>
                     </Box>
                     <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
@@ -145,7 +186,7 @@ function AddonsPage() {
                     </Typography>
 
                     <Stack spacing={3}>
-                        {bookingDetails?.passengers?.map((p, passengerIndex) => {
+                        {passengers?.map((p, passengerIndex) => {
                             const passengerAddon = passengerAddons[passengerIndex];
 
                             return (

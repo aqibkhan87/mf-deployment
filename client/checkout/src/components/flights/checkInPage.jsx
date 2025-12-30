@@ -53,7 +53,6 @@ const CheckInPage = () => {
 
     const handleSubmitCheckinForm = async (e) => {
         e?.preventDefault();
-        console.log(formData);
         await getCheckinDetails(formData)
     }
 
@@ -82,6 +81,8 @@ const CheckInPage = () => {
     }
 
     const handleWebCheck = () => {
+        if(selectedPassengers?.length === passengers?.length) localStorage.setItem("isAll", JSON.stringify(true))
+        else localStorage.setItem("c_p", JSON.stringify(passengers))
         history.push(`/check-in/addons`)
     }
 
