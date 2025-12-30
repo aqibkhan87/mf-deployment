@@ -28,9 +28,9 @@ const SeatMapSchema = new mongoose.Schema(
       of: {
         type: Map, // key: 1A, 1B, 1C
         of: {
-          type: String,
-          enum: ["available", "reserved"],
-          default: "available",
+          status: String, // "reserved", "available"
+          passengerId: String, // "12j43-434jff-343dff-34dfs"
+          reservedAt: Date, // 12-12-2025
         },
       },
       default: {},

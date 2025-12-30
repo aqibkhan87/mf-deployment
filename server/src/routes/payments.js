@@ -176,7 +176,9 @@ async function markSuccess(type, id, payment) {
           { flightInstanceKey: segmentKey },
           {
             $set: {
-              [`seatStatus.${seat.cabin}.${seat.seatNumber}`]: "reserved",
+              [`seatStatus.${seat.cabin}.${seat.seatNumber}.status`]: "reserved",
+              [`seatStatus.${seat.cabin}.${seat.seatNumber}.passengerId`]: passenger?.id,
+              [`seatStatus.${seat.cabin}.${seat.seatNumber}.reservedAt`]: new Date(),
             },
           }
         );

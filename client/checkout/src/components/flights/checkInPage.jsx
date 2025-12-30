@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Paper,
@@ -6,340 +6,305 @@ import {
     Divider,
     Grid,
     Avatar,
+    Container,
+    TextField,
+    Button,
+    Radio
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FlightIcon from "@mui/icons-material/Flight";
 import { useBookingStore } from "store/bookingStore";
-import { getItineraryDetails } from "../../apis/flights/itinerary";
+import { getCheckinDetails } from "../../apis/flights/checkin";
 import { formatDate, formatTime, formatDuration, getTimeDifference } from "../../utils/helper";
 
 
 const CheckInPage = () => {
-    const { itineraryDetails } = useBookingStore();
-    const params = new URLSearchParams(window.location.search);
-    const PNR = params.get("PNR");
-    const status = params.get("status");
-    const orderId = params.get("orderId");
-    const bookingDetails = itineraryDetails?.bookingDetails;
-    const priceBreakdown = bookingDetails?.priceBreakdown;
-    const contact = bookingDetails?.contact;
-    const segments = bookingDetails?.flightDetail?.segments;
+    const { checkinDetails } = useBookingStore();
+    const bookingDetails = checkinDetails?.bookingDetails;
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
     const connectingAirports = bookingDetails?.connectingAirports;
-    const deperatureDate = segments?.[0]?.departureTime;
-    const travelerPricing = bookingDetails?.flightDetail?.travelerPricing?.[0];
+    const segments = bookingDetails?.flightDetail?.segments;
+    const passengers = bookingDetails?.passengers;
+    console.log("checkinDetails", checkinDetails)
+
+    const [formData, setFormData] = useState({
+        PNR: "",
+        emailOrLastName: ""
+    });
+    const [touched, setTouched] = useState({
+        pnr: false,
+        emailOrLastName: false
+    });
+    const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
+
+    const errors = {
+        pnr: !formData.PNR,
+        emailOrLastName: !formData.emailOrLastName,
+    };
+
+    const handleBlur = (field) =>
+        setTouched((prev) => ({ ...prev, [field]: true }));
+
+    const handleSubmitCheckinForm = async (e) => {
+        e?.preventDefault();
+        console.log(formData);
+        await getCheckinDetails(formData)
+    }
 
     useEffect(() => {
-        if (PNR && status && orderId) {
-            getItineraryDetails({ orderId, status, PNR });
-        }
+        getCheckinDetails({ PNR: "12O51W", emailOrLastName: "Khan" })
     }, [])
 
+    const handleFieldChange = (e, field) => {
+        setFormData({ ...formData, [field]: e?.target?.value })
+    }
+
     return (
-        <Box sx={{ maxWidth: 900, mx: "auto", my: 3 }}>
-            <Paper
-                sx={{
-                    position: "relative",
-                    height: 260,
-                    backgroundImage: `url(${process.env.API_BASE_URL}/images/${destinationAirport?.iata}.png)`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    borderRadius: 3,
-                    overflow: "hidden",
-                }}
-            >
-                <Box sx={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
-
-                <Box
-                    sx={{
-                        position: "relative",
-                        zIndex: 1,
-                        height: "100%",
-                        color: "#fff",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                    }}
-                >
-                    <Avatar sx={{ bgcolor: "#2e7d32", mb: 1 }}>
-                        <CheckCircleIcon />
-                    </Avatar>
-
-                    <Typography variant="h6" fontWeight={700}>
-                        Booking Confirmed
-                    </Typography>
-
-                    <Typography sx={{ mt: 1 }}>
-                        {sourceAirport?.iata} → {destinationAirport?.iata}
-                    </Typography>
-
-                    <Typography variant="body2">
-                        {formatDate(deperatureDate)}
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                        PNR: <strong>{PNR}</strong>
-                    </Typography>
-                </Box>
-            </Paper>
-
-            {/* ===================== CONFIRMATION MESSAGE ===================== */}
-            <Paper sx={{ p: 3, mt: 3 }}>
-                <Typography>
-                    Your booking is confirmed. Confirmation has been sent to:
-                    <Typography variant="span" fontWeight={600} sx={{ paddingLeft: 1 }}>
-                        {contact?.email}
-                    </Typography>
-                </Typography>
-            </Paper>
-
-            {/* ===================== FLIGHT SEGMENTS ===================== */}
-            <Paper sx={{ mt: 3, pb: 2 }}>
-                <Box sx={{ p: 3, bgcolor: "#EEF7FF", mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight={700} gutterBottom sx={{}}>
-                        Flight Details
-                    </Typography>
-                </Box>
-                <Box sx={{ px: 3 }}>
-                    {segments?.map((seg, index) => {
-                        const departureAirportObj = connectingAirports?.find(a => a?.iata === seg?.departureAirport);
-                        const arrivalAirportObj = connectingAirports?.find(a => a?.iata === seg?.arrivalAirport);
-                        let arrivalTime = segments?.length > 1 ? segments[index - 1]?.arrivalTime : ""
-                        return (
-                            <Box key={index}>
-                                {index > 0 && (
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ color: "text.secondary", mt: 2, mb: 4, textAlign: "center" }}
-                                    >
-                                        Layover at {departureAirportObj?.city} {getTimeDifference(seg?.departureTime, arrivalTime)}
-                                    </Typography>
-                                )}
-
-                                <Grid container spacing={2} alignItems="center">
-                                    <Grid item xs={12}>
-                                        <Typography fontWeight={600}>
-                                            <FlightIcon color="action" /> {seg?.carrierCode} {seg?.aircraftCode}, {seg?.flightNumber} ({formatDate(seg?.departureTime)})
-                                        </Typography>
-                                    </Grid>
-
-                                    <Grid item xs={5}>
-                                        <Box>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Departure
-                                            </Typography>
-                                            <Typography fontWeight={600}>
-                                                {formatTime(seg?.departureTime)}
-                                                <Typography variant="span">
-                                                    {" "} {departureAirportObj?.iata}
-                                                    {seg?.departureTerminal
-                                                        ? `, T${seg?.departureTerminal}`
-                                                        : ""}
-                                                </Typography>
-                                            </Typography>
-                                            <Typography variant="body2">
-                                                {departureAirportObj?.city} - {departureAirportObj?.name},
-                                                {departureAirportObj?.country}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={2} textAlign="center">
-                                        <FlightIcon color="action" />
-                                        <Typography variant="body2">{formatDuration(seg?.duration)}</Typography>
-                                    </Grid>
-
-                                    <Grid item xs={5} sx={{ display: "flex", justifyContent: "flex-end" }}>
-                                        <Box>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Arrival
-                                            </Typography>
-                                            <Typography fontWeight={600}>
-                                                {formatTime(seg?.arrivalTime)}
-                                                <Typography variant="span">
-                                                    {" "} {arrivalAirportObj?.iata}
-                                                    {seg?.arrivalTerminal
-                                                        ? `, T${seg?.arrivalTerminal}`
-                                                        : ""}
-                                                </Typography>
-                                            </Typography>
-                                            <Typography variant="body2">
-                                                {arrivalAirportObj?.city} - {arrivalAirportObj?.name},
-                                                {arrivalAirportObj?.country}
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Divider sx={{ my: 1 }} />
-                                        <Box variant="body2" color="text.secondary">
-                                            Baggage Allowance
-                                        </Box>
-                                        <Box >
-                                            <Typography variant="caption" color="text.secondary">
-                                                {travelerPricing?.includedCabinBags?.quantity ?
-                                                    `Hand: Up to ${travelerPricing?.includedCabinBags?.quantity}PC`
-                                                    : ``}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {travelerPricing?.includedCabinBags?.weight ?
-                                                    `Hand: Up to ${travelerPricing?.includedCabinBags?.weight}${travelerPricing?.includedCabinBags?.weightUnit}`
-                                                    : ``}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {travelerPricing?.includedCheckedBags?.weight ?
-                                                    ` | Check-in: ${travelerPricing?.includedCheckedBags?.weight}${travelerPricing?.includedCheckedBags?.weightUnit}`
-                                                    : ``}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {travelerPricing?.includedCheckedBags?.quantity ?
-                                                    ` | Check-in: ${travelerPricing?.includedCheckedBags?.quantity}PC`
-                                                    : ``}
-                                            </Typography>
-
-                                        </Box>
-                                    </Grid>
-                                </Grid>
-
+        <Container sx={{ py: 3 }}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                    <Box
+                        sx={{
+                            // height: 350,
+                            // width: 300
+                        }}
+                    >
+                        <Box sx={{ p: 2 }}>
+                            <Typography fontWeight={600} fontSize={24}>
+                                Find your booking
+                            </Typography>
+                            <Typography fontSize={16}>
+                                Enjoy free online check-in from 48 hours up to 60 minutes before departure.
+                            </Typography>
+                        </Box>
+                        <Paper sx={{ p: 4 }}>
+                            <Box>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ mb: 2, bgcolor: "white" }}
+                                    label="Enter PNR"
+                                    name="pnr"
+                                    value={formData?.PNR}
+                                    onChange={(e) => handleFieldChange(e, "PNR")}
+                                    onBlur={() => handleBlur("pnr")}
+                                    error={errors.pnr && touched.pnr}
+                                    helperText={
+                                        touched.pnr && errors.pnr
+                                            ? "PNR length must be 6 alphanumeric characters."
+                                            : ""
+                                    }
+                                />
                             </Box>
-                        )
-                    })}
-                </Box>
-            </Paper>
-
-            {/* ===================== PASSENGERS & ADDONS ===================== */}
-            <Paper sx={{ mt: 3, pb: 2 }}>
-                <Box sx={{ p: 3, bgcolor: "#EEF7FF", mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight={700} gutterBottom sx={{}}>
-                        Passengers & Add-ons
-                    </Typography>
-                </Box>
-
-                <Box sx={{ px: 3 }}>
-                    {bookingDetails?.passengers?.map((p, i) => {
-                        const seats = Object.values(p?.seats);
-                        let seatNumbers = seats?.map((seat, i) => {
-                            return (
-                                <Typography variant="span" color="text.secondary" key={i}>
-                                    Seat: {seat?.seatNumber || "Not assigned"} {seat?.seatType || ""} {seats?.length - 1 !== i ? " | " : ""}
+                            <Box>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ mb: 2, bgcolor: "white" }}
+                                    label="Enter email or Last Name"
+                                    name="Email Or LastName"
+                                    onChange={(e) => handleFieldChange(e, "emailOrLastName")}
+                                    onBlur={() => handleBlur("emailOrLastName")}
+                                    error={errors.emailOrLastName && touched.emailOrLastName}
+                                    helperText={
+                                        touched.emailOrLastName && errors.emailOrLastName
+                                            ? "PNR length must be 6 alphanumeric characters."
+                                            : ""
+                                    }
+                                />
+                            </Box>
+                            <Button
+                                fullWidth
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                onClick={handleSubmitCheckinForm}
+                                aria-label="Web Check-in"
+                                role="button"
+                                tabIndex={0}
+                            >
+                                Web Check-in
+                            </Button>
+                        </Paper>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} md={8}>
+                    {bookingDetails ?
+                        <Box sx={{ py: 2 }}>
+                            <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                                <Typography align="center" fontWeight="bold">
+                                    {sourceAirport?.city} to {destinationAirport?.city}
                                 </Typography>
-                            )
-                        })
-                        return (
-                            <Box key={i} sx={{ mt: i > 0 ? 2 : 1, mb: 1 }}>
-                                <Typography fontWeight={600}>
-                                    {p?.firstName} {p?.lastName} ({p?.gender})
-                                </Typography>
-                                {seatNumbers}
-                                {p?.infantTagged &&
-                                    <Box>
-                                        <Typography variant="span" color="text.secondary" >
-                                            Infant Tagged: {p?.infantTagged?.firstName} {p?.infantTagged?.lastName}
+                            </Paper>
+                            <Paper>
+                                <Box sx={{ bgcolor: "#EEF7FF", mb: 2, display: "flex", justifyContent: "space-between", p: 2 }}>
+                                    <Box>{bookingDetails?.date}</Box>
+                                    <Box>PNR: {checkinDetails?.PNR}</Box>
+                                </Box>
+                                <Box sx={{ p: 2 }}>
+                                    {segments?.map((segment, index) => {
+                                        const departureAirportObj = connectingAirports?.find(a => a?.iata === segment?.departureAirport);
+                                        const arrivalAirportObj = connectingAirports?.find(a => a?.iata === segment?.arrivalAirport);
+                                        let arrivalTime = segments?.length > 1 ? segments[index - 1]?.arrivalTime : ""
+                                        return (
+                                            <Box key={index}>
+                                                {arrivalTime &&
+                                                    <Box className="flex justify-center py-4">
+                                                        <Box>
+                                                            <Typography sx={{ px: 4, py: 2, bgcolor: "#d0e5ff", borderRadius: 20 }}>
+                                                                Layover at {departureAirportObj?.city} {getTimeDifference(segment?.departureTime, arrivalTime)}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>}
+                                                <Box className="flex items-center justify-between">
+                                                    <Box className="flex-1" sx={{ width: "40%" }}>
+                                                        <p className="text-xl font-bold">
+                                                            {formatTime(segment?.departureTime)}
+                                                            <span className="pl-2 text-xs">
+                                                                {departureAirportObj?.iata} {segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""}
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-gray-500  text-xs">
+                                                            {departureAirportObj?.city} - {departureAirportObj?.name}, {departureAirportObj?.country}
+                                                        </p>
+                                                    </Box>
+                                                    <Box className="flex" sx={{ width: "20%" }}>
+                                                        <Box sx={{ width: "100%" }}>
+                                                            <Box sx={{ width: "100%" }}>
+                                                                <p className="text-gray-600">
+                                                                    {formatDuration(segment?.duration)}
+                                                                </p>
+                                                            </Box>
+                                                            <Box sx={{ width: "100%" }}>
+                                                                <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
+                                                            </Box>
+                                                        </Box>
+                                                    </Box>
+                                                    <Box className="flex-1 flex justify-end" sx={{ width: "40%" }}>
+                                                        <Box>
+                                                            <p className="text-xl font-bold">
+                                                                {formatTime(segment?.arrivalTime)}
+                                                                <span className="pl-2 text-xs">
+                                                                    {arrivalAirportObj?.iata} {segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""}
+                                                                </span>
+                                                            </p>
+                                                            <p className="text-gray-500 text-xs">
+                                                                {arrivalAirportObj?.city} - {arrivalAirportObj?.name}, {arrivalAirportObj?.country}
+                                                            </p>
+                                                        </Box>
+                                                    </Box>
+                                                </Box>
+
+                                            </Box>
+                                        )
+                                    })}
+                                    {/* Aircraft & Cabin Info */}
+                                    <Box className="text-gray-600 text-sm" sx={{ mt: 3 }}>
+                                        {segments?.map((seg, idx) => (
+                                            <span key={idx}>
+                                                <FlightIcon /> {seg?.aircraftCode} • Cabin: {seg?.cabin}
+                                                {idx < segments?.length - 1 && " | "}
+                                            </span>
+                                        ))}
+                                    </Box>
+                                    <Divider sx={{ my: 4 }} />
+                                    <Box
+                                        className="text-gray-600 text-sm"
+                                        sx={{ mt: 3, bgcolor: "#EEF7FF", p: 2, textAlign: "center", borderRadius: 2 }}
+                                    >
+                                        <Typography>
+                                            web check-in
+                                        </Typography>
+                                        <Typography>
+                                            web check-in window for your flight is now open
                                         </Typography>
                                     </Box>
-                                }
-                                {p?.addons?.length > 0 &&
-                                    <Box sx={{ marginTop: 2 }}>
-                                        <Typography fontWeight={600} className="">
-                                            Addons
-                                        </Typography>
-                                    </Box>}
-                                {p?.addons?.length > 0 && p?.addons?.map((addon, aIndex) => {
-                                    return (
-                                        <Box key={aIndex}>
-                                            <Typography color="text.secondary">{aIndex + 1}: {addon?.title}</Typography>
-                                            <Typography color="text.secondary" className="" sx={{ paddingLeft: 2 }}>
-                                                {addon?.description}
-                                            </Typography>
+                                    <Box className="text-gray-600 text-sm" sx={{ mt: 3, border: "1px solid #EEF7FF", borderRadius: 2 }}>
+                                        <Box sx={{ 
+                                            bgcolor: "#EEF7FF",
+                                            display: "flex", 
+                                            justifyContent: "space-between", 
+                                            alignItems: "center",
+                                            p: 2
+                                        }}>
+                                            <Box>
+                                                <Typography>
+                                                    Select passengers for web check-in
+                                                </Typography>
+                                            </Box>
+                                            <Box>
+                                                <Radio />
+                                            </Box>
                                         </Box>
-                                    )
-                                })}
-                            </Box>
-                        )
-                    })}
+                                        <Box>
+                                            <Box sx={{ display: "block" }}>
+                                                {passengers?.map((passenger, i) => {
+                                                    return (
+                                                        <Box key={i} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                            <Box sx={{ display: "flex", p: 2 }}>
+                                                                <Avatar />
+                                                                <Box sx={{pl: 2 }}>
+                                                                    {passenger?.firstName} {passenger?.lastName}
+                                                                </Box>
+                                                            </Box>
+                                                            <Box>
+                                                                <Radio />
+                                                            </Box>
+                                                        </Box>
+                                                    )
+                                                })}
+                                            </Box>
+                                            <Box sx={{ my: 2, p: 2 }}>
+                                                <Button
+                                                    fullWidth
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary">
+                                                    Check - in
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    </Box>
 
-                </Box>
+                                </Box>
+                            </Paper>
 
-            </Paper>
-
-            {/* ===================== PAYMENT SUMMARY ===================== */}
-            <Paper sx={{ mt: 3, pb: 2 }}>
-                <Box sx={{ p: 3, bgcolor: "#EEF7FF", mb: 2 }}>
-                    <Typography variant="subtitle1" fontWeight={700} gutterBottom sx={{}}>
-                        Payment Details
-                    </Typography>
-                </Box>
-
-                <Grid container spacing={2} sx={{ px: 3 }}>
-                    {priceBreakdown?.basePrice &&
-                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography>
-                                Adults
+                        </Box>
+                        : <Box sx={{ py: 2 }}>
+                            <Typography fontWeight={600} sx={{ mb: 3 }} fontSize={24}>
+                                How to Web Check-In
                             </Typography>
-                            <Typography>₹ {Math.round(priceBreakdown?.basePrice)}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.seatsPrice &&
-                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography>
-                                Seats
-                            </Typography>
-                            <Typography>₹ {priceBreakdown?.seatsPrice}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.addonsPrice &&
-                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography>
-                                Addons
-                            </Typography>
-                            <Typography>₹ {priceBreakdown?.addonsPrice}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.taxes &&
-                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography>
-                                Taxes
-                            </Typography>
-                            <Typography>₹ {Math.round(priceBreakdown?.taxes)}</Typography>
-                        </Grid>}
-
-                    {itineraryDetails?.amount &&
-                        <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography fontWeight={700}>
-                                Total Paid:
-                            </Typography>
-                            <Typography>₹ {itineraryDetails?.amount}</Typography>
-                        </Grid>}
-                    <Grid item xs={12}>
-                        <Divider sx={{ my: 1 }} />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                            Payment Mode
-                        </Typography>
-                        <Typography>{itineraryDetails?.gateway}</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                            Transaction ID
-                        </Typography>
-                        <Typography>{itineraryDetails?.receipt}</Typography>
-                    </Grid>
-
-
+                            <Paper sx={{ p: 3 }}>
+                                <Box>
+                                    <Typography fontWeight={600} sx={{ py: 2 }}>
+                                        Passengers can complete web check-in during the following time windows:
+                                    </Typography>
+                                    <Typography>
+                                        Domestic flights: From 48 hours to 60 minutes before departure
+                                    </Typography>
+                                    <Typography>
+                                        International flights: From 24 hours to 75 minutes before departure
+                                    </Typography>
+                                </Box>
+                                <Box>
+                                    <Typography fontWeight={600} sx={{ py: 2 }}>
+                                        For those checking in at the airport:
+                                    </Typography>
+                                    <Typography>
+                                        Domestic flights: Counter check-in is available up to 60 minutes before departure
+                                    </Typography>
+                                    <Typography>
+                                        International flights: Counter check-in is available up to 75 minutes before departure
+                                    </Typography>
+                                </Box>
+                            </Paper>
+                        </Box>}
                 </Grid>
-            </Paper>
-
-            {/* ===================== CONTACT DETAILS ===================== */}
-            <Paper sx={{ p: 3, mt: 3 }}>
-                <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-                    Contact Details
-                </Typography>
-                <Typography>{contact?.email}</Typography>
-                <Typography>{contact?.mobile}</Typography>
-            </Paper>
-        </Box>
+            </Grid>
+        </Container>
     );
 };
 

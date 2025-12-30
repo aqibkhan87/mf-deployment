@@ -19,7 +19,7 @@ const createSeatMapForSegment = (segment) => {
     Array.from({ length: cabin.rows }, (_, i) => i + 1).forEach((row) => {
       cabin.columns.forEach((col) => {
         const seatLabel = `${row}${col}`;
-        seatStatus[cabin.cabin][seatLabel] = "available"; // default
+        seatStatus[cabin.cabin][seatLabel].status = "available"; // default
       });
     });
   });

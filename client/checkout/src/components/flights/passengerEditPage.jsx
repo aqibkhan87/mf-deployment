@@ -112,7 +112,6 @@ function PassengerDetailsPage() {
       ...adult,
       infantTagged: passengers.find(child => child?.type === "infant" && child?.taggedTo === adult?.id)
     }));
-    debugger
     const payload = {
       flightDetail: selectedFlight?.fare,
       connectingAirports: selectedFlight?.connectingAirports,

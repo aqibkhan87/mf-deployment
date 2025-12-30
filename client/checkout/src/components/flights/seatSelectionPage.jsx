@@ -58,7 +58,7 @@ function SeatSelection() {
             const seatNumber = passenger?.seats?.[flightKey]?.seatNumber;
             const cabin = passenger?.seats?.[flightKey]?.cabin;
             if (seatNumber) {
-                updatedSeatStatus[cabin][seatNumber] = "selected";
+                updatedSeatStatus[cabin][seatNumber].status = "selected";
             }
         });
         setSeatStatusBySegment(prev => ({
@@ -76,7 +76,7 @@ function SeatSelection() {
                 if (bookingDetails?.passengers?.length) {
                     let seatPrices = 0;
                     bookingDetails?.passengers?.forEach((p) => {
-                        if(p?.isAdult && p?.seats && Object.values(p?.seats)) {
+                        if (p?.isAdult && p?.seats && Object.values(p?.seats)) {
                             for (let [key, value] of Object.entries(p?.seats)) {
                                 if (p?.seats?.[key]) {
                                     const seatPrice = value?.price || 0;
@@ -142,7 +142,9 @@ function SeatSelection() {
                         ...prev[flightKey],
                         [oldSeat.cabin]: {
                             ...prev[flightKey][oldSeat.cabin],
-                            [oldSeat.seatNumber]: "available",
+                            [oldSeat.seatNumber]: {
+                                ["status"]: "available"
+                            },
                         }
                     }
                 }));
@@ -179,7 +181,9 @@ function SeatSelection() {
                         ...prev[flightKey],
                         [oldSeat.cabin]: {
                             ...prev[flightKey][oldSeat.cabin],
-                            [oldSeat.seatNumber]: "available",
+                            [oldSeat.seatNumber]: {
+                            ["status"]: "available"
+                        },
                         }
                     }
                 }));
@@ -207,22 +211,19 @@ function SeatSelection() {
                     ...prev[flightKey],
                     [seatLayoutType]: {
                         ...prev[flightKey]?.[seatLayoutType],
-                        [seatId]: "selected",
+                        [seatId]: {
+                            ["status"]: "selected"
+                        },
                     }
                 }
             }));
             setSeatPricing((prev) => prev + seatTypeWithPrice?.price)
 
-//             if (activeSegmentIndex === 1) setActiveSegmentIndex(0)
-//             if (segments?.length > 1) setActiveSegmentIndex(prev => prev + 1)
-
-// console.log("seatStatusBySegment", seatStatusBySegment)
             // Move to next passenger
             setActivePassengerIndex(prevIdx => {
                 let currentInd = prevIdx;
-                if(currentInd === adultPassengers?.length - 1) {
+                if (currentInd === adultPassengers?.length - 1) {
                     if (segments?.length > 1) {
-                        debugger
                         setActiveSegmentIndex(prev => segments?.length - 1 >= prev + 1 ? prev + 1 : prev)
                         return 0;
                     }
