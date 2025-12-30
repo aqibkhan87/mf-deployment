@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import {
     Box,
     Paper,
@@ -11,7 +12,6 @@ import {
     Button,
     Radio
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FlightIcon from "@mui/icons-material/Flight";
 import { useBookingStore } from "store/bookingStore";
 import { getCheckinDetails } from "../../apis/flights/checkin";
@@ -20,13 +20,14 @@ import { formatDate, formatTime, formatDuration, getTimeDifference } from "../..
 
 const CheckInPage = () => {
     const { checkinDetails } = useBookingStore();
+    const history = useHistory();
     const bookingDetails = checkinDetails?.bookingDetails;
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
     const connectingAirports = bookingDetails?.connectingAirports;
     const segments = bookingDetails?.flightDetail?.segments;
-    const passengers = bookingDetails?.passengers;
-    console.log("checkinDetails", checkinDetails)
+    const passengers = bookingDetails?.passengers || [];
+    const [selectedPassengers, setSelectedPassengers] = useState([]);
 
     const [formData, setFormData] = useState({
         PNR: "",
@@ -36,6 +37,10 @@ const CheckInPage = () => {
         pnr: false,
         emailOrLastName: false
     });
+
+    const looksLikeEmail = (val) =>
+        typeof val === "string" && (val.includes("@") || val.includes("."));
+
     const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
 
     const errors = {
@@ -53,11 +58,31 @@ const CheckInPage = () => {
     }
 
     useEffect(() => {
-        getCheckinDetails({ PNR: "12O51W", emailOrLastName: "Khan" })
+        getCheckinDetails({ PNR: "Q50FMI", emailOrLastName: "Khan" })
     }, [])
 
     const handleFieldChange = (e, field) => {
         setFormData({ ...formData, [field]: e?.target?.value })
+    }
+
+    const handlePassengerSelect = (pId) => {
+        if (selectedPassengers?.includes(pId)) {
+            setSelectedPassengers(selectedPassengers?.filter(sp => sp !== pId))
+        } else {
+            setSelectedPassengers([...selectedPassengers, pId])
+        }
+    }
+
+    const toggleAllPassengers = () => {
+        if (selectedPassengers?.length === passengers?.length) {
+            setSelectedPassengers([])
+        } else {
+            setSelectedPassengers(Array.from({ length: passengers?.length }, (p, i) => p?.id))
+        }
+    }
+
+    const handleWebCheck = () => {
+        history.push(`/check-in/addons`)
     }
 
     return (
@@ -106,12 +131,18 @@ const CheckInPage = () => {
                                     sx={{ mb: 2, bgcolor: "white" }}
                                     label="Enter email or Last Name"
                                     name="Email Or LastName"
+                                    value={formData?.emailOrLastName}
                                     onChange={(e) => handleFieldChange(e, "emailOrLastName")}
                                     onBlur={() => handleBlur("emailOrLastName")}
                                     error={errors.emailOrLastName && touched.emailOrLastName}
                                     helperText={
-                                        touched.emailOrLastName && errors.emailOrLastName
-                                            ? "PNR length must be 6 alphanumeric characters."
+                                        touched.emailOrLastName
+                                            ? looksLikeEmail(formData?.emailOrLastName) &&
+                                                !isEmail(formData?.emailOrLastName)
+                                                ? "Invalid email address entered"
+                                                : errors.emailOrLastName
+                                                    ? "Enter valid last name"
+                                                    : ""
                                             : ""
                                     }
                                 />
@@ -141,7 +172,7 @@ const CheckInPage = () => {
                             </Paper>
                             <Paper>
                                 <Box sx={{ bgcolor: "#EEF7FF", mb: 2, display: "flex", justifyContent: "space-between", p: 2 }}>
-                                    <Box>{bookingDetails?.date}</Box>
+                                    <Box>{formatDate(bookingDetails?.date)}</Box>
                                     <Box>PNR: {checkinDetails?.PNR}</Box>
                                 </Box>
                                 <Box sx={{ p: 2 }}>
@@ -223,12 +254,13 @@ const CheckInPage = () => {
                                         </Typography>
                                     </Box>
                                     <Box className="text-gray-600 text-sm" sx={{ mt: 3, border: "1px solid #EEF7FF", borderRadius: 2 }}>
-                                        <Box sx={{ 
+                                        <Box sx={{
                                             bgcolor: "#EEF7FF",
-                                            display: "flex", 
-                                            justifyContent: "space-between", 
+                                            display: "flex",
+                                            justifyContent: "space-between",
                                             alignItems: "center",
-                                            p: 2
+                                            p: 2,
+                                            pr: 0
                                         }}>
                                             <Box>
                                                 <Typography>
@@ -236,22 +268,23 @@ const CheckInPage = () => {
                                                 </Typography>
                                             </Box>
                                             <Box>
-                                                <Radio />
+                                                <Radio checked={selectedPassengers?.length === passengers?.length} onClick={toggleAllPassengers} />
                                             </Box>
                                         </Box>
                                         <Box>
                                             <Box sx={{ display: "block" }}>
-                                                {passengers?.map((passenger, i) => {
+                                                {passengers?.map((p, i) => {
+                                                    console.log("ooooo", p)
                                                     return (
                                                         <Box key={i} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                            <Box sx={{ display: "flex", p: 2 }}>
+                                                            <Box sx={{ display: "flex", p: 2, alignItems: "center" }}>
                                                                 <Avatar />
-                                                                <Box sx={{pl: 2 }}>
-                                                                    {passenger?.firstName} {passenger?.lastName}
+                                                                <Box sx={{ pl: 2 }}>
+                                                                    {p?.firstName} {p?.lastName}
                                                                 </Box>
                                                             </Box>
                                                             <Box>
-                                                                <Radio />
+                                                                <Radio checked={selectedPassengers.includes(p?.id) || false} onClick={() => handlePassengerSelect(p?.id)} />
                                                             </Box>
                                                         </Box>
                                                     )
@@ -262,16 +295,17 @@ const CheckInPage = () => {
                                                     fullWidth
                                                     type="submit"
                                                     variant="contained"
-                                                    color="primary">
+                                                    color="primary"
+                                                    disabled={selectedPassengers?.length === 0}
+                                                    onClick={handleWebCheck}
+                                                >
                                                     Check - in
                                                 </Button>
                                             </Box>
                                         </Box>
                                     </Box>
-
                                 </Box>
                             </Paper>
-
                         </Box>
                         : <Box sx={{ py: 2 }}>
                             <Typography fontWeight={600} sx={{ mb: 3 }} fontSize={24}>

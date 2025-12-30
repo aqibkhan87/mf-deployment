@@ -37,8 +37,8 @@ function SeatSelection() {
     const [seatPricing, setSeatPricing] = useState(0);
     const [activeSegmentIndex, setActiveSegmentIndex] = useState(0);
     const activeSeatMap = seatMaps?.[activeSegmentIndex];
-    const ECONONMY_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout.cabin === "ECONOMY") || {};
-    const BUSINESS_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout.cabin === "BUSINESS") || {};
+    const ECONONMY_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout?.cabin === "ECONOMY") || {};
+    const BUSINESS_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout?.cabin === "BUSINESS") || {};
     const segments = bookingDetails?.flightDetail?.segments || [];
 
     const flightKey = activeSeatMap?.flightInstanceKey;
@@ -48,17 +48,17 @@ function SeatSelection() {
         if (!activeSeatMap) return;
         let updatedSeatStatus = {
             BUSINESS: {
-                ...activeSeatMap.seatStatus.BUSINESS
+                ...activeSeatMap?.seatStatus?.BUSINESS
             },
             ECONOMY: {
-                ...activeSeatMap.seatStatus.ECONOMY
+                ...activeSeatMap?.seatStatus?.ECONOMY
             }
         };
         flightPassengers.forEach((passenger) => {
             const seatNumber = passenger?.seats?.[flightKey]?.seatNumber;
             const cabin = passenger?.seats?.[flightKey]?.cabin;
             if (seatNumber) {
-                updatedSeatStatus[cabin][seatNumber].status = "selected";
+                updatedSeatStatus[cabin][seatNumber]["status"] = "selected";
             }
         });
         setSeatStatusBySegment(prev => ({

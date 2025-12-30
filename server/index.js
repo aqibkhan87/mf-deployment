@@ -24,7 +24,7 @@ import "./src/cron/updateFlightData.js";
 // import { createSeatMapsForFlight } from "./src/utils/flightSeatMap/importSeatMap.js";
 // import { findAllUniqueAircraftCode } from "./src/utils/flightSeatMap/findUniqueAircraftCode.js";
 // import { deleteYesterdaySeatMapData, deleteYesterdayFlightData } from "./src/cron/deleteFlightData.js";
-// import updateFlightKeys from "./src/utils/flightSeatMap/updateFlightKeys.js"
+// import { updateFlightKeys, updateSeatMapData} from "./src/utils/flightSeatMap/updateFlightKeys.js"
 // import { sendMail } from "./src/services/mailService.js";
 // import { flightConfirmationTemplate } from "./src/utils/template.js";
 
@@ -104,7 +104,9 @@ connectDB();
 // findAllUniqueAircraftCode();
 // setTimeout(async() => await deleteYesterdaySeatMapData(), 10000)
 // setTimeout(async() => await deleteYesterdayFlightData(), 10000)
+// setTimeout(async() => await updateSeatMapData(), 10000)
 // setTimeout(async() => await updateFlightKeys(), 10000)
+// setTimeout(async() => await updateSeatMapData(), 10000)
 // const booking = {
 //   destinationAirport: {
 //     city: "Chicago",

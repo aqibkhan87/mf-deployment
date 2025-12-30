@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 
-const Seat = ({ seatId, status, index, onSelect, gapAfter, seatTypeWithPrice }) => {
+const Seat = ({ seatId, status, onSelect, gapAfter }) => {
     const styles = {
         available: {
             bg: "#fff",

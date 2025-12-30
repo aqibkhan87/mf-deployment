@@ -24,6 +24,8 @@ const App = ({ history }) => {
         <Route exact path="/seat-selection" component={SeatSelectionPage} />
         <Route exact path="/itinerary" component={ItineraryPage} />
         <Route exact path="/check-in" component={CheckInPage} />
+        <Route exact path="/check-in/addons" component={AddonsPage} />
+        <Route exact path="/check-in/seat-selection" component={SeatSelectionPage} />
       </Switch>
     </Router>
   );

@@ -114,6 +114,22 @@ const App = () => {
                 </Suspense>
               )}
             />
+            <Route
+              path="/check-in/addons"
+              render={() => (
+                <Suspense fallback={<Loader />}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
+            <Route
+              path="/check-in/seat-selection"
+              render={() => (
+                <Suspense fallback={<Loader />}>
+                  <CheckoutMFApp />
+                </Suspense>
+              )}
+            />
             <Route path="/dashboard" component={DashboardPage} />
             <Route path="/wishlist" component={ProductWishlist} />
             <Route path="/addresses" component={AddressList} />

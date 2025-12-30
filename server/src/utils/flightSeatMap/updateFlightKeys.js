@@ -13,7 +13,7 @@ function replaceDatesInString(str) {
   );
 }
 
-async function updateFlightKeys() {
+export const updateFlightKeys = async () => {
   try {
     const flights = await SeatMapModel.find({});
 
@@ -44,7 +44,67 @@ async function updateFlightKeys() {
   } catch (err) {
     console.error("Error updating flight keys:", err);
   }
-}
+};
 
-// Call the function
-export default updateFlightKeys;
+export const updateSeatMapData = async () => {
+  try {
+    console.log("called Reached");
+    await SeatMapModel.updateMany(
+      {
+        seatStatus: { $exists: true },
+      },
+      [
+        {
+          $set: {
+            seatStatus: {
+              $arrayToObject: {
+                $map: {
+                  input: { $objectToArray: "$seatStatus" },
+                  as: "cabin",
+                  in: {
+                    k: "$$cabin.k",
+                    v: {
+                      $arrayToObject: {
+                        $map: {
+                          input: { $objectToArray: "$$cabin.v" },
+                          as: "seat",
+                          in: {
+                            k: "$$seat.k",
+                            v: {
+                              status: {
+                                $cond: [
+                                  {
+                                    $eq: [
+                                      { $type: "$$seat.v.status" },
+                                      "object",
+                                    ],
+                                  },
+                                  "$$seat.v.status.status",
+                                  "$$seat.v.status",
+                                ],
+                              },
+                              passengerId: {
+                                $ifNull: ["$$seat.v.passengerId", null],
+                              },
+                              reservedAt: {
+                                $ifNull: ["$$seat.v.reservedAt", null],
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ]
+    );
+
+    console.log(`SeatMap updated.`);
+  } catch (err) {
+    console.error("Error updating seatMap keys:", err);
+  }
+};
