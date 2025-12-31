@@ -7,6 +7,7 @@ import SeatBlock from "../../common/flights/seatSelection/seatBlock.jsx";
 import PlaneNose from "../../assets/plane-nose.png";
 import { useBookingStore } from "store/bookingStore";
 import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking.js";
+import { getCheckinBookingDetails, updateCheckinSeatSelectionInBooking } from "../../apis/flights/checkin.js";
 import { getSeatMaps } from "../../apis/flights/seatMap.js";
 import TripSummary from "../../common/flights/tripSummary.jsx";
 import { createOrder, verifyPayment } from "../../apis/payment.js";
@@ -30,7 +31,19 @@ const LegendItem = ({ color, label }) => (
 function SeatSelection() {
     const itineraryKey = useRef(null);
     const history = useHistory();
-    const { bookingDetails, seatMaps } = useBookingStore();
+    const isCheckin = history?.location?.pathname?.includes("/check-in/seat-selection")
+    const { bookingDetails, seatMaps, checkinDetails } = useBookingStore();
+
+    const flowData = useMemo(() => {
+        return isCheckin ? checkinDetails : bookingDetails;
+    }, [isCheckin, bookingDetails, checkinDetails]);
+
+    const {
+        bookingId,
+        priceBreakdown,
+        flightDetail = {}
+    } = flowData || {};
+
     const [seatStatusBySegment, setSeatStatusBySegment] = useState({});
     const [flightPassengers, setFlightPassengers] = useState([]);
     const [activePassengerIndex, setActivePassengerIndex] = useState(0);
@@ -39,7 +52,7 @@ function SeatSelection() {
     const activeSeatMap = seatMaps?.[activeSegmentIndex];
     const ECONONMY_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout?.cabin === "ECONOMY") || {};
     const BUSINESS_SEAT_MAP = seatMaps?.[activeSegmentIndex]?.seatLayout?.find(layout => layout?.cabin === "BUSINESS") || {};
-    const segments = bookingDetails?.flightDetail?.segments || [];
+    const segments = flightDetail?.segments || [];
 
     const flightKey = activeSeatMap?.flightInstanceKey;
     const seatStatusMap = seatStatusBySegment?.[flightKey] || {};
@@ -69,7 +82,7 @@ function SeatSelection() {
     }, [activeSeatMap]);
 
     useEffect(() => {
-        if (bookingDetails) {
+        if (bookingDetails && !isCheckin) {
             fetchSeatMaps();
             if (bookingDetails?.passengers) {
                 setFlightPassengers(bookingDetails?.passengers || [])
@@ -88,19 +101,46 @@ function SeatSelection() {
                     setSeatPricing(seatPrices);
                 }
             };
+        } else if (checkinDetails && isCheckin) {
+            fetchSeatMaps();
+
+            const passengers = checkinDetails?.passengers || [];
+            setFlightPassengers(passengers);
+
+            let seatDelta = 0;
+
+            passengers?.forEach(p => {
+                if (!p?.isAdult) return;
+
+                const currentSeatsTotal = sumSeatPrice(p?.seats);
+                const paidSeatsTotal = sumSeatPrice(p?.paidSeats);
+
+                seatDelta += Math.max(0, currentSeatsTotal - paidSeatsTotal);
+            });
+
+            setSeatPricing(seatDelta);
         }
-    }, [bookingDetails])
+
+    }, [bookingDetails, checkinDetails])
 
     useEffect(() => {
-        fetchBooking();
+        if (isCheckin) {
+            fetchCheckinBooking();
+        } else {
+            fetchBooking();
+        }
     }, [])
 
     const fetchBooking = async () => {
         await getBookingDetails();
     }
 
+    const fetchCheckinBooking = async () => {
+        await getCheckinBookingDetails();
+    }
+
     const fetchSeatMaps = async () => {
-        const segments = bookingDetails?.flightDetail?.segments || [];
+        const segments = flightDetail?.segments || [];
         itineraryKey.current = segments
             ?.map(seg =>
                 `${seg?.carrierCode}-${seg?.flightNumber}-${seg?.departureTime?.split(".")[0]}`
@@ -182,8 +222,8 @@ function SeatSelection() {
                         [oldSeat.cabin]: {
                             ...prev[flightKey][oldSeat.cabin],
                             [oldSeat.seatNumber]: {
-                            ["status"]: "available"
-                        },
+                                ["status"]: "available"
+                            },
                         }
                     }
                 }));
@@ -237,13 +277,23 @@ function SeatSelection() {
     };
 
     const handlePayment = async () => {
-        const response = await updateSeatSelectionInBooking({
-            bookingId: bookingDetails?.bookingId,
-            itineraryKey: itineraryKey?.current,
-            passengers: adultPassengers,
-        });
-        if (response?.success) {
-            proceedToPayment();
+        if (isCheckin) {
+            const response = await updateCheckinSeatSelectionInBooking({
+                itineraryKey: itineraryKey?.current,
+                passengers: adultPassengers,
+            });
+            if (response?.success) {
+                proceedToPayment();
+            }
+        } else {
+            const response = await updateSeatSelectionInBooking({
+                bookingId: bookingId,
+                itineraryKey: itineraryKey?.current,
+                passengers: adultPassengers,
+            });
+            if (response?.success) {
+                proceedToPayment();
+            }
         }
     }
 
@@ -309,28 +359,87 @@ function SeatSelection() {
         [flightPassengers]
     );
 
-    const priceBreakdownDetails = useMemo(() => {
-        return {
-            ...bookingDetails?.priceBreakdown,
-            seatsPrice: seatPricing,
-            totalPrice: bookingDetails?.priceBreakdown?.totalPrice + seatPricing,
+    const sumSeatPrice = seats =>
+        seats
+            ? Object.values(seats).reduce(
+                (sum, seat) => sum + Number(seat?.price || 0),
+                0
+            )
+            : 0;
+
+    const sumAddonsPrice = items =>
+        items?.reduce((s, i) => s + i.price, 0) || 0;
+
+    const calculateSeatDelta = () => {
+        return flightPassengers?.reduce((total, p) => {
+            const currentSeatsTotal = sumSeatPrice(p?.seats);
+            const paidSeatsTotal = sumSeatPrice(p?.paidSeats);
+
+            return total + Math.max(0, currentSeatsTotal - paidSeatsTotal);
+        }, 0);
+    };
+
+    const calculateCheckinDelta = () => {
+        return flightPassengers?.reduce((total, p) => {
+            const currentTotal = sumSeatPrice(p?.seats);
+            const paidTotal = sumSeatPrice(p?.paidSeats);
+
+            return total + Math.max(0, currentTotal - paidTotal);
+        }, 0);
+    };
+
+    const addonsCheckinPrice = useMemo(() => {
+        return flightPassengers?.reduce(
+            (sum, p) => sum + (p?.checkinAmount?.addonsPrice || 0),
+            0
+        );
+    }, [flightPassengers]);
+
+    const seatPrices = useMemo(() => {
+        // ✅ CHECK-IN
+        return calculateSeatDelta();
+    }, [flightPassengers, isCheckin]);
+
+    const totalPrice = useMemo(() => {
+        if (!isCheckin) {
+            return priceBreakdown?.totalPrice + seatPricing;
         }
-    }, [bookingDetails, seatPricing]);
+
+        // ✅ CHECK-IN
+        return calculateCheckinDelta();
+    }, [flightPassengers, isCheckin]);
+
+    const priceBreakdownDetails = useMemo(() => {
+        if (!isCheckin) {
+            return {
+                ...priceBreakdown,
+                seatsPrice: seatPricing,
+                totalPrice: totalPrice,
+            }
+        }
+        return {
+            ...priceBreakdown,
+            addonsPrice: addonsCheckinPrice,
+            seatsPrice: seatPrices,
+            totalPrice: totalPrice + addonsCheckinPrice,
+        }
+    }, [bookingDetails, seatPrices, addonsCheckinPrice, seatPricing, checkinDetails]);
 
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
                     <Box >
-                        <Link href="/addons" sx={{
-                            cursor: "pointer",
-                            color: "#000",
-                            textDecorationColor: "#000",
-                            textUnderlineOffset: "4px",
-                            "&:hover": {
+                        <Link href={isCheckin ? "/check-in/addons" : "/addons"}
+                            sx={{
+                                cursor: "pointer",
+                                color: "#000",
                                 textDecorationColor: "#000",
-                            },
-                        }}>
+                                textUnderlineOffset: "4px",
+                                "&:hover": {
+                                    textDecorationColor: "#000",
+                                },
+                            }}>
                             <KeyboardBackspaceIcon /> Back To Addons
                         </Link>
                     </Box>

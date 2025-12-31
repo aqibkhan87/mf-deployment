@@ -2,7 +2,7 @@ import { formatDate } from "./helper.js";
 
 export const flightConfirmationTemplate = (booking, PNR) => {
   const passengers = booking?.passengers;
-  const priceBreakdown = booking?.flightDetail?.priceBreakdown;
+  const priceBreakdown = booking?.priceBreakdown;
   const travelerPricing = booking?.flightDetail?.travelerPricing?.[0];
   const templateGenerated = `
         <div style="
@@ -68,7 +68,7 @@ export const flightConfirmationTemplate = (booking, PNR) => {
                     ${passengers
                       ?.map(
                         (p) =>
-                          `<li>${p?.firstName} ${p?.lastName} (${p?.type})</li>`
+                          `<li>${p?.firstName} ${p?.lastName} (${p?.gender})</li>`
                       )
                       .join("")}
                 </ul>
@@ -118,13 +118,13 @@ export const flightConfirmationTemplate = (booking, PNR) => {
                         </td>
                     </tr>
                     <tr>
-                        <td>Taxes & Fees</td>
+                        <td>Seats Price</td>
                         <td align="right">
                             ₹ ${priceBreakdown?.seatsPrice}
                         </td>
                     </tr>
                     <tr>
-                        <td>Taxes & Fees</td>
+                        <td>Taxes</td>
                         <td align="right">
                             ₹ ${priceBreakdown?.taxes}
                         </td>

@@ -61,9 +61,6 @@ export const updateSeatSelectionInBooking = async (payload) => {
 };
 
 export const getBookingDetails = async () => {
-  const userId = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))?._id
-    : "";
   const bookingId = localStorage.getItem("bookingId")
     ? JSON.parse(localStorage.getItem("bookingId"))
     : "";

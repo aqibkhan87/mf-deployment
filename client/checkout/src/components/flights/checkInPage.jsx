@@ -56,9 +56,9 @@ const CheckInPage = () => {
         await getCheckinDetails(formData)
     }
 
-    useEffect(() => {
-        getCheckinDetails({ PNR: "Q50FMI", emailOrLastName: "Khan" })
-    }, [])
+    // useEffect(() => {
+    //     getCheckinDetails({ PNR: "PUE86J", emailOrLastName: "Khan" })
+    // }, [])
 
     const handleFieldChange = (e, field) => {
         setFormData({ ...formData, [field]: e?.target?.value })

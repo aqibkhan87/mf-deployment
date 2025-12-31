@@ -57,8 +57,8 @@ const TripSummary = ({ priceBreakdown }) => {
     const history = useHistory();
     const { selectedFlight, bookingDetails, checkinDetails } = useBookingStore();
     let searchInfo = JSON.parse(sessionStorage.getItem("selectedFlight") || "{}");
-    const mode = history?.location?.pathname?.includes("/passenger-edit") ? "SELECTED_FLIGHT"
-        : history?.location?.pathname?.includes("/check-in/addons") ? "CHECKIN" : "BOOKING"
+    const mode = history?.location?.pathname?.includes("/check-in/seat-selection") || 
+    history?.location?.pathname?.includes("/check-in/addons") ? "CHECKIN" : "BOOKING"
 
 
     const flightData = useMemo(() => {

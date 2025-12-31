@@ -17,7 +17,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useBookingStore } from "store/bookingStore";
 import { getAddons } from "../../apis/flights/addons";
 import { getBookingDetails, updateAddonsInPassengers } from "../../apis/flights/booking";
-import { getCheckinBookingDetails } from "../../apis/flights/checkin";
+import { getCheckinBookingDetails, updateCheckinAddonsInPassengers } from "../../apis/flights/checkin";
 import TripSummary from "../../common/flights/tripSummary";
 
 const AddonsPage = () => {
@@ -35,7 +35,7 @@ const AddonsPage = () => {
         destinationAirport,
         passengers = [],
         bookingId,
-        priceBreakdown
+        priceBreakdown,
     } = flowData || {};
 
     const meals = useMemo(
@@ -79,18 +79,18 @@ const AddonsPage = () => {
         setPassengerAddons((prev) =>
             prev.map((p, index) => {
                 if (index !== passengerId) return p;
-                const exists = p.addons.some(a => a._id === addon._id);
+                const exists = p?.addons?.some(a => a._id === addon._id);
 
                 if (exists) {
                     return {
                         ...p,
-                        addons: p.addons.filter(a => a._id !== addon._id),
+                        addons: p?.addons?.filter(a => a._id !== addon._id),
                     };
                 }
                 return {
                     ...p,
                     addons: [
-                        ...p.addons.filter(a => a.type !== addon.type),
+                        ...p?.addons?.filter(a => a.type !== addon.type),
                         addon,
                     ],
                 };
@@ -101,62 +101,106 @@ const AddonsPage = () => {
 
 
     const assemblePassengersWithAddons = () => {
-        return passengerAddons.map(p => ({
+        return passengerAddons?.map(p => ({
             ...p,
             addons: p?.addons?.map(a => a?._id),
         }));
     };
 
+    const assemblePassengersWithCheckinAddons = () => {
+        return passengerAddons?.map(p => ({
+            ...p,
+            addons: p?.addons?.map(a => a?._id),
+            paidAddons: p?.paidAddons?.map(a => a?._id),
+        }));
+    };
+
 
     const handleSeatSelection = async () => {
-        const passengersWithAddons = assemblePassengersWithAddons();
-        const response = await updateAddonsInPassengers({
-            bookingId: bookingId,
-            passengers: passengersWithAddons,
-        });
-        if (!response?.success) return;
-        history.push("/seat-selection");
+        if (isCheckin) {
+            const passengersWithAddons = assemblePassengersWithCheckinAddons();
+            const response = await updateCheckinAddonsInPassengers({
+                passengers: passengersWithAddons,
+            });
+            if (!response?.success) return;
+            history.push("/check-in/seat-selection");
+        } else {
+            const passengersWithAddons = assemblePassengersWithAddons();
+            const response = await updateAddonsInPassengers({
+                bookingId: bookingId,
+                passengers: passengersWithAddons,
+            });
+            if (!response?.success) return;
+            history.push("/seat-selection");
+        }
     }
 
-    const calculateAddonsPrice = (passengers, isCheckin, originalPassengers) => {
+    const sumAddonsPrice = items =>
+        items?.reduce((s, i) => s + i.price, 0) || 0;
+
+    const calculateAddonsPrice = () => {
         if (!isCheckin) {
-            return passengers.reduce(
-                (sum, p) => sum + p.addons.reduce((s, a) => s + a.price, 0),
+            return passengerAddons?.reduce(
+                (sum, p) => sum + sumAddonsPrice(p?.addons),
                 0
             );
         }
 
         // check-in: charge only newly added addons
-        return passengers.reduce((sum, p, idx) => {
-            const originalAddonIds =
-                originalPassengers?.[idx]?.addons?.map(a => a._id) || [];
+        return passengerAddons?.reduce((sum, p) => {
+            const currentTotal = sumAddonsPrice(p?.addons);      // newly selected
+            const paidTotal = sumAddonsPrice(p?.paidAddons);     // already paid
 
-            const newAddons = p.addons.filter(
-                a => !originalAddonIds.includes(a._id)
-            );
-
-            return sum + newAddons.reduce((s, a) => s + a.price, 0);
+            return sum + Math.max(0, currentTotal - paidTotal);
         }, 0);
     };
 
     const addonsPrice = useMemo(() => {
-        return calculateAddonsPrice(
-            passengerAddons,
-            isCheckin,
-            flowData?.passengers
-        );
+        return calculateAddonsPrice();
     }, [passengerAddons]);
 
-    const priceBreakdownDetails = useMemo(() => {
-        const basePrice = priceBreakdown?.basePrice || 0;
-        const taxes = priceBreakdown?.taxes || 0;
-        return {
-            basePrice,
-            taxes,
-            addonsPrice,
-            totalPrice: basePrice + taxes + addonsPrice,
+
+    const calculateCheckinDelta = () => {
+        return passengerAddons?.reduce((total, p) => {
+            const currentAddonsTotal = sumAddonsPrice(p?.addons);
+            const paidAddonsTotal = sumAddonsPrice(p?.paidAddons);
+
+            const delta = currentAddonsTotal - paidAddonsTotal;
+
+            return total + Math.max(0, delta);
+        }, 0);
+    };
+
+    const totalPrice = useMemo(() => {
+        if (!isCheckin) {
+            return passengerAddons?.reduce(
+                (sum, p) =>
+                    sum +
+                    sumAddonsPrice(p?.addons) +
+                    0
+            , 0);
         }
-    }, [bookingDetails, addonsPrice]);
+
+        // ✅ CHECK-IN
+        return calculateCheckinDelta();
+    }, [passengerAddons, isCheckin]);
+
+    const priceBreakdownDetails = useMemo(() => {
+        if (!isCheckin) {
+            const basePrice = priceBreakdown?.basePrice || 0;
+            const taxes = priceBreakdown?.taxes || 0;
+            return {
+                basePrice,
+                taxes,
+                addonsPrice,
+                totalPrice: basePrice + taxes + addonsPrice,
+            }
+        }
+        return {
+            addonsPrice: totalPrice,
+            totalPrice: totalPrice,
+        };
+    }, [bookingDetails, addonsPrice, totalPrice]);
 
     return (
         <Box maxWidth="lg" mx="auto" p={2}>

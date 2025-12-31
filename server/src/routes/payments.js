@@ -171,25 +171,31 @@ async function markSuccess(type, id, payment) {
     const booking = await BookingModel.findById(id);
     booking.bookingStatus = "COMPLETED";
     for (const passenger of booking.passengers) {
-      for (const [segmentKey, seat] of Object.entries(passenger.seats || {})) {
+      for (const [segmentKey, seat] of passenger?.seats?.entries() || {}) {
+        const seatData = seat.toObject(); // convert to plain object
         await SeatMapModel.updateOne(
           { flightInstanceKey: segmentKey },
           {
             $set: {
-              [`seatStatus.${seat.cabin}.${seat.seatNumber}.status`]: "reserved",
-              [`seatStatus.${seat.cabin}.${seat.seatNumber}.passengerId`]: passenger?.id,
-              [`seatStatus.${seat.cabin}.${seat.seatNumber}.reservedAt`]: new Date(),
+              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.status`]:
+                "reserved",
+              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.passengerId`]:
+                passenger?.id,
+              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.reservedAt`]:
+                new Date(),
             },
           }
         );
       }
+      passenger.paidAddons = passenger.addons;
+      passenger.paidSeats = passenger.seats;
     }
     await booking.save();
 
     await sendMail({
       to: booking?.contact?.email,
       subject: "Your Flight Booking is Confirmed ✈️",
-      html: flightConfirmationTemplate(booking, PNR)
+      html: flightConfirmationTemplate(booking, PNR),
     });
 
     return { PNR: PNR };

@@ -1,33 +1,52 @@
 import mongoose from "mongoose";
 
-const PassengerSchema = new mongoose.Schema(
-  {
-    id: String,
-    firstName: String,
-    lastName: String,
-    age: Number,
-    gender: String,
-    infantTagged: Object,
-    isAdult: { type: Boolean, default: true },
-    isInfant: { type: Boolean, default: false },
-    addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
-    seats: {
-      type: Map,
-      of: new mongoose.Schema(
-        {
-          seatNumber: String, // "12A"
-          cabin: String, // ECONOMY
-          price: String,
-          seatType: {
-            type: String,
-            enum: ["window", "aisle", "middle"],
-          },
+const PassengerSchema = new mongoose.Schema({
+  id: String,
+  firstName: String,
+  lastName: String,
+  age: Number,
+  gender: String,
+  infantTagged: Object,
+  isAdult: { type: Boolean, default: true },
+  isInfant: { type: Boolean, default: false },
+  addons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
+  paidAddons: [{ type: mongoose.Schema.Types.ObjectId, ref: "addons" }],
+  seats: {
+    type: Map,
+    of: new mongoose.Schema(
+      {
+        seatNumber: String, // "12A"
+        cabin: String, // ECONOMY
+        price: String,
+        seatType: {
+          type: String,
+          enum: ["window", "aisle", "middle"],
         },
-        { _id: false }
-      ),
-    },
+      },
+      { _id: false }
+    ),
   },
-);
+  paidSeats: {
+    type: Map,
+    of: new mongoose.Schema(
+      {
+        seatNumber: String, // "12A"
+        cabin: String, // ECONOMY
+        price: String,
+        seatType: {
+          type: String,
+          enum: ["window", "aisle", "middle"],
+        },
+      },
+      { _id: false }
+    ),
+  },
+  checkinAmount: {
+    addonsPrice: { type: Number, default: 0 },
+    seatsPrice: { type: Number, default: 0 },
+    totalPrice: { type: Number, default: 0 },
+  },
+});
 
 const BookingSchema = new mongoose.Schema(
   {
@@ -62,15 +81,6 @@ const BookingSchema = new mongoose.Schema(
       addonsPrice: { type: Number, default: 0 },
       totalPrice: { type: Number, default: 0 },
       seatsPrice: { type: Number, default: 0 },
-    },
-
-    checkinAmount: {
-      type: Map,
-      of: {
-        addonsPrice: { type: Number, default: 0 },
-        seatsPrice: { type: Number, default: 0 },
-        totalPrice: { type: Number, default: 0 },
-      }
     },
 
     paymentRequired: { type: Boolean, default: true },
