@@ -87,7 +87,7 @@ function SeatSelection() {
     }, [activeSeatMap]);
 
     useEffect(() => {
-        if (bookingDetails && !isCheckin) {
+        if (bookingDetails?.passengers) {
             fetchSeatMaps();
             if (bookingDetails?.passengers) {
                 setFlightPassengers(bookingDetails?.passengers || [])
@@ -106,7 +106,7 @@ function SeatSelection() {
                     setSeatPricing(seatPrices);
                 }
             };
-        } else if (checkinDetails && isCheckin) {
+        } else if (checkinDetails?.passengers && isCheckin) {
             fetchSeatMaps();
 
             const passengers = checkinDetails?.passengers || [];
@@ -281,7 +281,8 @@ function SeatSelection() {
         });
     };
 
-    const handlePayment = async () => {
+    const handlePayment = async (e) => {
+        e?.preventDefault()
         if (isCheckin) {
             const response = await updateCheckinSeatSelectionInBooking({
                 bookingId: bookingId,
@@ -398,6 +399,7 @@ function SeatSelection() {
         return flightPassengers?.reduce((total, p) => {
             const currentSeatsTotal = sumSeatPrice(p?.seats);
             const paidSeatsTotal = sumSeatPrice(p?.paidSeats);
+            console.log("currentSeatsTotal", currentSeatsTotal, "paidSeatsTotal", paidSeatsTotal)
 
             return total + Math.max(0, currentSeatsTotal - paidSeatsTotal);
         }, 0);

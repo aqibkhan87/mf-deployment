@@ -178,7 +178,7 @@ const AddonsPage = () => {
                     sum +
                     sumAddonsPrice(p?.addons) +
                     0
-            , 0);
+                , 0);
         }
 
         // ✅ CHECK-IN
@@ -208,7 +208,7 @@ const AddonsPage = () => {
                 {/* LEFT */}
                 <Grid item xs={12} md={8}>
                     <Box >
-                        <Link href={isCheckin ? "check-in" : "/passenger-edit"} sx={{
+                        <Link href={isCheckin ? "/check-in" : "/passenger-edit"} sx={{
                             cursor: "pointer",
                             color: "#000",
                             textDecorationColor: "#000",
@@ -232,15 +232,22 @@ const AddonsPage = () => {
                     <Stack spacing={3}>
                         {passengers?.map((p, passengerIndex) => {
                             const passengerAddon = passengerAddons[passengerIndex];
-
+                            console.log(passengers, passengerAddons)
                             return (
                                 <Card key={p.id} sx={{ mb: 2 }}>
                                     <Box sx={{ display: "flex", alignItems: "center", backgroundColor: "#f7fbff", p: 2 }}>
                                         <Box sx={{ width: 4, height: 48, bgcolor: "success.main", borderRadius: 1, mr: 2 }} />
-                                        <Typography fontWeight={600}>{p.firstName} {p.lastName}</Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {p.type}
-                                        </Typography>
+                                        <Box>
+                                            <Typography fontWeight={600}>{p.firstName} {p.lastName}
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {" "}({p.gender})
+                                                </Typography>
+                                            </Typography>
+                                            {p?.infantTagged ? <Typography variant="caption" color="text.secondary">
+                                                Infant tagged: {p.infantTagged?.firstName}
+                                            </Typography> : ""}
+                                        </Box>
+
                                     </Box>
                                     <Box sx={{ p: 2 }}>
                                         <Box mt={3}>

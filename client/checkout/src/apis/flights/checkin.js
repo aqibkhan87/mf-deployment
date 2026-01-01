@@ -35,7 +35,7 @@ export const getCheckinBookingDetails = async () => {
 
   try {
     const response = await httpRequest(
-      "get",
+      "post", // using get,becoz we can send multiple passenger ids
       `/api/flights/checkin/passengers-addons/${bookingId}`,
       {
         passengerIds: localStorage.getItem("c_p")
@@ -94,13 +94,7 @@ export const updateCheckinSeatSelectionInBooking = async (payload) => {
       `/api/flights/checkin/update-passengers-seats`,
       payload
     );
-    if (response?.status) {
-      useBookingStore.setState((state) => ({
-        ...state,
-        checkinDetails: response.data?.checkinDetails || {},
-      }));
-    }
-    return response.data;
+    return response?.data;
   } catch (error) {
     console.error("Error while update addons in checkinDetails:", error);
   } finally {

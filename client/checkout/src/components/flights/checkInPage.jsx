@@ -57,7 +57,7 @@ const CheckInPage = () => {
     }
 
     // useEffect(() => {
-    //     getCheckinDetails({ PNR: "PUE86J", emailOrLastName: "Khan" })
+    //     getCheckinDetails({ PNR: "JDJTZP", emailOrLastName: "Khan" })
     // }, [])
 
     const handleFieldChange = (e, field) => {
@@ -76,13 +76,14 @@ const CheckInPage = () => {
         if (selectedPassengers?.length === passengers?.length) {
             setSelectedPassengers([])
         } else {
-            setSelectedPassengers(Array.from({ length: passengers?.length }, (p, i) => p?.id))
+            setSelectedPassengers(Array.from({ length: passengers?.length }, (_, i) => passengers?.[i]?.id))
         }
     }
 
     const handleWebCheck = () => {
+        localStorage.setItem("bookingId", JSON.stringify(bookingDetails?.bookingId))
         if(selectedPassengers?.length === passengers?.length) localStorage.setItem("isAll", JSON.stringify(true))
-        else localStorage.setItem("c_p", JSON.stringify(passengers))
+        else localStorage.setItem("c_p", JSON.stringify(selectedPassengers))
         history.push(`/check-in/addons`)
     }
 
@@ -275,7 +276,6 @@ const CheckInPage = () => {
                                         <Box>
                                             <Box sx={{ display: "block" }}>
                                                 {passengers?.map((p, i) => {
-                                                    console.log("ooooo", p)
                                                     return (
                                                         <Box key={i} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                                             <Box sx={{ display: "flex", p: 2, alignItems: "center" }}>

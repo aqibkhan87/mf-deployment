@@ -92,7 +92,14 @@ const BookingWidget = () => {
     icao: "VIDP",
     name: "Indira Gandhi International Airport"
   });
-  const [to, setTo] = useState(null);
+  const [to, setTo] = useState({
+    city: "Mumbai",
+    coords: [19.08956, 72.86561],
+    country: "IN",
+    iata: "BOM",
+    icao: "VABB",
+    name: "Chhatrapati Shivaji Maharaj International Airport"
+  });
   const [departDate, setDepartDate] = useState(new Date().toISOString().split("T")[0]);
   const [passengers, setPassengers] = useState({
     adult: 1,

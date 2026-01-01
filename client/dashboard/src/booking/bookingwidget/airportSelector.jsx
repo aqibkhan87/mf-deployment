@@ -7,6 +7,7 @@ import {
     Box,
     Popper
 } from "@mui/material";
+import FmdGoodIcon from '@mui/icons-material/FmdGood';
 
 const CustomPopper = (props) => {
     const { style } = props;
@@ -75,18 +76,23 @@ const AirportSelector = ({
                 )}
                 renderOption={(props, option) => (
                     <Box component="li" {...props}>
-                        <Box>
-                            <Typography variant="body1">{option.city}, {option.iata}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {option.name}{option.distanceInKm ? ` • ${Math.floor(option.distanceInKm)} Km` : ""}
-                            </Typography>
+                        <Box display={"flex"}>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <FmdGoodIcon sx={{ width: 32, height: 32 }} />
+                            </Box>
+                            <Box sx={{ pl: 1 }}>
+                                <Typography variant="body1">{option.city}, {option.iata}</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {option.name}{option.distanceInKm ? ` • ${Math.floor(option.distanceInKm)} Km` : ""}
+                                </Typography>
+                            </Box>
                         </Box>
                     </Box>
                 )}
             />
 
             <Typography variant="body2" color="text.secondary"
-                sx={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+                sx={{ wordBreak: "break-word" }} className="ellipsis-35">
                 {value?.name ? value?.name : "Select airport by place/city"}
             </Typography>
         </Paper>

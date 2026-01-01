@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const PassengerSchema = new mongoose.Schema({
   id: String,
+  title: String,
   firstName: String,
   lastName: String,
   age: Number,

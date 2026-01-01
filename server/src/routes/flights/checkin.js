@@ -1,9 +1,12 @@
 import express from "express";
+import crypto from "crypto";
 import AviationPaymentModel from "../../models/flights/aviation-payment.js";
 import BookingModel from "../../models/flights/booking.js";
 import AddonModel from "../../models/flights/addons.js";
 import SeatMapModel from "../../models/flights/seatMap.js";
 import { razorpay } from "../../razorpayService.js";
+import { sendMail } from "../../services/mailService.js";
+import { flightConfirmationTemplate } from "../../utils/template.js";
 
 const apiRouter = express.Router();
 
@@ -49,9 +52,10 @@ apiRouter.get("/retrieve-pnr", async (req, res) => {
   }
 });
 
-apiRouter.get("/passengers-addons/:bookingId", async (req, res) => {
+// using post instead of get, becoz we have to receive multiple passengers it can increase url length.
+apiRouter.post("/passengers-addons/:bookingId", async (req, res) => {
   try {
-    const { passengerIds, isAll = false } = req?.query;
+    const { passengerIds, isAll = false } = req?.body;
     const { bookingId } = req?.params;
     if ((!passengerIds?.length && !isAll) || !bookingId) {
       return res.status(404).json({ message: "Missing Details" });
@@ -125,37 +129,42 @@ apiRouter.put("/update-passengers-addons", async (req, res) => {
       addons.map((a) => [a._id.toString(), a.price])
     );
 
+    const updatedPassengerMap = new Map(
+      updatedPassengers?.map((p) => [String(p.id), p])
+    );
+
     const sumAddonsPriceByIds = (addonIds = []) =>
       addonIds.reduce(
         (sum, id) => sum + Number(addonPriceMap.get(id.toString()) || 0),
         0
       );
 
-    updatedPassengers.forEach((p) => {
-      // Calculate addons price
-      if (p.addons && p.addons.length > 0) {
-        const currentAddonsTotal = sumAddonsPriceByIds(p.addons || []);
+    booking.passengers = booking?.passengers?.map((p) => {
+      const incoming = updatedPassengerMap.get(String(p.id));
 
-        const paidAddonsTotal = sumAddonsPriceByIds(p.paidAddons || []);
+      if (!incoming) {
+        // passenger not part of this check-in → keep as-is
+        return p;
+      }
+      // Calculate addons price
+      if (incoming?.addons && incoming?.addons?.length > 0) {
+        const currentAddonsTotal = sumAddonsPriceByIds(incoming.addons || []);
+
+        const paidAddonsTotal = sumAddonsPriceByIds(incoming.paidAddons || []);
 
         const addonsDelta = Math.max(0, currentAddonsTotal - paidAddonsTotal);
 
-        p.checkinAmount = {
-          addonsPrice: addonsDelta,
-          totalPrice: addonsDelta,
-        };
+        p.checkinAmount.addonsPrice = addonsDelta;
+        p.checkinAmount.totalPrice = addonsDelta;
       } else {
         // Remove empty addons array
         p.addons = [];
       }
+      return p;
     });
 
     // 4️⃣ Return updated booking
-    await BookingModel.findByIdAndUpdate(
-      { _id: bookingId },
-      { passengers: updatedPassengers },
-      { new: true }
-    );
+    await booking.save();
 
     res.json({
       success: true,
@@ -192,34 +201,41 @@ apiRouter.put("/update-passengers-seats", async (req, res) => {
       return res.status(404).json({ message: "Seat map not found" });
     }
 
-    updatedPassengers.forEach((p) => {
-      let checkinAmount = p?.checkinAmount;
+    const updatedPassengerMap = new Map(
+      updatedPassengers?.map((p) => [String(p.id), p])
+    );
+
+    booking.passengers = booking?.passengers.map((p) => {
+      const incoming = updatedPassengerMap.get(String(p.id));
+
+      if (!incoming) {
+        // passenger not part of this check-in → keep as-is
+        return p;
+      }
+
       let seatsPrice = 0;
       let currentSeatsTotal = 0;
       let paidSeatsTotal = 0;
 
-      for (let [key, value] of Object.entries(p?.seats)) {
+      for (let [key, value] of Object.entries(incoming?.seats)) {
         if (p?.seats?.[key]) {
           currentSeatsTotal += Number(value?.price) || 0;
         }
       }
-      for (let [key, value] of Object.entries(p?.paidSeats)) {
+      for (let [key, value] of Object.entries(incoming?.paidSeats)) {
         if (p?.seats?.[key]) {
           paidSeatsTotal += Number(value?.price) || 0;
         }
       }
       seatsPrice = Math.max(0, currentSeatsTotal - paidSeatsTotal);
-      checkinAmount.seatsPrice = Number(seatsPrice);
-      checkinAmount.totalPrice =
-        Number(seatsPrice) + Number(checkinAmount.addonsPrice);
+      p.checkinAmount.seatsPrice = Number(seatsPrice);
+      p.checkinAmount.totalPrice =
+        Number(seatsPrice) + Number(p.checkinAmount.addonsPrice);
+      return p;
     });
 
     // 4️⃣ Return updated booking
-    await BookingModel.findByIdAndUpdate(
-      { _id: bookingId },
-      { passengers: updatedPassengers },
-      { new: true }
-    );
+    await booking.save();
 
     res.json({
       success: true,
@@ -304,7 +320,7 @@ apiRouter.put("/payment", async (req, res) => {
   }
 });
 
-apiRouter.post("/verify-payment", async (req, res) => {
+apiRouter.put("/verify-payment", async (req, res) => {
   try {
     const {
       entityId,
@@ -319,13 +335,16 @@ apiRouter.post("/verify-payment", async (req, res) => {
       .digest("hex");
 
     if (expected !== razorpay_signature) {
-      await AviationPaymentModel.findByIdAndUpdate(entityId, {
-        status: "FAILED",
-      });
+      await AviationPaymentModel.findByIdAndUpdate(
+        { razorpay_order_id: razorpay_order_id },
+        {
+          status: "FAILED",
+        }
+      );
       return res.status(400).json({ success: false });
     }
 
-    await markSuccess(type, entityId, {
+    await markSuccess(entityId, {
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
@@ -343,6 +362,7 @@ apiRouter.post("/verify-payment", async (req, res) => {
 });
 
 async function markSuccess(id, payment) {
+  // document of payment while checkin.
   const aviationPayment = await AviationPaymentModel.findOneAndUpdate(
     {
       razorpay_order_id: payment.razorpay_order_id,
@@ -354,8 +374,12 @@ async function markSuccess(id, payment) {
       paidAt: new Date(),
     }
   );
+  // document of payment while booking.
+  const bookingAviationPayment = await AviationPaymentModel.findOne({
+    bookingId: id,
+    PNR: { $exists: true },
+  });
   const booking = await BookingModel.findById(id);
-  booking.bookingStatus = "COMPLETED";
   for (const passenger of booking.passengers) {
     passenger.checkinAmount.isPaid = true;
     await seatBooking("reserved", passenger?.seats, passenger);
@@ -365,8 +389,8 @@ async function markSuccess(id, payment) {
 
   await sendMail({
     to: booking?.contact?.email,
-    subject: `Your Check-in for Flight Booking is Done Against ${aviationPayment?.PNR} ✈️`,
-    html: flightConfirmationTemplate(booking, aviationPayment?.PNR),
+    subject: `Your Check-in for Flight Booking is Done Against ${bookingAviationPayment?.PNR} ✈️`,
+    html: flightConfirmationTemplate(booking, bookingAviationPayment?.PNR),
   });
 }
 

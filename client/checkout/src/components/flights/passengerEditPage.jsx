@@ -34,6 +34,7 @@ import TripSummary from "../../common/flights/tripSummary";
 const createPassenger = (type) => {
   const passenger = {
     type, // "adult" or "infant" or "child later" 
+    title: "",
     firstName: "",
     lastName: "",
     gender: "",
@@ -91,6 +92,9 @@ function PassengerDetailsPage() {
   const updatePassenger = (idx, field, value) => {
     setPassengers((prev) => {
       let updated = prev.map((p, i) => (i === idx ? { ...p, [field]: value } : p));
+      if (field === "gender") {
+        updated[idx].title = value === "Male" ? "Mr." : "Ms.";
+      }
       if (updated[idx]?.type === "infant" && field === "taggedTo") {
         return updated?.map((updateAdult) => {
           if (updateAdult?.id === value) {
