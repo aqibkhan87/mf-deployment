@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const AviationPaymentSchema = new mongoose.Schema(
   {
     gateway: { type: String, default: "RAZORPAY" },
+    type: { type: String, default: "BOOKING", enum: ["BOOKING", "CHECKIN"] },
 
     razorpay_order_id: String,
     razorpay_payment_id: String,
@@ -12,6 +13,7 @@ const AviationPaymentSchema = new mongoose.Schema(
 
     amount: { type: Number, required: true }, 
     currency: { type: String, default: "INR" },
+    passengerIds: [{ type: String }],
 
     status: {
       type: String,
@@ -33,6 +35,11 @@ const AviationPaymentSchema = new mongoose.Schema(
     },
     paidAt: Date,
     failedAt: Date,
+    breakdown: {
+      addonsPirce: { type: Number, default: 0 },
+      seatsPrice: { type: Number, default: 0 },
+      totalPrice: { type: Number, default: 0 },
+    }
   },
   { collection: "AviationPayment" }
 );

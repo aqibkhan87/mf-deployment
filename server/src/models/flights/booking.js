@@ -45,7 +45,15 @@ const PassengerSchema = new mongoose.Schema({
     addonsPrice: { type: Number, default: 0 },
     seatsPrice: { type: Number, default: 0 },
     totalPrice: { type: Number, default: 0 },
+    isPaid: { type: Boolean, default: false },
   },
+  status: {
+    type: String,
+    default: "CREATED",
+    enum: ["CREATED", "PAID", "FAILED"],
+  }, // CREATED | PAID | FAILED
+  razorpay_order_id: String,
+  receipt: String,
 });
 
 const BookingSchema = new mongoose.Schema(

@@ -107,3 +107,39 @@ export const updateCheckinSeatSelectionInBooking = async (payload) => {
     useLoaderStore.getState().setLoading(false);
   }
 };
+
+export const checkinPaymentForPassengers = async (payload) => {
+  useLoaderStore.getState().setLoading(true);
+  try {
+    const response = await httpRequest(
+      "put",
+      `/api/flights/checkin/payment`,
+      payload
+    );
+    if (response?.data && response?.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error("Error while update addons in checkinDetails:", error);
+  } finally {
+    useLoaderStore.getState().setLoading(false);
+  }
+};
+
+export const verifyCheckinPayment = async (payload) => {
+  useLoaderStore.getState().setLoading(true);
+  try {
+    const response = await httpRequest(
+      "put",
+      `/api/flights/checkin/verify-payment`,
+      payload
+    );
+    if (response?.data && response?.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error("Error while verify payments in checkinDetails:", error);
+  } finally {
+    useLoaderStore.getState().setLoading(false);
+  }
+};

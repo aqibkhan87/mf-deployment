@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { useCartStore } from "store/cartStore";
 import { useProductStore } from "store/productStore";
-import { getProductById, getProductByCategory } from "../../apis/products.js";
-import { addToCart } from "../../apis/cart.js";
+import { getProductById, getProductByCategory } from "../../apis/ecommerce/products";
+import { addToCart } from "../../apis/ecommerce/cart";
 import Recommendations from "../../common/ecommerce/recommendations";
 
 

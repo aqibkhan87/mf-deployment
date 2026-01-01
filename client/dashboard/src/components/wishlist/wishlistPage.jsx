@@ -13,7 +13,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useWishlistStore } from "store/wishlistStore";
 import { useAuthStore } from "store/authStore";
-import { getWishlistProducts, deleteItemFromWishlist } from "../../apis/wishlist.js";
+import { getWishlistProducts, deleteItemFromWishlist } from "../../apis/ecommerce/wishlist";
 
 const ProductWishlist = () => {
     const history = useHistory();

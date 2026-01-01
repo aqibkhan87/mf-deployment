@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance.js';
+import axiosInstance from './axiosInstance';
 
 const httpRequest = async (method, url="", data = null, config = {}) => {
   try {

@@ -18,8 +18,8 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 import { useWishlistStore } from "store/wishlistStore";
-import { getCart } from "../apis/cart";
-import { getWishlistProducts } from "../apis/wishlist.js";
+import { getCart } from "../apis/ecommerce/cart";
+import { getWishlistProducts } from "../apis/ecommerce/wishlist";
 
 const MainNav = () => {
   const history = useHistory();

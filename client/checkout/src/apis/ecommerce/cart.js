@@ -1,4 +1,4 @@
-import httpRequest from "../helper/httpMethods";
+import httpRequest from "../../helper/httpMethods";
 import { useCartStore } from "store/cartStore";
 import { useLoaderStore } from "store/loaderStore";
 

@@ -2,16 +2,21 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Box, Typography, Grid, Chip, Link, Button, Paper } from "@mui/material";
 import { useHistory } from "react-router-dom"
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import ExitGap from "../../common/flights/seatSelection/exitGap.jsx";
-import SeatBlock from "../../common/flights/seatSelection/seatBlock.jsx";
+import ExitGap from "../../common/flights/seatSelection/exitGap";
+import SeatBlock from "../../common/flights/seatSelection/seatBlock";
 import PlaneNose from "../../assets/plane-nose.png";
 import { useBookingStore } from "store/bookingStore";
-import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking.js";
-import { getCheckinBookingDetails, updateCheckinSeatSelectionInBooking } from "../../apis/flights/checkin.js";
-import { getSeatMaps } from "../../apis/flights/seatMap.js";
-import TripSummary from "../../common/flights/tripSummary.jsx";
-import { createOrder, verifyPayment } from "../../apis/payment.js";
-import { loadRazorpay } from "../../utils/loadRazorpay.js";
+import { getBookingDetails, updateSeatSelectionInBooking } from "../../apis/flights/booking";
+import {
+    getCheckinBookingDetails,
+    updateCheckinSeatSelectionInBooking,
+    checkinPaymentForPassengers,
+    verifyCheckinPayment
+} from "../../apis/flights/checkin";
+import { getSeatMaps } from "../../apis/flights/seatMap";
+import TripSummary from "../../common/flights/tripSummary";
+import { createOrder, verifyPayment } from "../../apis/payment";
+import { loadRazorpay } from "../../utils/loadRazorpay";
 
 const LegendItem = ({ color, label }) => (
     <Box display="flex" alignItems="center" gap={1.5}>
@@ -279,6 +284,7 @@ function SeatSelection() {
     const handlePayment = async () => {
         if (isCheckin) {
             const response = await updateCheckinSeatSelectionInBooking({
+                bookingId: bookingId,
                 itineraryKey: itineraryKey?.current,
                 passengers: adultPassengers,
             });
@@ -299,10 +305,19 @@ function SeatSelection() {
 
     const proceedToPayment = async () => {
         // 1️⃣ Create Order
-        const data = await createOrder({
-            type: "FLIGHT", // or ECOMMERCE
-            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
-        });
+        let data = {};
+        if (isCheckin) {
+            data = await checkinPaymentForPassengers({
+                type: "FLIGHT", // or ECOMMERCE
+                entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+                passengers: adultPassengers
+            });
+        } else {
+            data = await createOrder({
+                type: "FLIGHT", // or ECOMMERCE
+                entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+            });
+        }
 
         // 2️⃣ Load Razorpay
         const loaded = await loadRazorpay();
@@ -319,18 +334,30 @@ function SeatSelection() {
 
             handler: async (res) => {
                 try {
-                    const response = await verifyPayment({
-                        type: "FLIGHT",
-                        entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
-                        ...res,
-                    });
+                    let response = {};
+                    if (isCheckin) {
+                        response = await verifyCheckinPayment({
+                            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+                            ...res,
+                        });
+                    } else {
+                        response = await verifyPayment({
+                            type: "FLIGHT",
+                            entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
+                            ...res,
+                        });
+                    }
                     const { orderId, status, PNR } = response;
 
                     if (response?.success) {
                         localStorage.setItem("bookingId", "");
                         localStorage.setItem("search-info", "{}");
                         sessionStorage.setItem("selectedFlight", "{}");
-                        history.push(`/itinerary?orderId=${orderId}&status=${status}&PNR=${PNR}`);
+                        if (isCheckin) {
+                            history.push(`/boarding-pass?orderId=${orderId}&status=${status}&PNR=${PNR}`);
+                        } else {
+                            history.push(`/itinerary?orderId=${orderId}&status=${status}&PNR=${PNR}`);
+                        }
                     }
                 } catch (err) {
                     alert("Payment verification failed");
@@ -366,9 +393,6 @@ function SeatSelection() {
                 0
             )
             : 0;
-
-    const sumAddonsPrice = items =>
-        items?.reduce((s, i) => s + i.price, 0) || 0;
 
     const calculateSeatDelta = () => {
         return flightPassengers?.reduce((total, p) => {

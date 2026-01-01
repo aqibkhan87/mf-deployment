@@ -1,5 +1,5 @@
 import axios from "axios";
-import httpRequest from "../helper/httpMethods.js";
+import httpRequest from "../helper/httpMethods";
 import { useLoaderStore } from "store/loaderStore";
 
 export const createOrder = async (payload) => {

@@ -1,4 +1,4 @@
-import httpRequest from "../helper/httpMethods.js";
+import httpRequest from "../helper/httpMethods";
 import { useLoaderStore } from "store/loaderStore";
 
 export const login = async ({ contact, password }) => {

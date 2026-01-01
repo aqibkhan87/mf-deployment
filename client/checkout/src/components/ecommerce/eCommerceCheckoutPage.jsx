@@ -4,10 +4,10 @@ import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import OrderSummary from "../../common/ecommerce/orderSummary";
 import CheckoutItems from "../../common/ecommerce/checkout";
-import { eventEmitter } from "../../utils/helper.js";
-import { loadRazorpay } from "../../utils/loadRazorpay.js";
-import { createOrder, verifyPayment } from "../../apis/payment.js";
-import { getAllAddresses } from "../../apis/address.js";
+import { eventEmitter } from "../../utils/helper";
+import { loadRazorpay } from "../../utils/loadRazorpay";
+import { createOrder, verifyPayment } from "../../apis/payment";
+import { getAllAddresses } from "../../apis/address";
 
 const Checkout = () => {
   const history = useHistory();

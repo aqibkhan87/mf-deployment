@@ -15,7 +15,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useCartStore } from "store/cartStore";
-import { getCart, updateInCart } from "../../apis/cart";
+import { getCart, updateInCart } from "../../apis/ecommerce/cart";
 import { updateQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {

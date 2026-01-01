@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useAuthStore } from "store/authStore";
 import { login, signup } from "../apis/auth";
-import { updateUserIdInCart } from "../apis/cart";
+import { updateUserIdInCart } from "../apis/ecommerce/cart";
 import { getAllAddresses } from "../apis/address";
 
 const AuthFormPopup = ({ open, onClose, type = "login" }) => {

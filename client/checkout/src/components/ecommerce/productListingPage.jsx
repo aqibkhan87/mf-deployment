@@ -13,7 +13,7 @@ import {
   Rating,
 } from "@mui/material";
 import { useProductStore } from "store/productStore";
-import { getProductByCategory } from "../../apis/products.js";
+import { getProductByCategory } from "../../apis/ecommerce/products";
 import useDebounce from "../../helper/useDebounce";
 
 const ProductListing = () => {

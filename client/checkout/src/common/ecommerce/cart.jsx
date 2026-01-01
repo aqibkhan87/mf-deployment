@@ -16,8 +16,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { useCartStore } from "store/cartStore";
 import { useAuthStore } from "store/authStore";
 import { updateQuantity } from "../../utils/helper";
-import { updateInCart, removeItemFromCart } from "../../apis/cart";
-import { addToWishlist } from "../../apis/wishlist";
+import { updateInCart, removeItemFromCart } from "../../apis/ecommerce/cart";
+import { addToWishlist } from "../../apis/ecommerce/wishlist";
 
 const Cart = () => {
   const history = useHistory();

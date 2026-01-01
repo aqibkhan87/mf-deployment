@@ -1,6 +1,6 @@
 import { useLoaderStore } from "store/loaderStore";
 import { useCartStore } from "store/cartStore";
-import httpRequest from "../helper/httpMethods.js";
+import httpRequest from "../../helper/httpMethods";
 
 export const getCart = async () => {
   const cartId = localStorage.getItem("cartId")
