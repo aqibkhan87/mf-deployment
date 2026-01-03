@@ -2,7 +2,10 @@ import puppeteer from "puppeteer";
 import QRCode from "qrcode";
 import fs from "fs";
 import path from "path";
-import { boardingPassGenerateTemplate } from "./template.js";
+import {
+  boardingPassGenerateTemplate,
+  singleBoardingPassGenerateTemplate,
+} from "./template.js";
 
 export const calculateCartSummary = (cart) => {
   // Initialize totals
@@ -109,7 +112,15 @@ export const buildBoardingPassData = (booking, passenger) => {
   };
 };
 
-export async function generateBoardingPassPDF(boardingPasses, PNR, paymentId) {
+export async function generateBoardingPassPDF({
+  boardingPasses,
+  PNR,
+  paymentId,
+  bookingId,
+  passengerId = "",
+  segmentKey,
+  type = "multi",
+}) {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -117,7 +128,11 @@ export async function generateBoardingPassPDF(boardingPasses, PNR, paymentId) {
 
   const page = await browser.newPage();
 
-  const html = boardingPassGenerateTemplate(boardingPasses, PNR);
+  let html = "";
+  if (type === "multi")
+    html = boardingPassGenerateTemplate(boardingPasses, PNR);
+  else if (type === "single")
+    html = singleBoardingPassGenerateTemplate(boardingPasses, PNR);
 
   await page.setContent(html, {
     waitUntil: "domcontentloaded",
@@ -130,13 +145,24 @@ export async function generateBoardingPassPDF(boardingPasses, PNR, paymentId) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
-  const pdfPath = path.join(
-    process.cwd(),
-    "public",
-    "uploads",
-    "checkin",
-    `boarding-pass-${paymentId}.pdf`
-  );
+  let pdfPath = "";
+  if (type === "single") {
+    pdfPath = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "checkin",
+      `boardingpass_${bookingId}_${passengerId}_${segmentKey}.pdf`
+    );
+  } else {
+    pdfPath = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "checkin",
+      `boardingpass_${paymentId}.pdf`
+    );
+  }
 
   await page.pdf({
     path: pdfPath,
@@ -148,3 +174,5 @@ export async function generateBoardingPassPDF(boardingPasses, PNR, paymentId) {
 
   return pdfPath;
 }
+
+export const getBaseUrl = (req) => `${req.protocol}://${req.get("host")}`;

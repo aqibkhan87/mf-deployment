@@ -422,10 +422,10 @@ function FlightResults() {
                                             </p>
                                         </Box>
                                         <Box className="flex-1">
-                                            <p className="text-gray-600">
+                                            <p className="text-gray-600 text-center">
                                                 {formatDuration(segment?.duration)}
                                             </p>
-                                            <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
+                                            <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2", margin: "6px auto" }}></p>
                                         </Box>
                                         <Box className="flex-1">
                                             <p className="text-xl font-bold">

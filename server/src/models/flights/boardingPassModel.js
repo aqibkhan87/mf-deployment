@@ -27,6 +27,7 @@ const BoardingPassSchema = new mongoose.Schema(
     cabin: String,
     barcodeData: String,
     status: String,
+    pdfURL: String,
   },
   { timestamps: true, collection: "boardingPass" }
 );

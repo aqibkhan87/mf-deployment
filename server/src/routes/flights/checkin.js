@@ -12,9 +12,25 @@ import {
   generateBoardingPassPDF,
   generateQRCode,
   buildBarcodePayload,
+  getBaseUrl,
 } from "../../utils/helper.js";
 
 const apiRouter = express.Router();
+
+apiRouter.get("/download/:pdfurl", async (req, res) => {
+  try {
+    const { pdfurl } = req?.params;
+    if (!pdfurl) {
+      return res.status(404).json({ message: "Missing Details" });
+    }
+
+    let pdfFullPath = getBaseUrl(req) + pdfurl;
+    res.download(pdfFullPath);
+  } catch (err) {
+    console.error("Error fetching checkin Details:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 apiRouter.get("/retrieve-pnr", async (req, res) => {
   try {
@@ -401,12 +417,13 @@ async function markSuccess(req, id, payment) {
       p.checkinAmount?.isPaid !== true
   );
   for (const passenger of payablePassengers) {
-    // passenger.checkinAmount.isPaid = true;
+    passenger.checkinAmount.isPaid = true;
     await seatBooking("free", passenger?.paidSeats, passenger);
     await seatBooking("reserved", passenger?.seats, passenger);
   }
 
   let pdfPath = await createBoardingPass(
+    req,
     booking,
     payablePassengers,
     bookingAviationPayment?.PNR,
@@ -424,8 +441,6 @@ async function markSuccess(req, id, payment) {
     html: boardingPassMailTemplate(pdfPath),
   });
 }
-
-const getBaseUrl = (req) => `${req.protocol}://${req.get("host")}`;
 
 const seatBooking = async (type = "free", seatData, passenger) => {
   for (const [segmentKey, paidSeat] of seatData?.entries() || {}) {
@@ -449,6 +464,7 @@ const seatBooking = async (type = "free", seatData, passenger) => {
 };
 
 const createBoardingPass = async (
+  req,
   booking,
   payablePassengers,
   PNR,
@@ -507,13 +523,28 @@ const createBoardingPass = async (
         barcodeData: qrCodeBase64,
         status: "ACTIVE",
       });
+      let pdfURL = await generateBoardingPassPDF({
+        boardingPasses: boardingPass,
+        PNR,
+        paymentId,
+        bookingId: booking._id,
+        passengerId: passenger.id,
+        segmentKey: segmentKey,
+        type: "single",
+      });
+      pdfURL = getBaseUrl(req) + pdfURL?.split("public")[1];
+      boardingPass.pdfURL = pdfURL;
       boardingPasses.push(boardingPass);
       await boardingPass.save();
       idx++;
     }
   }
 
-  const pdfPath = await generateBoardingPassPDF(boardingPasses, PNR, paymentId);
+  const pdfPath = await generateBoardingPassPDF({
+    boardingPasses,
+    PNR,
+    paymentId,
+  });
 
   return pdfPath;
 };

@@ -10,5 +10,6 @@
 /*/*/.env
 *.env
 *.env.production
+/server/public/uploads/checkin/**
 /metacook.in.key
 /metacook.in.pem

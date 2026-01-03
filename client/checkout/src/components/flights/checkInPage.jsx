@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import FlightIcon from "@mui/icons-material/Flight";
 import { useBookingStore } from "store/bookingStore";
-import { getCheckinDetails } from "../../apis/flights/checkin";
+import { getCheckinDetails, downloadBoardingPDF } from "../../apis/flights/checkin";
 import { formatDate, formatTime, formatDuration, getTimeDifference } from "../../utils/helper";
 
 
@@ -93,8 +93,10 @@ const CheckInPage = () => {
         history.push(`/check-in/addons`)
     }
 
-    const downloadBoardingPass = () => {
+    const downloadBoardingPass = async () => {
         console.log("Download Boarding Pass.")
+        const pdfPath = "";
+        await downloadBoardingPDF(pdfPath)
     }
 
     return (
@@ -195,7 +197,7 @@ const CheckInPage = () => {
                                         return (
                                             <Box key={index}>
                                                 {arrivalTime &&
-                                                    <Box className="flex justify-center py-4">
+                                                    <Box className="flex justify-center py-6">
                                                         <Box>
                                                             <Typography sx={{ px: 4, py: 2, bgcolor: "#d0e5ff", borderRadius: 20 }}>
                                                                 Layover at {departureAirportObj?.city} {getTimeDifference(segment?.departureTime, arrivalTime)}
@@ -203,41 +205,39 @@ const CheckInPage = () => {
                                                         </Box>
                                                     </Box>}
                                                 <Box className="flex items-center justify-between">
-                                                    <Box className="flex-1" sx={{ width: "40%" }}>
+                                                    <Box className="flex-1">
                                                         <p className="text-xl font-bold">
                                                             {formatTime(segment?.departureTime)}
                                                             <span className="pl-2 text-xs">
-                                                                {departureAirportObj?.iata} {segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""}
+                                                                {departureAirportObj?.iata}{segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""}
                                                             </span>
                                                         </p>
                                                         <p className="text-gray-500  text-xs">
                                                             {departureAirportObj?.city} - {departureAirportObj?.name}, {departureAirportObj?.country}
                                                         </p>
                                                     </Box>
-                                                    <Box className="flex" sx={{ width: "20%" }}>
-                                                        <Box sx={{ width: "100%" }}>
-                                                            <Box sx={{ width: "100%" }}>
-                                                                <p className="text-gray-600">
-                                                                    {formatDuration(segment?.duration)}
-                                                                </p>
-                                                            </Box>
-                                                            <Box sx={{ width: "100%" }}>
-                                                                <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2" }}></p>
-                                                            </Box>
-                                                        </Box>
+                                                    <Box className="flex-1">
+                                                        <p className="text-gray-600 text-center">
+                                                            {formatDuration(segment?.duration)}
+                                                        </p>
+                                                        <p style={{ 
+                                                            width: 60, 
+                                                            height: 5, 
+                                                            borderRadius: 8, 
+                                                            backgroundColor: "#1976d2", 
+                                                            margin: "6px auto" 
+                                                        }}></p>
                                                     </Box>
-                                                    <Box className="flex-1 flex justify-end" sx={{ width: "40%" }}>
-                                                        <Box>
-                                                            <p className="text-xl font-bold">
-                                                                {formatTime(segment?.arrivalTime)}
-                                                                <span className="pl-2 text-xs">
-                                                                    {arrivalAirportObj?.iata} {segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""}
-                                                                </span>
-                                                            </p>
-                                                            <p className="text-gray-500 text-xs">
-                                                                {arrivalAirportObj?.city} - {arrivalAirportObj?.name}, {arrivalAirportObj?.country}
-                                                            </p>
-                                                        </Box>
+                                                    <Box className="flex-1">
+                                                        <p className="text-xl font-bold">
+                                                            {formatTime(segment?.arrivalTime)}
+                                                            <span className="pl-2 text-xs">
+                                                                {arrivalAirportObj?.iata}{segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""}
+                                                            </span>
+                                                        </p>
+                                                        <p className="text-gray-500 text-xs">
+                                                            {arrivalAirportObj?.city} - {arrivalAirportObj?.name}, {arrivalAirportObj?.country}
+                                                        </p>
                                                     </Box>
                                                 </Box>
 
@@ -280,9 +280,9 @@ const CheckInPage = () => {
                                                 </Typography>
                                             </Box>
                                             <Box>
-                                                <Radio 
-                                                    checked={selectedPassengers?.length === passengers?.length} 
-                                                    onClick={toggleAllPassengers} 
+                                                <Radio
+                                                    checked={selectedPassengers?.length === passengers?.length}
+                                                    onClick={toggleAllPassengers}
                                                 />
                                             </Box>
                                         </Box>
@@ -299,10 +299,10 @@ const CheckInPage = () => {
                                                             </Box>
                                                             <Box>
                                                                 {p?.checkinAmount?.isPaid ?
-                                                                    <Box onClick={downloadBoardingPass}>Download Boarding Pass</Box> :
+                                                                    <Box onClick={(e) => downloadBoardingPass(p)}>Download Boarding Pass</Box> :
                                                                     <Radio
                                                                         checked={selectedPassengers.includes(p?.id) || false}
-                                                                        onClick={() => handlePassengerSelect(p?.id)} 
+                                                                        onClick={() => handlePassengerSelect(p?.id)}
                                                                     />
                                                                 }
                                                             </Box>
