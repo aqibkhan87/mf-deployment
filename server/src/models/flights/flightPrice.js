@@ -47,4 +47,6 @@ const flightPriceSchema = new mongoose.Schema(
 
 flightPriceSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2 * 24 * 60 * 60 }); // 2 days
 
-export default mongoose.model("flightPrice", flightPriceSchema);
+const FlightPriceModel = mongoose.model("flightPrice", flightPriceSchema);
+
+export default FlightPriceModel;

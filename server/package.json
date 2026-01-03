@@ -30,6 +30,8 @@
     "mongoose": "^8.18.3",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
+    "puppeteer": "^24.34.0",
+    "qrcode": "^1.5.4",
     "razorpay": "^2.9.6",
     "redis": "^5.8.3",
     "uuid": "^13.0.0"

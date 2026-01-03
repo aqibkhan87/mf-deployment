@@ -4,9 +4,15 @@ import AviationPaymentModel from "../../models/flights/aviation-payment.js";
 import BookingModel from "../../models/flights/booking.js";
 import AddonModel from "../../models/flights/addons.js";
 import SeatMapModel from "../../models/flights/seatMap.js";
+import BoardingPassModel from "../../models/flights/boardingPassModel.js";
 import { razorpay } from "../../razorpayService.js";
 import { sendMail } from "../../services/mailService.js";
-import { flightConfirmationTemplate } from "../../utils/template.js";
+import { boardingPassMailTemplate } from "../../utils/template.js";
+import {
+  generateBoardingPassPDF,
+  generateQRCode,
+  buildBarcodePayload,
+} from "../../utils/helper.js";
 
 const apiRouter = express.Router();
 
@@ -73,8 +79,8 @@ apiRouter.post("/passengers-addons/:bookingId", async (req, res) => {
     let passengers = [];
     if (passengerIds?.length) {
       for (let id of passengerIds) {
-        passengers = addonsCheckinDetails?.passengers?.filter(
-          (pass) => pass?.id === id
+        passengers.push(
+          addonsCheckinDetails?.passengers?.find((pass) => pass?.id === id)
         );
       }
     } else if (isAll) {
@@ -344,7 +350,7 @@ apiRouter.put("/verify-payment", async (req, res) => {
       return res.status(400).json({ success: false });
     }
 
-    await markSuccess(entityId, {
+    await markSuccess(req, entityId, {
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
@@ -361,38 +367,65 @@ apiRouter.put("/verify-payment", async (req, res) => {
   }
 });
 
-async function markSuccess(id, payment) {
+async function markSuccess(req, id, payment) {
   // document of payment while checkin.
-  const aviationPayment = await AviationPaymentModel.findOneAndUpdate(
-    {
-      razorpay_order_id: payment.razorpay_order_id,
-    },
-    {
-      status: "COMPLETED",
-      razorpay_payment_id: payment.razorpay_payment_id,
-      razorpay_signature: payment.razorpay_signature,
-      paidAt: new Date(),
-    }
-  );
+  const aviationPayment = await AviationPaymentModel.findOne({
+    razorpay_order_id: payment.razorpay_order_id,
+  });
+  if (!aviationPayment) {
+    throw new Error("Check-in payment record not found");
+  }
+  if (aviationPayment.status === "COMPLETED") {
+    return res.status(200).json({ message: "Payment already processed" });
+  }
+  aviationPayment.status = "COMPLETED";
+  aviationPayment.razorpay_payment_id = payment.razorpay_payment_id;
+  aviationPayment.razorpay_signature = payment.razorpay_signature;
+  aviationPayment.paidAt = new Date();
   // document of payment while booking.
   const bookingAviationPayment = await AviationPaymentModel.findOne({
     bookingId: id,
     PNR: { $exists: true },
   });
   const booking = await BookingModel.findById(id);
-  for (const passenger of booking.passengers) {
-    passenger.checkinAmount.isPaid = true;
-    await seatBooking("reserved", passenger?.seats, passenger);
-    await seatBooking("free", passenger?.paidSeats, passenger);
+  if (!booking) {
+    throw new Error("Booking not found");
   }
+  const passengerIds = aviationPayment?.passengerIds;
+  // update seats for individual or all passengers.
+  // Backend decides payable passengers
+  const payablePassengers = booking.passengers.filter(
+    (p) =>
+      passengerIds.includes(String(p?.id)) &&
+      p.checkinAmount?.totalPrice > 0 &&
+      p.checkinAmount?.isPaid !== true
+  );
+  for (const passenger of payablePassengers) {
+    // passenger.checkinAmount.isPaid = true;
+    await seatBooking("free", passenger?.paidSeats, passenger);
+    await seatBooking("reserved", passenger?.seats, passenger);
+  }
+
+  let pdfPath = await createBoardingPass(
+    booking,
+    payablePassengers,
+    bookingAviationPayment?.PNR,
+    payment.razorpay_payment_id
+  );
+
   await booking.save();
+  await aviationPayment.save();
+
+  pdfPath = getBaseUrl(req) + pdfPath?.split("public")[1];
 
   await sendMail({
     to: booking?.contact?.email,
     subject: `Your Check-in for Flight Booking is Done Against ${bookingAviationPayment?.PNR} ✈️`,
-    html: flightConfirmationTemplate(booking, bookingAviationPayment?.PNR),
+    html: boardingPassMailTemplate(pdfPath),
   });
 }
+
+const getBaseUrl = (req) => `${req.protocol}://${req.get("host")}`;
 
 const seatBooking = async (type = "free", seatData, passenger) => {
   for (const [segmentKey, paidSeat] of seatData?.entries() || {}) {
@@ -413,6 +446,76 @@ const seatBooking = async (type = "free", seatData, passenger) => {
       );
     }
   }
+};
+
+const createBoardingPass = async (
+  booking,
+  payablePassengers,
+  PNR,
+  paymentId
+) => {
+  let boardingPasses = [];
+  for (const passenger of payablePassengers) {
+    let idx = 0;
+    for (const [segmentKey, seat] of passenger?.seats?.entries() || {}) {
+      const segment = booking?.flightDetail?.segments[idx];
+      const airline = booking?.flightDetail?.airline;
+      const barcodeText = buildBarcodePayload({
+        PNR: PNR,
+        flightNumber: segment?.flightNumber,
+        seatNumber: seat?.seatNumber,
+        departureTime: segment?.departureTime,
+        departureAirport: segment?.departureAirport,
+        arrivalAirport: segment?.arrivalAirport,
+        passengerId: passenger?.id,
+      });
+      const qrCodeBase64 = await generateQRCode(barcodeText);
+
+      const connectingAirports = booking?.connectingAirports;
+      const departureAirportObj = connectingAirports?.find(
+        (a) => a?.iata === segment?.departureAirport
+      );
+      const arrivalAirportObj = connectingAirports?.find(
+        (a) => a?.iata === segment?.arrivalAirport
+      );
+
+      const boardingPass = await BoardingPassModel.create({
+        bookingId: booking._id,
+        airlineCode: airline?.code,
+        airlineName: airline?.name,
+        passengerId: passenger.id,
+        PNR: PNR,
+        segmentKey: segmentKey,
+
+        flightNumber: segment?.flightNumber,
+        arrivalAirport: segment?.arrivalAirport,
+        arrivalCity: arrivalAirportObj?.city,
+        arrivalTerminal: segment?.arrivalTerminal,
+        arrivalTime: segment?.arrivalTime,
+        carrierCode: segment?.carrierCode,
+        class: segment?.class,
+        departureAirport: segment?.departureAirport,
+        departureCity: departureAirportObj?.city,
+        departureTerminal: segment?.departureTerminal,
+        departureTime: segment?.departureTime,
+        duration: segment?.duration,
+
+        passengerName: `${passenger.firstName} ${passenger.lastName}`,
+        seatNumber: seat?.seatNumber,
+        cabin: seat?.cabin,
+
+        barcodeData: qrCodeBase64,
+        status: "ACTIVE",
+      });
+      boardingPasses.push(boardingPass);
+      await boardingPass.save();
+      idx++;
+    }
+  }
+
+  const pdfPath = await generateBoardingPassPDF(boardingPasses, PNR, paymentId);
+
+  return pdfPath;
 };
 
 export default apiRouter;

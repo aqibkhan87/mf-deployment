@@ -399,7 +399,6 @@ function SeatSelection() {
         return flightPassengers?.reduce((total, p) => {
             const currentSeatsTotal = sumSeatPrice(p?.seats);
             const paidSeatsTotal = sumSeatPrice(p?.paidSeats);
-            console.log("currentSeatsTotal", currentSeatsTotal, "paidSeatsTotal", paidSeatsTotal)
 
             return total + Math.max(0, currentSeatsTotal - paidSeatsTotal);
         }, 0);

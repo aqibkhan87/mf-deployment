@@ -17,19 +17,21 @@ endOfYesterday.setHours(23, 59, 59, 999);
 // };
 
 export const deleteYesterdayFlightData = async () => {
-  console.log("Deleting Yesterday existing Flight data...");
-  await FlightPriceModel.deleteMany({
+  console.log("Deleting Yesterday existing Flight data...", endOfYesterday);
+  const result = await FlightPriceModel.deleteMany({
     date: {
       $lte: endOfYesterday,
     },
   });
+  console.log("Flight data result.deletedCount...", result.deletedCount)
 };
 
 export const deleteYesterdaySeatMapData = async () => {
-  console.log("Deleting yesterday existing SeatMap data...");
-  await SeatMapModel.deleteMany({
+  console.log("Deleting yesterday existing SeatMap data...", endOfYesterday);
+  const result = await SeatMapModel.deleteMany({
     departureDate: {
       $lte: endOfYesterday,
     },
   });
+  console.log("SeatMap data result.deletedCount...", result.deletedCount);
 };

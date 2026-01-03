@@ -82,9 +82,19 @@ const CheckInPage = () => {
 
     const handleWebCheck = () => {
         localStorage.setItem("bookingId", JSON.stringify(bookingDetails?.bookingId))
-        if(selectedPassengers?.length === passengers?.length) localStorage.setItem("isAll", JSON.stringify(true))
-        else localStorage.setItem("c_p", JSON.stringify(selectedPassengers))
+        if (selectedPassengers?.length === passengers?.length) {
+            localStorage.setItem("isAll", JSON.stringify(true))
+            localStorage.setItem("c_p", JSON.stringify(selectedPassengers))
+        }
+        else {
+            localStorage.setItem("isAll", JSON.stringify(false))
+            localStorage.setItem("c_p", JSON.stringify(selectedPassengers))
+        }
         history.push(`/check-in/addons`)
+    }
+
+    const downloadBoardingPass = () => {
+        console.log("Download Boarding Pass.")
     }
 
     return (
@@ -270,7 +280,10 @@ const CheckInPage = () => {
                                                 </Typography>
                                             </Box>
                                             <Box>
-                                                <Radio checked={selectedPassengers?.length === passengers?.length} onClick={toggleAllPassengers} />
+                                                <Radio 
+                                                    checked={selectedPassengers?.length === passengers?.length} 
+                                                    onClick={toggleAllPassengers} 
+                                                />
                                             </Box>
                                         </Box>
                                         <Box>
@@ -285,7 +298,13 @@ const CheckInPage = () => {
                                                                 </Box>
                                                             </Box>
                                                             <Box>
-                                                                <Radio checked={selectedPassengers.includes(p?.id) || false} onClick={() => handlePassengerSelect(p?.id)} />
+                                                                {p?.checkinAmount?.isPaid ?
+                                                                    <Box onClick={downloadBoardingPass}>Download Boarding Pass</Box> :
+                                                                    <Radio
+                                                                        checked={selectedPassengers.includes(p?.id) || false}
+                                                                        onClick={() => handlePassengerSelect(p?.id)} 
+                                                                    />
+                                                                }
                                                             </Box>
                                                         </Box>
                                                     )

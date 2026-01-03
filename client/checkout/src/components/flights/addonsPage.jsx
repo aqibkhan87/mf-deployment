@@ -231,8 +231,7 @@ const AddonsPage = () => {
 
                     <Stack spacing={3}>
                         {passengers?.map((p, passengerIndex) => {
-                            const passengerAddon = passengerAddons[passengerIndex];
-                            console.log(passengers, passengerAddons)
+                            const passengerAddon = passengerAddons?.[passengerIndex];
                             return (
                                 <Card key={p.id} sx={{ mb: 2 }}>
                                     <Box sx={{ display: "flex", alignItems: "center", backgroundColor: "#f7fbff", p: 2 }}>
