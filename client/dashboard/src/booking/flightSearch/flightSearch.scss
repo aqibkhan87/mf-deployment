@@ -29,7 +29,11 @@
     }
 
     .swiper {
-      height: 80px;
+      height: 100px;
+      
+      .swiper-wrapper {
+        height: 80px;
+      }
     }
 
     .swiper-slide {

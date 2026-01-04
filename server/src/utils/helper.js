@@ -96,7 +96,7 @@ export const buildBoardingPassData = (booking, passenger) => {
     passengerId: passenger.id,
     PNR: booking.PNR,
 
-    passengerName: `${passenger.firstName} ${passenger.lastName}`,
+    passengerName: `${passenger.title} ${passenger.firstName} ${passenger.lastName}`,
     flightNumber: booking.flightNumber,
     flightDate: booking.flightDate,
 

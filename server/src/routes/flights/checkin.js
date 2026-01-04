@@ -376,6 +376,7 @@ apiRouter.put("/verify-payment", async (req, res) => {
       success: true,
       orderId: razorpay_order_id,
       status: "COMPLETED",
+      email: ""
     });
   } catch (err) {
     console.error(err);
@@ -516,7 +517,7 @@ const createBoardingPass = async (
         departureTime: segment?.departureTime,
         duration: segment?.duration,
 
-        passengerName: `${passenger.firstName} ${passenger.lastName}`,
+        passengerName: `${passenger.title} ${passenger.firstName} ${passenger.lastName}`,
         seatNumber: seat?.seatNumber,
         cabin: seat?.cabin,
 

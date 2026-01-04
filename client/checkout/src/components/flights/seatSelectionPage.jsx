@@ -348,14 +348,18 @@ function SeatSelection() {
                             ...res,
                         });
                     }
-                    const { orderId, status, PNR } = response;
 
+                    const orderId = response?.orderId;
+                    const status = response?.status;
+                    const PNR = response?.PNR;
+                    debugger;
                     if (response?.success) {
                         localStorage.setItem("bookingId", "");
                         localStorage.setItem("search-info", "{}");
                         sessionStorage.setItem("selectedFlight", "{}");
                         if (isCheckin) {
-                            history.push(`/boarding-pass?orderId=${orderId}&status=${status}&PNR=${PNR}`);
+                            const email = response?.email;
+                            history.push(`/check-in?PNR=${PNR}&email=${email}`);
                         } else {
                             history.push(`/itinerary?orderId=${orderId}&status=${status}&PNR=${PNR}`);
                         }
@@ -385,6 +389,22 @@ function SeatSelection() {
     const adultPassengers = useMemo(
         () => flightPassengers?.filter(p => p.isAdult),
         [flightPassengers]
+    );
+
+    const hasSelectedSeatsForAllSegments = (passenger) => {
+        return seatMaps.every(
+            seatMap => passenger?.seats?.[seatMap?.flightInstanceKey]?.seatNumber
+        );
+    };
+
+    const toggleProceedToPaymentBtn = useMemo(
+        () => {
+            if (!flightPassengers?.length || !seatMaps?.length) return true;
+            return !flightPassengers.every(passenger =>
+                hasSelectedSeatsForAllSegments(passenger)
+            );
+        },
+        [flightPassengers, segments]
     );
 
     const sumSeatPrice = seats =>
@@ -510,7 +530,7 @@ function SeatSelection() {
                                     onClick={() => setActivePassengerIndex(index)}
                                 >
                                     <Typography variant="h6">
-                                        {passenger?.firstName} {passenger?.lastName}
+                                        {passenger?.title} {passenger?.firstName} {passenger?.lastName}
                                     </Typography>
                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         {passenger?.seats?.[flightKey] ? (
@@ -618,7 +638,12 @@ function SeatSelection() {
                 {/* RIGHT SUMMARY */}
                 <Grid item xs={12} md={4}>
                     <TripSummary priceBreakdown={priceBreakdownDetails} />
-                    <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handlePayment}>
+                    <Button
+                        variant="contained"
+                        fullWidth sx={{ mt: 2 }}
+                        onClick={handlePayment}
+                        disabled={toggleProceedToPaymentBtn}
+                    >
                         Proceed to Payment
                     </Button>
                 </Grid>

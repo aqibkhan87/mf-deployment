@@ -103,12 +103,7 @@ const CheckInPage = () => {
         <Container sx={{ py: 3 }}>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
-                    <Box
-                        sx={{
-                            // height: 350,
-                            // width: 300
-                        }}
-                    >
+                    <Box>
                         <Box sx={{ p: 2 }}>
                             <Typography fontWeight={600} fontSize={24}>
                                 Find your booking
@@ -294,7 +289,7 @@ const CheckInPage = () => {
                                                             <Box sx={{ display: "flex", p: 2, alignItems: "center" }}>
                                                                 <Avatar />
                                                                 <Box sx={{ pl: 2 }}>
-                                                                    {p?.firstName} {p?.lastName}
+                                                                    {p?.title} {p?.firstName} {p?.lastName}
                                                                 </Box>
                                                             </Box>
                                                             <Box>

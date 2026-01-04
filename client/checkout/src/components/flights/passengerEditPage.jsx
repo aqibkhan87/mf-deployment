@@ -86,7 +86,9 @@ function PassengerDetailsPage() {
   };
 
   const toggleCard = (idx) => {
-    setSelectedPassenger(idx);
+    if (idx === selectedPassenger) {
+      setSelectedPassenger(null);
+    } else setSelectedPassenger(idx);
   };
 
   const updatePassenger = (idx, field, value) => {
@@ -135,8 +137,6 @@ function PassengerDetailsPage() {
   const handleContactChange = (field, value) => {
     setContact((prev) => ({ ...prev, [field]: value }));
   };
-
-  console.log("passengerspassengers", passengers)
 
   return (
     <Container sx={{ py: 3 }}>

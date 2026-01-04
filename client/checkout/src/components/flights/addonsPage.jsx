@@ -237,13 +237,13 @@ const AddonsPage = () => {
                                     <Box sx={{ display: "flex", alignItems: "center", backgroundColor: "#f7fbff", p: 2 }}>
                                         <Box sx={{ width: 4, height: 48, bgcolor: "success.main", borderRadius: 1, mr: 2 }} />
                                         <Box>
-                                            <Typography fontWeight={600}>{p.firstName} {p.lastName}
+                                            <Typography fontWeight={600}>{p?.title} {p.firstName} {p.lastName}
                                                 <Typography variant="caption" color="text.secondary">
                                                     {" "}({p.gender})
                                                 </Typography>
                                             </Typography>
                                             {p?.infantTagged ? <Typography variant="caption" color="text.secondary">
-                                                Infant tagged: {p.infantTagged?.firstName}
+                                                Infant tagged: {p.infantTagged?.title} {p.infantTagged?.firstName}
                                             </Typography> : ""}
                                         </Box>
 

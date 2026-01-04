@@ -83,7 +83,7 @@ const SeatBlock = ({ layout, seatState, onSelect, seatPricing = {}, seatLayoutTy
         let rowMap = [];
         for (let row = 1; row <= rows; row++) {
             rowMap.push(
-                <Box key={row} display="flex" gap={2} flexDirection="column" justifyContent="space-around">
+                <Box key={row} display="flex" gap={1} flexDirection="column" justifyContent="space-around">
                     {columns?.map((col, i) => {
                         const seatId = `${row}${col}`;
                         const status = seatState[seatId]["status"] || "available";

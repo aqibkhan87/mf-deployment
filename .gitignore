@@ -11,5 +11,6 @@
 *.env
 *.env.production
 /server/public/uploads/checkin/**
+/server/public/uploads/.DS_store
 /metacook.in.key
 /metacook.in.pem

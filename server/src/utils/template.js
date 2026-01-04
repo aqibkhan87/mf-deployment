@@ -68,7 +68,7 @@ export const flightConfirmationTemplate = (booking, PNR) => {
                     ${passengers
                       ?.map(
                         (p) =>
-                          `<li>${p?.firstName} ${p?.lastName} (${p?.gender})</li>`
+                          `<li>${p?.title} ${p?.firstName} ${p?.lastName} (${p?.gender})</li>`
                       )
                       .join("")}
                 </ul>

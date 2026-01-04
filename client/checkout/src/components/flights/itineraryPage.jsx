@@ -231,13 +231,13 @@ const ItineraryPage = () => {
                         return (
                             <Box key={i} sx={{ mt: i > 0 ? 2 : 1, mb: 1 }}>
                                 <Typography fontWeight={600}>
-                                    {p?.firstName} {p?.lastName} ({p?.gender})
+                                    {p?.title} {p?.firstName} {p?.lastName} ({p?.gender})
                                 </Typography>
                                 {seatNumbers}
                                 {p?.infantTagged &&
                                     <Box>
                                         <Typography variant="span" color="text.secondary" >
-                                            Infant Tagged: {p?.infantTagged?.firstName} {p?.infantTagged?.lastName}
+                                            Infant Tagged: {p?.infantTagged?.title} {p?.infantTagged?.firstName} {p?.infantTagged?.lastName}
                                         </Typography>
                                     </Box>
                                 }
@@ -274,42 +274,42 @@ const ItineraryPage = () => {
                 </Box>
 
                 <Grid container spacing={2} sx={{ px: 3 }}>
-                    {priceBreakdown?.basePrice &&
+                    {priceBreakdown?.basePrice ?
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography>
                                 Adults
                             </Typography>
                             <Typography>₹ {Math.round(priceBreakdown?.basePrice)}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.seatsPrice &&
+                        </Grid> : ""}
+                    {priceBreakdown?.seatsPrice ?
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography>
                                 Seats
                             </Typography>
                             <Typography>₹ {priceBreakdown?.seatsPrice}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.addonsPrice &&
+                        </Grid> : ""}
+                    {priceBreakdown?.addonsPrice ?
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography>
                                 Addons
                             </Typography>
                             <Typography>₹ {priceBreakdown?.addonsPrice}</Typography>
-                        </Grid>}
-                    {priceBreakdown?.taxes &&
+                        </Grid> : ""}
+                    {priceBreakdown?.taxes ?
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography>
                                 Taxes
                             </Typography>
                             <Typography>₹ {Math.round(priceBreakdown?.taxes)}</Typography>
-                        </Grid>}
+                        </Grid> : ""}
 
-                    {itineraryDetails?.amount &&
+                    {itineraryDetails?.amount ?
                         <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography fontWeight={700}>
                                 Total Paid:
                             </Typography>
                             <Typography>₹ {itineraryDetails?.amount}</Typography>
-                        </Grid>}
+                        </Grid> : ""}
                     <Grid item xs={12}>
                         <Divider sx={{ my: 1 }} />
                     </Grid>
