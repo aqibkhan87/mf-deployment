@@ -12,7 +12,8 @@ import {
 import { useAuthStore } from "store/authStore";
 import { login } from "../apis/auth";
 import CartMergePopup from "./cartMergePopup";
-
+import { updateUserIdInCart } from "../apis/ecommerce/cart";
+import { getAllAddresses } from "../apis/address";
 
 const LoginFormPopup = ({ open, onClose, setFormType }) => {
     const { setUser } = useAuthStore();
@@ -57,16 +58,24 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
             if (userDetails?.data?.user) {
                 localStorage.setItem("user", JSON.stringify(userDetails?.data?.user));
                 localStorage.setItem("token", JSON.stringify(userDetails?.data?.token));
-                debugger
                 if (userDetails?.data?.cartId) {
                     setOpenMergePopup(true)
+                } else {
+                    const response = await updateUserIdInCart(
+                        user?._id,
+                        JSON.parse(localStorage.getItem("cartId")),
+                        true
+                    );
+                    if (response?.data?.cart) {
+                        localStorage.setItem("cartId", JSON.stringify(response?.data?.cart?._id));
+                    }
+                    await getAllAddresses();
+                    onClose();
                 }
                 setUser(userDetails?.data?.user);
-                onClose();
             }
         }
     };
-    console.log("openMergePopup", openMergePopup)
 
     return (
         <>
@@ -137,7 +146,7 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
                     </Box>
                 </DialogContent>
             </Dialog>
-            <CartMergePopup open={openMergePopup} onClose={setOpenMergePopup} />
+            <CartMergePopup open={openMergePopup} onClose={setOpenMergePopup} closeAuthPopup={onClose} />
         </>
     );
 };

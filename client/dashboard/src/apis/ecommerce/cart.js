@@ -22,7 +22,11 @@ export const getCart = async () => {
   }
 };
 
-export const updateUserIdInCart = async (userId, cartId) => {
+export const updateUserIdInCart = async (
+  userId,
+  cartId,
+  SyncProducts = true
+) => {
   try {
     useLoaderStore.getState().setLoading(true);
     const response = await httpRequest(
@@ -31,6 +35,7 @@ export const updateUserIdInCart = async (userId, cartId) => {
       {
         userId,
         guestCartId: cartId,
+        SyncProducts,
       }
     );
     useLoaderStore.getState().setLoading(false);

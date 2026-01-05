@@ -9,22 +9,27 @@ import {
 } from "@mui/material";
 import { useAuthStore } from "store/authStore";
 import { updateUserIdInCart } from "../apis/ecommerce/cart";
+import { getAllAddresses } from "../apis/address";
 
-const cartMergePopup = ({ open, onClose }) => {
-    console.log(open, onClose, "open, onClose")
+const cartMergePopup = ({ open, onClose, closeAuthPopup }) => {
     const { user } = useAuthStore();
 
-    const updateCart = async () => {
+    const updateCart = async (SyncProducts = true) => {
         if (localStorage.getItem("cartId")) {
-            await updateUserIdInCart(
+            const response = await updateUserIdInCart(
                 user?._id,
-                JSON.parse(localStorage.getItem("cartId"))
+                JSON.parse(localStorage.getItem("cartId")),
+                SyncProducts
             );
+            if (response?.data?.cart) {
+                localStorage.setItem("cartId", JSON.stringify(response?.data?.cart?._id));
+            }
             await getAllAddresses();
+            closeAuthPopup();
         }
     }
     const cancelMerging = () => {
-        updateCart()
+        updateCart(false)
         onClose()
     }
 
@@ -38,29 +43,30 @@ const cartMergePopup = ({ open, onClose }) => {
             <DialogContent>
                 <Box sx={{ mt: 1, maxWidth: 500 }}>
                     <Typography>
-                        Do you want to merge your existing cart with current cart.
+                        Do you want to Products from your guest cart to be added to your account cart?
                     </Typography>
 
-                    <Button
-                        fullWidth
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 2 }}
-                        onClick={cancelMerging}
-                    >
-                        No
-                    </Button>
-                    <Button
-                        fullWidth
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 2 }}
-                        onClick={handleMerge}
-                    >
-                        Yes
-                    </Button>
+                    <Box gap={2} sx={{ display: "flex", justifyContent: "flex-end" }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 2 }}
+                            onClick={cancelMerging}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 2 }}
+                            onClick={handleMerge}
+                        >
+                            Yes
+                        </Button>
+                    </Box>
+
                 </Box>
             </DialogContent>
         </Dialog>

@@ -148,16 +148,24 @@ apiRouter.put("/update", async (req, res) => {
 
 apiRouter.put("/update-userid-in-cart", async (req, res) => {
   try {
-    const { userId, guestCartId } = req.body;
+    const { userId, guestCartId, SyncProducts } = req.body;
 
     if (!guestCartId || !userId) {
       return res.status(400).json({ error: "Valid cart Id required." });
     }
 
     const guestCart = await CartModel.findById(guestCartId);
-    const userCart = await CartModel.findOne({ userId }).populate(
+    let userCart = await CartModel.findOne({ userId }).populate(
       "products.productDetail"
     );
+
+    if (!SyncProducts) {
+      return res.json({
+        merged: false,
+        message: "Cart sync skipped by user choice.",
+        cart: userCart || {},
+      });
+    }
 
     if (!userCart) {
       guestCart.userId = userId;
