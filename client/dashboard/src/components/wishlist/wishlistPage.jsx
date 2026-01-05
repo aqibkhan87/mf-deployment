@@ -102,8 +102,15 @@ const ProductWishlist = () => {
                             </Card>
                         </a>
                     </Grid>
-                )) : <Typography className="m-8" variant="h6" gutterBottom>No wishlist Items</Typography>}
+                )) : <></>
+                }
             </Grid>
+            {!wishlist?.length ? <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Typography variant="h6" 
+                sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+                    No wishlist Items
+                </Typography>
+            </Box> : <></>}
         </Box>
     );
 };

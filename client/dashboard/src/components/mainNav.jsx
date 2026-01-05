@@ -159,7 +159,7 @@ const MainNav = () => {
 
                 <Divider />
 
-                <MenuItem onClick={handleCloseMenu}>User Profile</MenuItem>
+                {/* <MenuItem onClick={handleCloseMenu}>User Profile</MenuItem> */}
                 <MenuItem onClick={handleOrder}>Orders</MenuItem>
                 <MenuItem onClick={handleAddress}>Addresses</MenuItem>
                 <MenuItem onClick={handleLogOut}>Logout</MenuItem>

@@ -14,8 +14,6 @@ import { useAuthStore } from "store/authStore";
 import AddressFormDialog from "./addressDialogForm";
 import { addNewAddress, getAllAddresses, editAddress, markDefaultAddress, deleteAddress } from "../../apis/address";
 
-const brown = "#7B4A12";
-
 const AddressList = () => {
     const history = useHistory();
     const { user, addresses } = useAuthStore();
@@ -63,7 +61,7 @@ const AddressList = () => {
                         sx={{
                             width: 300,
                             minWidth: 300,
-                            border: `1px solid ${brown}`,
+                            border: `1px solid #1976d2`,
                             background: "#fff"
                         }}
                     >
@@ -83,7 +81,7 @@ const AddressList = () => {
                                     <></> :
                                     <Button
                                         onClick={() => handleMarkDefault(addr)}
-                                        sx={{ pr: 1, color: brown, textTransform: "none" }}
+                                        sx={{ pr: 1, color: "#1976d2", textTransform: "none" }}
                                     >
                                         Mark as Default
                                     </Button>}
@@ -104,7 +102,7 @@ const AddressList = () => {
                         </CardContent>
                     </Card>
                 )) : (
-                    <Box className="">
+                    <Box>
                         <Typography>No Address Found</Typography>
                     </Box>
                 )}
@@ -115,11 +113,6 @@ const AddressList = () => {
                 onClick={() => {
                     setCurrent(null);
                     setOpen(true);
-                }}
-                sx={{
-                    borderColor: brown,
-                    color: brown,
-                    textTransform: "none",
                 }}
             >
                 Add New Address
