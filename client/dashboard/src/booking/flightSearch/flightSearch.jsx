@@ -13,9 +13,9 @@ import dayjs from "dayjs";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../../apis/flights/booking";
 import BookingWidget from "../bookingwidget/bookingWidget";
-import "./flightSearch.scss"
 import { eventEmitter, formatTime, formatDuration, getTimeDifference } from "../../utils/helper"
 import ConnectingFlightPopup from "../../common/simplePopup";
+import "./flightSearch.scss"
 
 export const getAllowedDates = (days = 10) => {
     const today = dayjs().startOf("day");
@@ -60,12 +60,12 @@ function FlightResults() {
 
     useEffect(() => {
         if (localStorage.getItem("search-info")) {
-            const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : "";
+            const searchInfo = localStorage.getItem("search-info") ? JSON.parse(localStorage.getItem("search-info")) : {};
             setSearchInfo({
-                from: searchInfo?.from,
-                to: searchInfo?.to,
+                from: searchInfo?.from || "DEL",
+                to: searchInfo?.to || "BOM",
                 date: searchInfo?.date,
-                passengers: searchInfo?.passengers
+                passengers: searchInfo?.passengers || {}
             })
         }
     }, []);

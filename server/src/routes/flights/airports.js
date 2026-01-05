@@ -113,7 +113,7 @@ router.get("/search", async (req, res) => {
       { $limit: 5 },
     ]);
 
-    console.log("matchedAirports", matchedAirports);
+    // console.log("matchedAirports", matchedAirports);
 
     if (!matchedAirports.length) {
       return res.status(200).json({ queryResults: [] });
