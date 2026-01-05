@@ -60,3 +60,13 @@ export const getTimeDifference = (smallerDate, largerDate) => {
 
   return `${hours ? `${hours}h` : ""} ${minutes ? `${minutes}m` : ""}`;
 }
+
+export const downloadFile = (url) => {
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.download = "";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

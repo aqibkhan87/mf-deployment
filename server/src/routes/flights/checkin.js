@@ -52,11 +52,32 @@ apiRouter.get("/retrieve-pnr", async (req, res) => {
     if (!checkinDetails)
       return res.status(404).json({ message: "Checkin Details not found" });
 
+    const boardingPasses = await BoardingPassModel.find({
+      PNR,
+      status: "ACTIVE",
+    }).lean();
+
+    const boardingPassMap = boardingPasses.reduce((acc, bp) => {
+      acc[bp.passengerId] = acc[bp.passengerId] || [];
+      acc[bp.passengerId].push({
+        arrivalAirport: bp.arrivalAirport,
+        departureAirport: bp.departureAirport,
+        pdfURL: bp.pdfURL,
+      });
+      return acc;
+    }, {});
+
+    const passengers = checkinDetails.bookingId?.passengers
+      ?.map((p) => ({
+        ...p?.toObject(),
+        boardingPasses: boardingPassMap?.[p?.id] || [],
+      }));
+
     const response = {
       bookingDetails: {
         date: checkinDetails?.bookingId?.date,
         contact: checkinDetails?.bookingId?.contact,
-        passengers: checkinDetails?.bookingId?.passengers,
+        passengers: passengers,
         flightDetail: checkinDetails?.bookingId?.flightDetail,
         sourceAirport: checkinDetails?.bookingId?.sourceAirport,
         destinationAirport: checkinDetails?.bookingId?.destinationAirport,
@@ -366,17 +387,23 @@ apiRouter.put("/verify-payment", async (req, res) => {
       return res.status(400).json({ success: false });
     }
 
-    await markSuccess(req, entityId, {
-      razorpay_payment_id,
-      razorpay_order_id,
-      razorpay_signature,
+    const booking = await BookingModel.findById(entityId);
+    const bookingAviationPayment = await AviationPaymentModel.findOne({
+      bookingId: entityId,
+      PNR: { $exists: true },
     });
 
     res.json({
       success: true,
       orderId: razorpay_order_id,
       status: "COMPLETED",
-      email: ""
+      email: booking?.contact?.email,
+      PNR: bookingAviationPayment?.PNR,
+    });
+    await markSuccess(req, entityId, {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
     });
   } catch (err) {
     console.error(err);
@@ -384,30 +411,32 @@ apiRouter.put("/verify-payment", async (req, res) => {
   }
 });
 
-async function markSuccess(req, id, payment) {
+const markSuccess = async (req, id, payment) => {
+  // document of payment while booking.
+  const bookingAviationPayment = await AviationPaymentModel.findOne({
+    bookingId: id,
+    PNR: { $exists: true },
+  });
   // document of payment while checkin.
   const aviationPayment = await AviationPaymentModel.findOne({
     razorpay_order_id: payment.razorpay_order_id,
   });
+  const booking = await BookingModel.findById(id);
+
   if (!aviationPayment) {
     throw new Error("Check-in payment record not found");
   }
   if (aviationPayment.status === "COMPLETED") {
     return res.status(200).json({ message: "Payment already processed" });
   }
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
   aviationPayment.status = "COMPLETED";
   aviationPayment.razorpay_payment_id = payment.razorpay_payment_id;
   aviationPayment.razorpay_signature = payment.razorpay_signature;
   aviationPayment.paidAt = new Date();
-  // document of payment while booking.
-  const bookingAviationPayment = await AviationPaymentModel.findOne({
-    bookingId: id,
-    PNR: { $exists: true },
-  });
-  const booking = await BookingModel.findById(id);
-  if (!booking) {
-    throw new Error("Booking not found");
-  }
+
   const passengerIds = aviationPayment?.passengerIds;
   // update seats for individual or all passengers.
   // Backend decides payable passengers
@@ -423,6 +452,9 @@ async function markSuccess(req, id, payment) {
     await seatBooking("reserved", passenger?.seats, passenger);
   }
 
+  await booking.save();
+  await aviationPayment.save();
+
   let pdfPath = await createBoardingPass(
     req,
     booking,
@@ -431,9 +463,6 @@ async function markSuccess(req, id, payment) {
     payment.razorpay_payment_id
   );
 
-  await booking.save();
-  await aviationPayment.save();
-
   pdfPath = getBaseUrl(req) + pdfPath?.split("public")[1];
 
   await sendMail({
@@ -441,7 +470,7 @@ async function markSuccess(req, id, payment) {
     subject: `Your Check-in for Flight Booking is Done Against ${bookingAviationPayment?.PNR} ✈️`,
     html: boardingPassMailTemplate(pdfPath),
   });
-}
+};
 
 const seatBooking = async (type = "free", seatData, passenger) => {
   for (const [segmentKey, paidSeat] of seatData?.entries() || {}) {

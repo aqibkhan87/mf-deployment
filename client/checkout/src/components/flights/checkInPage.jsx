@@ -10,17 +10,30 @@ import {
     Container,
     TextField,
     Button,
-    Radio
+    Radio,
+    Menu,
+    MenuItem,
+    ListItemText
 } from "@mui/material";
 import FlightIcon from "@mui/icons-material/Flight";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useBookingStore } from "store/bookingStore";
 import { getCheckinDetails, downloadBoardingPDF } from "../../apis/flights/checkin";
-import { formatDate, formatTime, formatDuration, getTimeDifference } from "../../utils/helper";
+import {
+    formatDate,
+    formatTime,
+    formatDuration,
+    getTimeDifference,
+    downloadFile
+} from "../../utils/helper";
 
 
 const CheckInPage = () => {
     const { checkinDetails } = useBookingStore();
     const history = useHistory();
+    const params = new URLSearchParams(window.location.search);
+    const PNR = params.get("PNR");
+    const email = params.get("email");
     const bookingDetails = checkinDetails?.bookingDetails;
     const sourceAirport = bookingDetails?.sourceAirport;
     const destinationAirport = bookingDetails?.destinationAirport;
@@ -28,6 +41,10 @@ const CheckInPage = () => {
     const segments = bookingDetails?.flightDetail?.segments;
     const passengers = bookingDetails?.passengers || [];
     const [selectedPassengers, setSelectedPassengers] = useState([]);
+    const [menuState, setMenuState] = useState({
+        anchorEl: null,
+        passengerId: null,
+    });
 
     const [formData, setFormData] = useState({
         PNR: "",
@@ -56,9 +73,9 @@ const CheckInPage = () => {
         await getCheckinDetails(formData)
     }
 
-    // useEffect(() => {
-    //     getCheckinDetails({ PNR: "JDJTZP", emailOrLastName: "Khan" })
-    // }, [])
+    useEffect(() => {
+        if (PNR && email) getCheckinDetails({ PNR: PNR, emailOrLastName: email });
+    }, [PNR, email])
 
     const handleFieldChange = (e, field) => {
         setFormData({ ...formData, [field]: e?.target?.value })
@@ -91,12 +108,6 @@ const CheckInPage = () => {
             localStorage.setItem("c_p", JSON.stringify(selectedPassengers))
         }
         history.push(`/check-in/addons`)
-    }
-
-    const downloadBoardingPass = async () => {
-        console.log("Download Boarding Pass.")
-        const pdfPath = "";
-        await downloadBoardingPDF(pdfPath)
     }
 
     return (
@@ -215,12 +226,12 @@ const CheckInPage = () => {
                                                         <p className="text-gray-600 text-center">
                                                             {formatDuration(segment?.duration)}
                                                         </p>
-                                                        <p style={{ 
-                                                            width: 60, 
-                                                            height: 5, 
-                                                            borderRadius: 8, 
-                                                            backgroundColor: "#1976d2", 
-                                                            margin: "6px auto" 
+                                                        <p style={{
+                                                            width: 60,
+                                                            height: 5,
+                                                            borderRadius: 8,
+                                                            backgroundColor: "#1976d2",
+                                                            margin: "6px auto"
                                                         }}></p>
                                                     </Box>
                                                     <Box className="flex-1">
@@ -275,10 +286,14 @@ const CheckInPage = () => {
                                                 </Typography>
                                             </Box>
                                             <Box>
-                                                <Radio
-                                                    checked={selectedPassengers?.length === passengers?.length}
-                                                    onClick={toggleAllPassengers}
-                                                />
+                                                {passengers?.length ?
+                                                    passengers?.find((p) => p?.checkinAmount?.isPaid) ?
+                                                        "" :
+                                                        <Radio
+                                                            checked={selectedPassengers?.length === passengers?.length}
+                                                            onClick={toggleAllPassengers}
+                                                        />
+                                                    : ""}
                                             </Box>
                                         </Box>
                                         <Box>
@@ -294,7 +309,42 @@ const CheckInPage = () => {
                                                             </Box>
                                                             <Box>
                                                                 {p?.checkinAmount?.isPaid ?
-                                                                    <Box onClick={(e) => downloadBoardingPass(p)}>Download Boarding Pass</Box> :
+                                                                    <>
+                                                                        <Button
+                                                                            variant="contained"
+                                                                            startIcon={<DownloadIcon />}
+                                                                            onClick={(e) =>
+                                                                                setMenuState({
+                                                                                    anchorEl: e.currentTarget,
+                                                                                    passengerId: p.id,
+                                                                                })
+                                                                            }
+                                                                        >
+                                                                            Download Boarding Pass
+                                                                        </Button>
+                                                                        <Menu
+                                                                            anchorEl={menuState.anchorEl}
+                                                                            open={menuState.passengerId === p.id}
+                                                                            onClose={() => setMenuState({ anchorEl: null, passengerId: null })}
+                                                                        >
+                                                                            {p?.boardingPasses?.map((bp, idx) => {
+                                                                                return (
+                                                                                    <MenuItem
+                                                                                        key={idx}
+                                                                                        onClick={() => {
+                                                                                            downloadFile(bp.pdfURL);
+                                                                                            setMenuState({ anchorEl: null, passengerId: null });
+                                                                                        }}
+                                                                                    >
+                                                                                        <ListItemText
+                                                                                            primary={`${bp.departureAirport} → ${bp.arrivalAirport}`}
+                                                                                        />
+                                                                                    </MenuItem>
+                                                                                )
+                                                                            })}
+                                                                        </Menu>
+                                                                    </>
+                                                                    :
                                                                     <Radio
                                                                         checked={selectedPassengers.includes(p?.id) || false}
                                                                         onClick={() => handlePassengerSelect(p?.id)}
