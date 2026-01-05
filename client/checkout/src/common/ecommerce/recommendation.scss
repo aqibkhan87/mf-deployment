@@ -1,6 +1,9 @@
 .recommendation {
   .swiper {
-    height: 400px;
+    height: 420px;
+    .swiper-wrapper {
+      height: 400px;
+    }
   }
   .swiper-button-next,
   .swiper-button-prev {

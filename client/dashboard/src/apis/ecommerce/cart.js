@@ -30,7 +30,7 @@ export const updateUserIdInCart = async (userId, cartId) => {
       `/api/ecommerce/cart/update-userid-in-cart`,
       {
         userId,
-        cartId,
+        guestCartId: cartId,
       }
     );
     useLoaderStore.getState().setLoading(false);

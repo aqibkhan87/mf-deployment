@@ -7,9 +7,7 @@ export const useAuthStore = create((set, get) => ({
   token: localStorage.getItem("token")
     ? JSON.parse(localStorage.getItem("token"))
     : "",
-  address: localStorage.getItem("address")
-    ? JSON.parse(localStorage.getItem("address"))
-    : "",
+  address: "",
   addresses: [],
   theme: "light",
   settings: {},

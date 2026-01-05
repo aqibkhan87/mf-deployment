@@ -84,7 +84,7 @@ const DestinationCard = ({ item }) => {
       <div className="overlay">
         <span>{sourceAirport?.city} - {destinationAirport?.city}</span>
         <span>
-          Starting at <p>₹{item?.fare?.totalPrice}*</p>
+          Starting at <p>₹ {Math.floor(item?.fare?.totalPrice)}</p>
         </span>
       </div>
     </div>

@@ -28,6 +28,12 @@ const Checkout = () => {
   }, [isEditMode, user, address]);
 
   useEffect(() => {
+    if(!localStorage.getItem("cartId")) {
+      history.push("/")
+    }
+  }, []);
+  
+  useEffect(() => {
     setDefaultAddress();
   }, [addresses]);
 

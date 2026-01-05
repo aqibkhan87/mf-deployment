@@ -199,42 +199,6 @@ const ProductDetail = () => {
                   {product.discountedPrice}
                 </Typography>
               </Box>
-              <Typography variant="caption" color="text.secondary">
-                + ₹19 Protect Promise Fee
-              </Typography>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Offers */}
-              <Typography variant="subtitle1" gutterBottom>
-                Available offers
-              </Typography>
-              <ul style={{ marginTop: 0, paddingLeft: 20 }}>
-                <li>Bank Offer: 5% cashback on Flipkart Axis Bank Credit Card</li>
-                <li>
-                  Bank Offer: 5% cashback on Axis Bank Debit Card up to ₹750
-                </li>
-                <li>Partner Offer: Earn 25 Supercoins using BHIM UPI</li>
-              </ul>
-              <Typography sx={{ color: "primary.main", cursor: "pointer" }}>
-                View 6 more offers
-              </Typography>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Delivery Check */}
-              <Box display="flex" gap={1} alignItems="center">
-                <TextField
-                  label="Enter Pincode"
-                  size="small"
-                  variant="outlined"
-                  sx={{ width: 150 }}
-                />
-                <Button variant="outlined">Check</Button>
-              </Box>
-              <Typography variant="body2" mt={1}>
-                Delivery in <b>2 Days, Friday</b>
-              </Typography>
             </Grid>
           </Grid>
         </Box>

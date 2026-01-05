@@ -33,6 +33,25 @@ export const calculateCartSummary = (cart) => {
   return cart;
 };
 
+export const mergeProducts = (userProducts = [], guestProducts = []) => {
+  const map = new Map();
+
+  [...userProducts, ...guestProducts].forEach(item => {
+    const key = item.productDetail.toString();
+
+    if (!map.has(key)) {
+      map.set(key, {
+        productDetail: item.productDetail,
+        quantity: item.quantity,
+      });
+    } else {
+      map.get(key).quantity += item.quantity;
+    }
+  });
+
+  return Array.from(map.values());
+};
+
 export const formatDate = (iso) =>
   new Date(iso).toLocaleDateString("en-IN", {
     day: "2-digit",

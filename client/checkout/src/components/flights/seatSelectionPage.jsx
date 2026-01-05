@@ -352,7 +352,6 @@ function SeatSelection() {
                     const orderId = response?.orderId;
                     const status = response?.status;
                     const PNR = response?.PNR;
-                    debugger;
                     if (response?.success) {
                         localStorage.setItem("bookingId", "");
                         localStorage.setItem("search-info", "{}");

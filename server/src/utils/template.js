@@ -455,7 +455,7 @@ export const singleBoardingPassGenerateTemplate = (
             body {
                 font-family: "Inter", Arial, sans-serif;
                 background: #eef1f5;
-                padding: 30px;
+                padding: 15px;
             }
 
             .ticket {
@@ -731,7 +731,7 @@ export const boardingPassMailTemplate = (
             body {
             font-family: "Inter", Arial, sans-serif;
             background: #eef1f5;
-            padding: 30px;
+            padding: 15px;
             }
 
             .ticket {

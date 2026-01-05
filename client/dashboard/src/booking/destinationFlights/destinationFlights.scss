@@ -5,6 +5,9 @@
 
   .swiper {
     height: 100%;
+    .swiper-wrapper {
+      height: 100%;
+    }
   }
   .swiper-button-next::after,
   .swiper-button-prev::after {

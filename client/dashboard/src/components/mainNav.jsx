@@ -23,9 +23,9 @@ import { getWishlistProducts } from "../apis/ecommerce/wishlist";
 
 const MainNav = () => {
   const history = useHistory();
-  const { cartId, cartCount, setCartId } = useCartStore();
-  const { wishlistCount } = useWishlistStore();
-  const { user, setUser } = useAuthStore();
+  const { cartId, cartCount, setCartId, setCartCount, setCart } = useCartStore();
+  const { wishlistCount, setWishlistCount } = useWishlistStore();
+  const { user, setUser, setAddress } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -53,12 +53,19 @@ const MainNav = () => {
 
   const handleLogOut = (e) => {
     e.preventDefault();
-    localStorage.setItem("user", JSON.stringify({}));
-    localStorage.setItem("cartId", "");
-    localStorage.setItem("token", "");
-    localStorage.setItem("address", "");
+    localStorage.removeItem("user");
+    localStorage.removeItem("cartId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("address");
+    localStorage.removeItem("bookingId");
+    localStorage.removeItem("c_p");
+    localStorage.removeItem("isAll");
     setUser({});
+    setCart({});
+    setAddress({})
     setCartId("");
+    setCartCount(0);
+    setWishlistCount(0);
     handleCloseMenu();
     history.push("/auth/login");
   };

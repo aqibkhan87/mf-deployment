@@ -5,9 +5,7 @@ export const useCartStore = () => ({
   cartId: localStorage.getItem("cartId")
     ? JSON.parse(localStorage.getItem("cartId"))
     : "",
-  cartCount: localStorage.getItem("cartCount")
-    ? JSON.parse(localStorage.getItem("cartCount"))
-    : 0,
+  cartCount: 0,
 
 
   setCart: (cart) => set({ cart }),

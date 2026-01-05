@@ -3,7 +3,7 @@ const apiRouter = express.Router();
 
 import CartModel from "../../models/ecommerce/e-cart.js";
 import ProductModel from "../../models/ecommerce/e-product.js";
-import { calculateCartSummary } from "../../utils/helper.js";
+import { calculateCartSummary, mergeProducts } from "../../utils/helper.js";
 
 apiRouter.post("/", async (req, res) => {
   try {
@@ -19,7 +19,7 @@ apiRouter.post("/", async (req, res) => {
       cart = await CartModel.findById(cartId);
     }
 
-    if (!cart && userId) {
+    if (!cart && userId !== "anonymous") {
       cart = await CartModel.findOne({ userId });
     }
 
@@ -28,10 +28,6 @@ apiRouter.post("/", async (req, res) => {
         userId: userId || "anonymous",
         products: [],
       });
-    }
-
-    if (!cart.userId && userId) {
-      cart.userId = userId;
     }
 
     let totalAmount = 0;
@@ -60,7 +56,7 @@ apiRouter.post("/", async (req, res) => {
     cart.totalAmount = totalAmount.toFixed(2);
     cart.totalActual = totalActual.toFixed(2);
     cart.savedAmount = (totalActual - totalAmount).toFixed(2);
-    
+
     await cart.save();
 
     res.json({
@@ -152,22 +148,32 @@ apiRouter.put("/update", async (req, res) => {
 
 apiRouter.put("/update-userid-in-cart", async (req, res) => {
   try {
-    const { cartId, userId } = req.body;
+    const { userId, guestCartId } = req.body;
 
-    if (!cartId) {
+    if (!guestCartId || !userId) {
       return res.status(400).json({ error: "Valid cart Id required." });
     }
 
-    // Find the cart by ID
-    let cart = await CartModel.findOneAndUpdate(
-      { _id: cartId },
-      { userId },
-      { new: true }
+    const guestCart = await CartModel.findById(guestCartId);
+    const userCart = await CartModel.findOne({ userId }).populate(
+      "products.productDetail"
     );
-    if (cart.userId === userId)
-      return res.json({ message: "User Id updated." });
-    // Optionally populate products.productDetail before returning
-    res.json({ cart });
+
+    if (!userCart) {
+      guestCart.userId = userId;
+      await guestCart.save();
+      return res.json({ cart: guestCart, merged: false });
+    }
+
+    userCart.products = mergeProducts(userCart.products, guestCart.products);
+    userCart = calculateCartSummary(userCart);
+    await userCart.save();
+    await CartModel.deleteOne({ _id: guestCartId }); // delete guest cart
+
+    res.json({
+      cart: userCart,
+      merged: true,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

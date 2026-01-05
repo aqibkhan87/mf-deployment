@@ -2,7 +2,8 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
+import UserModel from "../models/user.js";
+import CartModel from "../models/ecommerce/e-cart.js";
 
 const apiRouter = express.Router();
 
@@ -13,12 +14,12 @@ apiRouter.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
-    const exists = await User.findOne({ email });
+    const exists = await UserModel.findOne({ email });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
     const hashed = await bcrypt.hash(password, 10);
 
-    await User.create({
+    await UserModel.create({
       firstName,
       lastName,
       email,
@@ -39,7 +40,7 @@ apiRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await UserModel.findOne({ email });
     if (!user)
       return res.status(401).json({ message: "Invalid email or password" });
 
@@ -51,7 +52,9 @@ apiRouter.post("/login", async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.json({
+    const cart = await CartModel.findOne({ userId: user?._id });
+
+    const payload = {
       success: true,
       token,
       user: {
@@ -60,7 +63,9 @@ apiRouter.post("/login", async (req, res) => {
         email: user.email,
         _id: user._id,
       },
-    });
+    };
+    if(cart?._id) payload.cartId = cart?._id;
+    res.json(payload);
   } catch (err) {
     console.error("login error", err);
     res.status(500).json({ message: "Server error" });
