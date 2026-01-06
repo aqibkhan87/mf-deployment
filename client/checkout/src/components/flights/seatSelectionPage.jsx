@@ -73,7 +73,7 @@ function SeatSelection() {
                 ...activeSeatMap?.seatStatus?.ECONOMY
             }
         };
-        flightPassengers.forEach((passenger) => {
+        flightPassengers?.forEach((passenger) => {
             const seatNumber = passenger?.seats?.[flightKey]?.seatNumber;
             const cabin = passenger?.seats?.[flightKey]?.cabin;
             if (seatNumber) {
@@ -314,6 +314,10 @@ function SeatSelection() {
                 entityId: JSON.parse(localStorage.getItem("bookingId")) || "",
                 passengers: adultPassengers
             });
+            if (data?.zeroPayment) {
+                history.push(`/check-in?PNR=${data?.PNR}&email=${data?.email}`);
+                return;
+            }
         } else {
             data = await createOrder({
                 type: "FLIGHT", // or ECOMMERCE
@@ -391,7 +395,7 @@ function SeatSelection() {
     );
 
     const hasSelectedSeatsForAllSegments = (passenger) => {
-        return seatMaps.every(
+        return seatMaps?.every(
             seatMap => passenger?.seats?.[seatMap?.flightInstanceKey]?.seatNumber
         );
     };
@@ -403,7 +407,7 @@ function SeatSelection() {
                 hasSelectedSeatsForAllSegments(passenger)
             );
         },
-        [flightPassengers, segments]
+        [flightPassengers, seatMaps, segments]
     );
 
     const sumSeatPrice = seats =>

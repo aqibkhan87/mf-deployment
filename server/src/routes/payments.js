@@ -8,7 +8,10 @@ import EcommercePayment from "../models/ecommerce/e-payment.js";
 import AviationPaymentModel from "../models/flights/aviation-payment.js";
 import SeatMapModel from "../models/flights/seatMap.js";
 import { sendMail } from "../services/mailService.js";
-import { flightConfirmationTemplate, ecommerceConfirmationTemplate } from "../utils/template.js";
+import {
+  flightConfirmationTemplate,
+  ecommerceConfirmationTemplate,
+} from "../utils/template.js";
 import UserModel from "../models/user.js";
 
 const apiRouter = express.Router();
@@ -185,17 +188,16 @@ async function markSuccess(type, id, payment) {
     booking.bookingStatus = "COMPLETED";
     for (const passenger of booking.passengers) {
       for (const [segmentKey, seat] of passenger?.seats?.entries() || {}) {
-        const seatData = seat.toObject(); // convert to plain object
+        const seatData = seat?.toObject(); // convert to plain object
         await SeatMapModel.updateOne(
           { flightInstanceKey: segmentKey },
           {
             $set: {
-              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.status`]:
-                "reserved",
-              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.passengerId`]:
-                passenger?.id,
-              [`seatStatus.${seatData.cabin}.${seatData.seatNumber}.reservedAt`]:
-                new Date(),
+              [`seatStatus.${seatData?.cabin}.${seatData?.seatNumber}`]: {
+                status: "reserved",
+                passengerId: passenger?.id,
+                reservedAt: new Date(),
+              },
             },
           }
         );

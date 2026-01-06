@@ -268,7 +268,9 @@ const CheckInPage = () => {
                                             web check-in
                                         </Typography>
                                         <Typography>
-                                            web check-in window for your flight is now open
+                                            {passengers?.every((p) => p?.checkinAmount?.isPaid) ?
+                                                "web check-in is done for all passenger" :
+                                                "web check-in window for your flight is now open"}
                                         </Typography>
                                     </Box>
                                     <Box className="text-gray-600 text-sm" sx={{ mt: 3, border: "1px solid #EEF7FF", borderRadius: 2 }}>

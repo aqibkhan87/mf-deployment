@@ -67,11 +67,10 @@ apiRouter.get("/retrieve-pnr", async (req, res) => {
       return acc;
     }, {});
 
-    const passengers = checkinDetails.bookingId?.passengers
-      ?.map((p) => ({
-        ...p?.toObject(),
-        boardingPasses: boardingPassMap?.[p?.id] || [],
-      }));
+    const passengers = checkinDetails.bookingId?.passengers?.map((p) => ({
+      ...p?.toObject(),
+      boardingPasses: boardingPassMap?.[p?.id] || [],
+    }));
 
     const response = {
       bookingDetails: {
@@ -304,13 +303,8 @@ apiRouter.put("/payment", async (req, res) => {
     const payablePassengers = booking.passengers.filter(
       (p) =>
         requestedPassengerIds.includes(p?.id) &&
-        p.checkinAmount?.totalPrice > 0 &&
         p.checkinAmount?.isPaid !== true
     );
-
-    if (!payablePassengers.length) {
-      return res.status(400).json({ message: "No payable passengers" });
-    }
 
     const totalAddonsPrice = payablePassengers.reduce(
       (sum, p) => sum + p.checkinAmount.addonsPrice,
@@ -324,6 +318,70 @@ apiRouter.put("/payment", async (req, res) => {
       (sum, p) => sum + p.checkinAmount.totalPrice,
       0
     );
+
+    if (totalPrice === 0) {
+      // 1️⃣ Create internal payment record (COMPLETED)
+      const payment = await AviationPaymentModel.create({
+        amount: 0,
+        bookingId: booking._id,
+        passengerIds: payablePassengers.map((p) => p.id),
+        type: "CHECKIN",
+        status: "COMPLETED",
+        paidAt: new Date(),
+        method: "ZERO_PAYMENT",
+        breakdown: {
+          addons: totalAddonsPrice,
+          seats: totalSeatsPrice,
+          total: 0,
+        },
+      });
+
+      // 2️⃣ Mark passengers as paid
+      booking.passengers.forEach((p) => {
+        if (payablePassengers.find((pp) => pp.id === p.id)) {
+          p.checkinAmount.isPaid = true;
+          p.paidAddons = p.addons;
+          p.paidSeats = p.seats;
+        }
+      });
+
+      await booking.save();
+
+      const bookingAviationPayment = await AviationPaymentModel.findOne({
+        bookingId: entityId,
+        PNR: { $exists: true },
+      });
+
+      let pdfPath = await createBoardingPass(
+        req,
+        booking,
+        payablePassengers,
+        bookingAviationPayment?.PNR,
+        bookingAviationPayment.razorpay_payment_id,
+      );
+
+      pdfPath = getBaseUrl(req) + pdfPath?.split("public")[1];
+
+      await sendMail({
+        to: booking?.contact?.email,
+        subject: `Your Check-in for Flight Booking is Done Against ${bookingAviationPayment?.PNR} ✈️`,
+        html: boardingPassMailTemplate(pdfPath),
+      });
+
+      // 3️⃣ Return success immediately
+      return res.json({
+        success: true,
+        zeroPayment: true,
+        paymentId: payment._id,
+        message: "Check-in completed with zero payment",
+        PNR: bookingAviationPayment?.PNR,
+        email: booking?.contact?.email,
+      });
+    }
+
+    if (!payablePassengers.length) {
+      return res.status(400).json({ message: "No payable passengers" });
+    }
 
     const order = await razorpay.orders.create({
       amount: Math.round(totalPrice * 100), // paise

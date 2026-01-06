@@ -10,6 +10,7 @@ export const login = async ({ contact, password }) => {
     });
   } catch (error) {
     console.error("Error during login:", error);
+    return error?.response?.data
   } finally {
     useLoaderStore.getState().setLoading(false);
   }

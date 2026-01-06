@@ -11,6 +11,7 @@ import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import { login } from "../apis/auth";
 import { updateUserIdInCart } from "../apis/ecommerce/cart";
+import { getAllAddresses } from "../apis/address";
 import CartMergePopup from "./cartMergePopup";
 
 const Login = () => {
@@ -21,7 +22,9 @@ const Login = () => {
     password: "",
   });
   const [openMergePopup, setOpenMergePopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [touched, setTouched] = useState({});
+
   const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
   const isMobile = (str) => /^[0-9]{10}$/.test(str);
 
@@ -59,7 +62,7 @@ const Login = () => {
           setOpenMergePopup(true)
         } else {
           const response = await updateUserIdInCart(
-            user?._id,
+            userDetails?.data?.user?._id,
             JSON.parse(localStorage.getItem("cartId")),
             true
           );
@@ -70,6 +73,8 @@ const Login = () => {
           history.push("/");
         }
         setUser(userDetails?.data?.user);
+      } else if(userDetails?.message) {
+        setErrorMessage(userDetails?.message)
       }
     }
   };
@@ -86,6 +91,10 @@ const Login = () => {
         }}
         className="w-100 bg-white border-1 mt-16"
       >
+        {errorMessage ? 
+          <Box sx={{ pb: 2 }}>
+            <Typography variant="span" color="red">{errorMessage}</Typography>
+          </Box> : null}
         <Box sx={{ pb: 2 }}>
           <Typography variant="h5">Login</Typography>
         </Box>
