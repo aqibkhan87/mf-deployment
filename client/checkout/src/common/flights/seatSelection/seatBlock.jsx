@@ -86,7 +86,7 @@ const SeatBlock = ({ layout, seatState, onSelect, seatPricing = {}, seatLayoutTy
                 <Box key={row} display="flex" gap={1} flexDirection="column" justifyContent="space-around">
                     {columns?.map((col, i) => {
                         const seatId = `${row}${col}`;
-                        const status = seatState[seatId]["status"] || "available";
+                        const status = seatState?.[seatId]?.["status"] || "available";
                         const gapAfter = getGapAfter(columns).includes(i);
                         const seatTypeWithPrice = getSeatType(columns, seatPricing, seatId, seatLayoutType, i);
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import {
   Box,
@@ -77,7 +77,7 @@ const Cart = () => {
   }
 
   return (
-    <Grid item xs={12} md={7}>
+    <Grid>
       <Typography variant="h5" gutterBottom>
         Items in Cart: {cartCount ? (cartCount) : ""}
       </Typography>

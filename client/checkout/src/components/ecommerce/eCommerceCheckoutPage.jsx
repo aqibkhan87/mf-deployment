@@ -9,6 +9,7 @@ import { eventEmitter } from "../../utils/helper";
 import { loadRazorpay } from "../../utils/loadRazorpay";
 import { createOrder, verifyPayment } from "../../apis/payment";
 import { getAllAddresses } from "../../apis/address";
+import TestPaymentDisplay from "../../common/testPaymentDetails";
 
 const Checkout = () => {
   const history = useHistory();
@@ -30,11 +31,11 @@ const Checkout = () => {
   }, [isEditMode, user, address]);
 
   useEffect(() => {
-    if(!localStorage.getItem("cartId")) {
+    if (!localStorage.getItem("cartId")) {
       history.push("/")
     }
   }, []);
-  
+
   useEffect(() => {
     setDefaultAddress();
   }, [addresses]);
@@ -49,7 +50,7 @@ const Checkout = () => {
   const setDefaultAddress = () => {
     if (addresses?.length) {
       const defaultAddr = addresses?.find((addr) => addr?.isDefault) || addresses[0];
-      if(defaultAddr) setAddress(defaultAddr)
+      if (defaultAddr) setAddress(defaultAddr)
     };
   }
 
@@ -224,7 +225,7 @@ const Checkout = () => {
             setCartCount(0)
             history.push("/");
           }
-        } catch(err) {
+        } catch (err) {
           console.log("Payment verification failed", err);
         }
       },
@@ -275,7 +276,10 @@ const Checkout = () => {
             Continue to Payment
           </Button>
         </Grid>
-        <OrderSummary />
+        <Grid item xs={12} md={4}>
+          <OrderSummary />
+          <TestPaymentDisplay />
+        </Grid>
       </Grid>
     </Box>
   );

@@ -24,8 +24,12 @@ const CartPage = () => {
       ) : (
         <Box sx={{ p: 3 }}>
           <Grid container spacing={2} justifyContent="center">
-            <Cart />
-            <OrderSummary />
+            <Grid item xs={12} md={8}>
+              <Cart />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <OrderSummary />
+            </Grid>
           </Grid>
         </Box>
       )}

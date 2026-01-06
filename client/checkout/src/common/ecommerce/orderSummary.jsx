@@ -6,52 +6,50 @@ const OrderSummary = () => {
   const { cart } = useCartStore();
 
   return (
-    <Grid item xs={12} md={4}>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="subtitle2" gutterBottom>
-          ORDER SUMMARY
-        </Typography>
-        <Divider sx={{ mb: 1 }} />
-        {cart?.products?.map((product, i) => (
-          <Grid container spacing={1} key={i}>
-            <Grid item xs={8}>
-              <Typography>{product?.productDetail?.name}</Typography>
-            </Grid>
-            <Grid item xs={4}>
-              <Typography align="right">₹{product?.productDetail?.price} x {product?.quantity}</Typography>
-            </Grid>
-          </Grid>
-        ))}
-        <Divider sx={{ my: 1 }} />
-        <Grid container>
+    <Paper sx={{ p: 3 }}>
+      <Typography variant="subtitle2" gutterBottom>
+        ORDER SUMMARY
+      </Typography>
+      <Divider sx={{ mb: 1 }} />
+      {cart?.products?.map((product, i) => (
+        <Grid container spacing={1} key={i}>
           <Grid item xs={8}>
-            <Typography>
-              <b>Total Payable</b>
-            </Typography>
+            <Typography>{product?.productDetail?.name}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography align="right" sx={{ fontWeight: 600 }}>
-              ₹{cart?.totalAmount}
-            </Typography>
+            <Typography align="right">₹{product?.productDetail?.price} x {product?.quantity}</Typography>
           </Grid>
         </Grid>
-        <Grid container>
-          <Grid item xs={8}>
-            <Typography>
-              Actual Payable
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography align="right" sx={{ fontWeight: 500 }}>
-              ₹{cart?.totalActual}
-            </Typography>
-          </Grid>
+      ))}
+      <Divider sx={{ my: 1 }} />
+      <Grid container>
+        <Grid item xs={8}>
+          <Typography>
+            <b>Total Payable</b>
+          </Typography>
         </Grid>
-        <Typography sx={{ color: "green", mt: 1 }}>
-          Your Total Savings on this order ₹{cart?.savedAmount}
-        </Typography>
-      </Paper>
-    </Grid>
+        <Grid item xs={4}>
+          <Typography align="right" sx={{ fontWeight: 600 }}>
+            ₹{cart?.totalAmount}
+          </Typography>
+        </Grid>
+      </Grid>
+      <Grid container>
+        <Grid item xs={8}>
+          <Typography>
+            Actual Payable
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography align="right" sx={{ fontWeight: 500 }}>
+            ₹{cart?.totalActual}
+          </Typography>
+        </Grid>
+      </Grid>
+      <Typography sx={{ color: "green", mt: 1 }}>
+        Your Total Savings on this order ₹{cart?.savedAmount}
+      </Typography>
+    </Paper>
   );
 };
 
