@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Grid, Button, Chip } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
+import { useCartStore } from "store/cartStore";
 import OrderSummary from "../../common/ecommerce/orderSummary";
 import CheckoutItems from "../../common/ecommerce/checkout";
 import { eventEmitter } from "../../utils/helper";
@@ -12,6 +13,7 @@ import { getAllAddresses } from "../../apis/address";
 const Checkout = () => {
   const history = useHistory();
   const { user, address, addresses, setAddress } = useAuthStore();
+  const { setCartCount } = useCartStore();
   const [isContinueDisabled, setIsContinueDisabled] = useState(true);
   const [isEditMode, setIsEditMode] = useState(true);
   const [step, setStep] = useState("auth"); // 1-auth, 2-address
@@ -54,7 +56,7 @@ const Checkout = () => {
     setIsEditMode(true);
   };
 
-  const selectAddress = () => {
+  const AddAddress = () => {
     const eventData = { openAddressForm: true };
     eventEmitter("openAddressForm", eventData);
     setStep("address");
@@ -142,10 +144,9 @@ const Checkout = () => {
             <Button
               variant="outlined"
               size="small"
-              disabled={!address}
-              onClick={(e) => selectAddress(true)}
+              onClick={(e) => AddAddress(true)}
             >
-              Select Address
+              Add Address
             </Button>
           </Grid>
         </Grid>
@@ -170,7 +171,7 @@ const Checkout = () => {
             <Button
               variant="outlined"
               size="small"
-              onClick={(e) => editAddress(addresses[0])}
+              onClick={(e) => editAddress(addresses?.[0])}
             >
               Edit Address
             </Button>
@@ -211,21 +212,23 @@ const Checkout = () => {
         try {
           const verify = await verifyPayment({
             type: "ECOMMERCE",
-            entityId,
+            entityId: JSON.parse(localStorage.getItem("cartId")) || "",
             ...res,
           });
 
           if (verify.success) {
-            navigate("/dashbaord");
+            localStorage.removeItem("cartId");
+            setCartCount(0)
+            history.push("/");
           }
-        } catch {
-          alert("Payment verification failed");
+        } catch(err) {
+          console.log("Payment verification failed", err);
         }
       },
 
       modal: {
-        ondismiss: async () => {
-          alert("Payment cancelled");
+        ondismiss: async (err) => {
+          console.log("Payment cancelled");
         },
       },
     };

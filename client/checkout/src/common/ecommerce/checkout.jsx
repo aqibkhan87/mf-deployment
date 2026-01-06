@@ -16,7 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useCartStore } from "store/cartStore";
 import { getCart, updateInCart } from "../../apis/ecommerce/cart";
-import { updateQuantity } from "../../utils/helper";
+import { formatDate, updateQuantity } from "../../utils/helper";
 
 const CheckoutItems = () => {
   const history = useHistory();
@@ -62,6 +62,9 @@ const CheckoutItems = () => {
     updateInCart(existingCartProducts);
   };
 
+  const dateUTC = new Date();
+  let deliveryDayUTC = new Date(dateUTC); // create a copy
+  deliveryDayUTC.setDate(deliveryDayUTC.getDate() + 2); // next two day
   return (
     <Paper sx={{ p: 2, mt: 2, mb: 2 }}>
       {/* ITEMS SUMMARY */}
@@ -127,7 +130,7 @@ const CheckoutItems = () => {
             {/* Delivery message */}
             <Box sx={{ my: 1.5, display: "flex", alignItems: "center" }}>
               <Typography variant="caption" color="text.secondary">
-                Delivery by <b>Thu Sep 4</b>
+                Delivery by <b>{formatDate(deliveryDayUTC)}</b>
               </Typography>
             </Box>
 

@@ -11,17 +11,20 @@ const OrderDetails = ({ order, cart }) => {
 
         return (
           <div key={item._id} className="product-row">
-            <img src={p.productImage} alt={p.name} />
-
-            <div className="info">
-              <h4>{p.name}</h4>
-              <p>Seller: {p.seller}</p>
-              <p>Qty: {qty}</p>
+            <div className="flex">
+              <div>
+                <img src={p?.productImage} alt={p.name} />
+              </div>
+              <div className="info">
+                <h4>{p?.name}</h4>
+                <p>Seller: {p.seller}</p>
+                <p>Qty: {qty}</p>
+              </div>
             </div>
 
             <div className="price">
               <p>₹{selling} × {qty}</p>
-              <p className="mrp">MRP ₹{actual * qty}</p>
+              <p className="mrp">₹{actual * qty}</p>
               <p className="saved">
                 Saved ₹{(actual - selling) * qty}
               </p>

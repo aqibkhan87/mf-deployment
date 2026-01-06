@@ -7,11 +7,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import GoogleIcon from "@mui/icons-material/Google";
 import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import { login } from "../apis/auth";
-import { updateUserIdInCart } from "../apis/cart";
+import { updateUserIdInCart } from "../apis/ecommerce/cart";
+import CartMergePopup from "./cartMergePopup";
 
 const Login = () => {
   const history = useHistory();
@@ -20,6 +20,7 @@ const Login = () => {
     contact: "",
     password: "",
   });
+  const [openMergePopup, setOpenMergePopup] = useState(false);
   const [touched, setTouched] = useState({});
   const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
   const isMobile = (str) => /^[0-9]{10}$/.test(str);
@@ -54,14 +55,21 @@ const Login = () => {
       if (userDetails?.data?.user) {
         localStorage.setItem("user", JSON.stringify(userDetails?.data?.user));
         localStorage.setItem("token", JSON.stringify(userDetails?.data?.token));
-        if (localStorage.getItem("cartId")) {
-          await updateUserIdInCart(
-            userDetails?.data?.user?._id,
-            JSON.parse(localStorage.getItem("cartId"))
+        if (userDetails?.data?.cartId) {
+          setOpenMergePopup(true)
+        } else {
+          const response = await updateUserIdInCart(
+            user?._id,
+            JSON.parse(localStorage.getItem("cartId")),
+            true
           );
+          if (response?.data?.cart) {
+            localStorage.setItem("cartId", JSON.stringify(response?.data?.cart?._id));
+          }
+          await getAllAddresses();
+          history.push("/");
         }
         setUser(userDetails?.data?.user);
-        history.push("/");
       }
     }
   };
@@ -148,6 +156,7 @@ const Login = () => {
           </Link>
         </Box>
       </Box>
+      <CartMergePopup open={openMergePopup} onClose={setOpenMergePopup} />
     </Container>
   );
 };

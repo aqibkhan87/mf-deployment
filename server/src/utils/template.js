@@ -1,4 +1,9 @@
-import { formatDate, formatDuration, formatTime, subtractMinutesFromUTC } from "./helper.js";
+import {
+  formatDate,
+  formatDuration,
+  formatTime,
+  subtractMinutesFromUTC,
+} from "./helper.js";
 
 export const flightConfirmationTemplate = (booking, PNR) => {
   const passengers = booking?.passengers;
@@ -162,10 +167,7 @@ export const flightConfirmationTemplate = (booking, PNR) => {
   return templateGenerated;
 };
 
-export const boardingPassGenerateTemplate = (
-  boardingPasses,
-  PNR,
-) => {
+export const boardingPassGenerateTemplate = (boardingPasses, PNR) => {
   const templateGenerated = `<!DOCTYPE html>
     <html>
         <head>
@@ -336,7 +338,9 @@ export const boardingPassGenerateTemplate = (
                         <span>${boardingPass?.departureCity}</span>
                         </div>
 
-                        <div class="plane">${boardingPass?.airlineName}${" "}✈️</div>
+                        <div class="plane">${
+                          boardingPass?.airlineName
+                        }${" "}✈️</div>
 
                         <div class="city">
                         <h2>${boardingPass?.arrivalAirport}</h2>
@@ -366,15 +370,25 @@ export const boardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Date</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        formatDate(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? formatDate(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Boarding Time</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        subtractMinutesFromUTC(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? subtractMinutesFromUTC(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -383,15 +397,23 @@ export const boardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Deperature Time</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        formatTime(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? formatTime(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Arrival Time</div>
                                 <div class="value">
-                                    ${boardingPass?.arrivalTime ? 
-                                        formatTime(boardingPass?.arrivalTime) : ""}
+                                    ${
+                                      boardingPass?.arrivalTime
+                                        ? formatTime(boardingPass?.arrivalTime)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -400,15 +422,21 @@ export const boardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Duration</div>
                                 <div class="value">
-                                    ${boardingPass?.duration ? 
-                                        formatDuration(boardingPass?.duration) : ""}
+                                    ${
+                                      boardingPass?.duration
+                                        ? formatDuration(boardingPass?.duration)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Duration</div>
                                 <div class="value">
-                                    ${boardingPass?.duration ? 
-                                        formatDuration(boardingPass?.duration) : ""}
+                                    ${
+                                      boardingPass?.duration
+                                        ? formatDuration(boardingPass?.duration)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -417,7 +445,11 @@ export const boardingPassGenerateTemplate = (
                         <div class="seat-box">
                             <div>Seat: ${boardingPass?.seatNumber}</div>
                             <div>${boardingPass?.cabin}</div>
-                            <div>${boardingPass?.departureTerminal ? `T${boardingPass?.departureTerminal}` : ""}</div>
+                            <div>${
+                              boardingPass?.departureTerminal
+                                ? `T${boardingPass?.departureTerminal}`
+                                : ""
+                            }</div>
                         </div>
                         </div>
 
@@ -434,7 +466,8 @@ export const boardingPassGenerateTemplate = (
 
                     </div>
                 `
-                ).join("")}
+              )
+              .join("")}
               </div>
           </body>
         </html>
@@ -442,11 +475,7 @@ export const boardingPassGenerateTemplate = (
   return templateGenerated;
 };
 
-export const singleBoardingPassGenerateTemplate = (
-  boardingPass,
-  PNR,
-) => {
-    
+export const singleBoardingPassGenerateTemplate = (boardingPass, PNR) => {
   const templateGenerated = `<!DOCTYPE html>
     <html>
         <head>
@@ -615,7 +644,9 @@ export const singleBoardingPassGenerateTemplate = (
                         <span>${boardingPass?.departureCity}</span>
                         </div>
 
-                        <div class="plane">${boardingPass?.airlineName}${" "}✈️</div>
+                        <div class="plane">${
+                          boardingPass?.airlineName
+                        }${" "}✈️</div>
 
                         <div class="city">
                         <h2>${boardingPass?.arrivalAirport}</h2>
@@ -645,15 +676,25 @@ export const singleBoardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Date</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        formatDate(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? formatDate(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Boarding Time</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        subtractMinutesFromUTC(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? subtractMinutesFromUTC(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -662,15 +703,23 @@ export const singleBoardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Deperature Time</div>
                                 <div class="value">
-                                    ${boardingPass?.departureTime ? 
-                                        formatTime(boardingPass?.departureTime) : ""}
+                                    ${
+                                      boardingPass?.departureTime
+                                        ? formatTime(
+                                            boardingPass?.departureTime
+                                          )
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Arrival Time</div>
                                 <div class="value">
-                                    ${boardingPass?.arrivalTime ? 
-                                        formatTime(boardingPass?.arrivalTime) : ""}
+                                    ${
+                                      boardingPass?.arrivalTime
+                                        ? formatTime(boardingPass?.arrivalTime)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -679,15 +728,21 @@ export const singleBoardingPassGenerateTemplate = (
                             <div class="block">
                                 <div class="label">Duration</div>
                                 <div class="value">
-                                    ${boardingPass?.duration ? 
-                                        formatDuration(boardingPass?.duration) : ""}
+                                    ${
+                                      boardingPass?.duration
+                                        ? formatDuration(boardingPass?.duration)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             <div class="block">
                                 <div class="label">Duration</div>
                                 <div class="value">
-                                    ${boardingPass?.duration ? 
-                                        formatDuration(boardingPass?.duration) : ""}
+                                    ${
+                                      boardingPass?.duration
+                                        ? formatDuration(boardingPass?.duration)
+                                        : ""
+                                    }
                                 </div>
                             </div>
                             
@@ -696,7 +751,11 @@ export const singleBoardingPassGenerateTemplate = (
                         <div class="seat-box">
                             <div>Seat: ${boardingPass?.seatNumber}</div>
                             <div>${boardingPass?.cabin}</div>
-                            <div>${boardingPass?.departureTerminal ? `T${boardingPass?.departureTerminal}` : ""}</div>
+                            <div>${
+                              boardingPass?.departureTerminal
+                                ? `T${boardingPass?.departureTerminal}`
+                                : ""
+                            }</div>
                         </div>
                         </div>
 
@@ -720,9 +779,7 @@ export const singleBoardingPassGenerateTemplate = (
   return templateGenerated;
 };
 
-export const boardingPassMailTemplate = (
-  pdfPath
-) => {
+export const boardingPassMailTemplate = (pdfPath) => {
   const templateGenerated = `<!DOCTYPE html>
     <html>
         <head>
@@ -882,6 +939,66 @@ export const boardingPassMailTemplate = (
               </div>
           </body>
         </html>
+      `;
+  return templateGenerated;
+};
+
+export const ecommerceConfirmationTemplate = (cart) => {
+  const products = cart?.products;
+  const templateGenerated = `
+        <div style="
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+            ">
+            <div style="
+                max-width: 600px;
+                margin: auto;
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 24px;
+            ">
+                <p style="font-size: 14px; color: #555;">
+                    Your Order has been placed successfully.
+                </p>
+
+
+                <!-- FARE -->
+                <h3 style="font-size: 16px; margin-top: 24px;">Cart Summary</h3>
+                <table width="100%" cellpadding="6" cellspacing="0" style="font-size: 14px;">
+                  <tr style="font-weight: bold; border-bottom: 1px solid #ddd;">
+                        <td>Product</td>
+                        <td>Name</td>
+                        <td>Quantity</td>
+                        <td align="right">Total</td>
+                    </tr>
+                    ${products?.map(
+                      (p) =>
+                        `<tr>
+                            <td>${
+                              p?.productDetail?.productImage
+                                ? `<img src="${p?.productDetail?.productImage}" width="60" alt="product" />`
+                                : ""
+                            }</td>
+                            <td>${p?.productDetail?.name}</td>
+                            <td>${p?.quantity}</td>
+                            <td align="right">
+                                ₹ ${p?.quantity * p?.productDetail?.price}
+                            </td>
+                           </tr>`
+                    ).join("")}
+                    <tr style="border-top: 1px solid #ddd; font-weight: bold;">
+                        <td colspan="2" align="right">Grand Total</td>
+                        <td align="right">₹ ${cart?.totalAmount}</td>
+                    </tr>
+                </table>
+
+                <!-- FOOTER -->
+                <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                    This is an automated email. Please do not reply.
+                </p>
+            </div>
+        </div>
       `;
   return templateGenerated;
 };

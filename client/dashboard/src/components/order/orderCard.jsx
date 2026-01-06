@@ -14,7 +14,7 @@ const OrderCard = ({ order }) => {
 
         <div>
           <strong>Date:</strong>{" "}
-          {new Date(order?.createdAt).toLocaleDateString()}
+          {new Date(order?.paidAt).toLocaleDateString()}
         </div>
 
         <div>
@@ -22,7 +22,7 @@ const OrderCard = ({ order }) => {
         </div>
 
         <div className={`status ${order?.status.toLowerCase()}`}>
-          {order?.status}
+          Status: {order?.status}
         </div>
       </div>
 

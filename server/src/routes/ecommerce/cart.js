@@ -20,7 +20,10 @@ apiRouter.post("/", async (req, res) => {
     }
 
     if (!cart && userId !== "anonymous") {
-      cart = await CartModel.findOne({ userId });
+      cart = await CartModel.findOne({
+        userId,
+        cartStatus: { $ne: "COMPLETED" },
+      });
     }
 
     if (!cart) {
@@ -79,9 +82,10 @@ apiRouter.get("/:cartId", async (req, res) => {
     if (cartId === "") {
       throw new Error("Invalid cart Id provided.");
     } else if (cartId) {
-      cart = await CartModel.findOne({ _id: cartId }).populate(
-        "products.productDetail"
-      );
+      cart = await CartModel.findOne({
+        _id: cartId,
+        cartStatus: { $ne: "COMPLETED" },
+      }).populate("products.productDetail");
       if (!cart) {
         return res.json({
           cart: null,

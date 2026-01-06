@@ -2,13 +2,13 @@ import express from "express";
 const apiRouter = express.Router();
 
 // import OrderModel from "../../models/ecommerce/e-orders.js";
-import PaymentModel from "../../models/ecommerce/e-payment.js";
+import EcommercePayment from "../../models/ecommerce/e-payment.js";
 
 apiRouter.get("/", async (req, res) => {
   try {
     const userId = req.query.userId;
 
-    const orders = await PaymentModel.find({ userId })
+    const orders = await EcommercePayment.find({ userId, status: "COMPLETED" })
       .populate({
         path: "cartId",
         populate: {
@@ -37,7 +37,7 @@ apiRouter.get("/:orderId", async (req, res) => {
     const userId = req.user.id;
     const { orderId } = req.params;
 
-    await PaymentModel.findOne({ userId, _id: orderId });
+    await EcommercePayment.findOne({ userId, _id: orderId });
 
     res.json({
       success: true,

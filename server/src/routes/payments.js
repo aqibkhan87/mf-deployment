@@ -8,7 +8,8 @@ import EcommercePayment from "../models/ecommerce/e-payment.js";
 import AviationPaymentModel from "../models/flights/aviation-payment.js";
 import SeatMapModel from "../models/flights/seatMap.js";
 import { sendMail } from "../services/mailService.js";
-import { flightConfirmationTemplate } from "../utils/template.js";
+import { flightConfirmationTemplate, ecommerceConfirmationTemplate } from "../utils/template.js";
+import UserModel from "../models/user.js";
 
 const apiRouter = express.Router();
 
@@ -107,13 +108,12 @@ apiRouter.post("/verify-payment", async (req, res) => {
       return res.status(400).json({ success: false });
     }
 
-    const { PNR } = await markSuccess(type, entityId, {
-      razorpay_payment_id,
-      razorpay_order_id,
-      razorpay_signature,
-    });
-
     if (type === "FLIGHT") {
+      const { PNR } = await markSuccess(type, entityId, {
+        razorpay_payment_id,
+        razorpay_order_id,
+        razorpay_signature,
+      });
       return res.json({
         success: true,
         orderId: razorpay_order_id,
@@ -122,11 +122,18 @@ apiRouter.post("/verify-payment", async (req, res) => {
       });
     }
 
-    res.json({
-      success: true,
-      orderId: razorpay_order_id,
-      status: "COMPLETED",
-    });
+    if (type === "ECOMMERCE") {
+      await markSuccess(type, entityId, {
+        razorpay_payment_id,
+        razorpay_order_id,
+        razorpay_signature,
+      });
+      return res.json({
+        success: true,
+        orderId: razorpay_order_id,
+        status: "COMPLETED",
+      });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -144,14 +151,20 @@ async function markSuccess(type, id, payment) {
         paidAt: new Date(),
       }
     );
-    await CartModel.findOneAndUpdate(
+    const cart = await CartModel.findOneAndUpdate(
       {
         _id: id,
       },
       {
         cartStatus: "COMPLETED",
       }
-    );
+    ).populate("products.productDetail");
+    const user = await UserModel.findById(cart?.userId);
+    await sendMail({
+      to: user?.email,
+      subject: "Your Cart Items Order Placed",
+      html: ecommerceConfirmationTemplate(cart),
+    });
   }
 
   if (type === "FLIGHT") {

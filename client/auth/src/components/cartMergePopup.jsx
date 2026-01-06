@@ -7,12 +7,13 @@ import {
     Box,
     Typography
 } from "@mui/material";
+import { useHistory } from "react-router-dom";
 import { useAuthStore } from "store/authStore";
 import { updateUserIdInCart, getCart } from "../apis/ecommerce/cart";
-import { getAllAddresses } from "../apis/address";
 
-const CartMergePopup = ({ open, onClose, closeAuthPopup }) => {
+const CartMergePopup = ({ open, onClose }) => {
     const { user } = useAuthStore();
+    const history = useHistory();
 
     const updateCart = async (SyncProducts = true) => {
         if (localStorage.getItem("cartId")) {
@@ -25,8 +26,7 @@ const CartMergePopup = ({ open, onClose, closeAuthPopup }) => {
                 localStorage.setItem("cartId", JSON.stringify(response?.data?.cart?._id));
             }
             await getCart();
-            await getAllAddresses();
-            closeAuthPopup();
+            history.push("/");
         }
     }
     const cancelMerging = () => {
