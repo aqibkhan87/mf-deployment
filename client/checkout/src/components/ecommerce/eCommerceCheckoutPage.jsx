@@ -41,12 +41,15 @@ const Checkout = () => {
 
   useEffect(() => {
     if (user?.email) getAllAddresses();
+    return () => {
+      setAddress({})
+    }
   }, []);
 
   const setDefaultAddress = () => {
     if (addresses?.length) {
       const defaultAddr = addresses?.find((addr) => addr?.isDefault) || addresses[0];
-      setAddress(defaultAddr)
+      if(defaultAddr) setAddress(defaultAddr)
     };
   }
 

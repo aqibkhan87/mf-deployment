@@ -99,7 +99,6 @@ const BookingSchema = new mongoose.Schema(
       enum: [
         "IN_PROGRESS",
         "PENDING_PAYMENT",
-        "CONFIRMED",
         "CANCELLED",
         "FAILED",
         "COMPLETED",

@@ -23,7 +23,7 @@ export const useAuthStore = create((set, get) => ({
       country = "",
     } = address;
     let updatedAddress = "";
-    if (address)
+    if (address?.line1)
       updatedAddress = `${line1}, ${line2}, ${city}, ${state}, ${country}, ${pincode}`;
     localStorage.setItem("address", JSON.stringify(updatedAddress));
     return set({ ...state, address: updatedAddress });

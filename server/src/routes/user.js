@@ -52,7 +52,10 @@ apiRouter.post("/login", async (req, res) => {
       expiresIn: "7d",
     });
 
-    const cart = await CartModel.findOne({ userId: user?._id });
+    const cart = await CartModel.findOne({
+      userId: user?._id,
+      cartStatus: { $ne: "COMPLETED" },
+    });
 
     const payload = {
       success: true,
@@ -64,7 +67,7 @@ apiRouter.post("/login", async (req, res) => {
         _id: user._id,
       },
     };
-    if(cart?._id) payload.cartId = cart?._id;
+    if (cart?._id) payload.cartId = cart?._id;
     res.json(payload);
   } catch (err) {
     console.error("login error", err);

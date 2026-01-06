@@ -158,10 +158,13 @@ apiRouter.put("/update-userid-in-cart", async (req, res) => {
       return res.status(400).json({ error: "Valid cart Id required." });
     }
 
-    const guestCart = await CartModel.findById(guestCartId);
-    let userCart = await CartModel.findOne({ userId }).populate(
+    const guestCart = await CartModel.findById(guestCartId).populate(
       "products.productDetail"
     );
+    let userCart = await CartModel.findOne({
+      userId,
+      cartStatus: { $eq: "IN_PROGRESS" },
+    }).populate("products.productDetail");
 
     if (!SyncProducts) {
       return res.json({

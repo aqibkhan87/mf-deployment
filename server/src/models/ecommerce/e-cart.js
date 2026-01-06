@@ -28,7 +28,6 @@ const cartSchema = new Schema(
       enum: [
         "IN_PROGRESS",
         "PENDING_PAYMENT",
-        "CONFIRMED",
         "CANCELLED",
         "FAILED",
         "COMPLETED"

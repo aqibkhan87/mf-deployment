@@ -37,7 +37,7 @@ export const mergeProducts = (userProducts = [], guestProducts = []) => {
   const map = new Map();
 
   [...userProducts, ...guestProducts].forEach(item => {
-    const key = item.productDetail.toString();
+    const key = item?.productDetail?.id.toString();
 
     if (!map.has(key)) {
       map.set(key, {
