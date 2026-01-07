@@ -137,20 +137,3 @@ export const verifyCheckinPayment = async (payload) => {
     useLoaderStore.getState().setLoading(false);
   }
 };
-
-export const downloadBoardingPDF = async (pdfURL) => {
-  useLoaderStore.getState().setLoading(true);
-  try {
-    const response = await httpRequest(
-      "get",
-      `/api/flights/checkin/download/${pdfURL}`,
-    );
-    if (response?.data && response?.status === 200) {
-      return response.data;
-    }
-  } catch (error) {
-    console.error("Error while Downloading PDF: ", error);
-  } finally {
-    useLoaderStore.getState().setLoading(false);
-  }
-};

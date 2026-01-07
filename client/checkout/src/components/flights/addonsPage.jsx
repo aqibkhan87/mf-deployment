@@ -260,10 +260,10 @@ const AddonsPage = () => {
                                                         <Grid item xs={12} sm={6} key={meal._id}>
                                                             <Card variant="outlined">
                                                                 <CardContent>
-                                                                    <Typography fontWeight={600}>
+                                                                    <Box fontWeight={600}>
                                                                         {meal.title}
                                                                         <Chip size="small" label={meal.tag} sx={{ ml: 1, bgcolor: "#f7fbff" }} />
-                                                                    </Typography>
+                                                                    </Box>
                                                                     <Typography variant="caption">{meal.description}</Typography>
                                                                     <Typography fontWeight={600}>₹{meal.price}</Typography>
                                                                     <Button

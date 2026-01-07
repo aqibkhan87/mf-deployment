@@ -17,21 +17,6 @@ import {
 
 const apiRouter = express.Router();
 
-apiRouter.get("/download/:pdfurl", async (req, res) => {
-  try {
-    const { pdfurl } = req?.params;
-    if (!pdfurl) {
-      return res.status(404).json({ message: "Missing Details" });
-    }
-
-    let pdfFullPath = getBaseUrl(req) + pdfurl;
-    res.download(pdfFullPath);
-  } catch (err) {
-    console.error("Error fetching checkin Details:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 apiRouter.get("/retrieve-pnr", async (req, res) => {
   try {
     const { emailOrLastName, PNR } = req?.query;
@@ -357,7 +342,7 @@ apiRouter.put("/payment", async (req, res) => {
         booking,
         payablePassengers,
         bookingAviationPayment?.PNR,
-        bookingAviationPayment.razorpay_payment_id,
+        bookingAviationPayment.razorpay_payment_id
       );
 
       pdfPath = getBaseUrl(req) + pdfPath?.split("public")[1];
@@ -451,17 +436,18 @@ apiRouter.put("/verify-payment", async (req, res) => {
       PNR: { $exists: true },
     });
 
+    await markSuccess(req, entityId, {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+    });
+
     res.json({
       success: true,
       orderId: razorpay_order_id,
       status: "COMPLETED",
       email: booking?.contact?.email,
       PNR: bookingAviationPayment?.PNR,
-    });
-    await markSuccess(req, entityId, {
-      razorpay_payment_id,
-      razorpay_order_id,
-      razorpay_signature,
     });
   } catch (err) {
     console.error(err);
@@ -500,18 +486,13 @@ const markSuccess = async (req, id, payment) => {
   // Backend decides payable passengers
   const payablePassengers = booking.passengers.filter(
     (p) =>
-      passengerIds.includes(String(p?.id)) &&
-      p.checkinAmount?.totalPrice > 0 &&
-      p.checkinAmount?.isPaid !== true
+      passengerIds.includes(String(p?.id)) && p.checkinAmount?.isPaid !== true
   );
   for (const passenger of payablePassengers) {
     passenger.checkinAmount.isPaid = true;
     await seatBooking("free", passenger?.paidSeats, passenger);
     await seatBooking("reserved", passenger?.seats, passenger);
   }
-
-  await booking.save();
-  await aviationPayment.save();
 
   let pdfPath = await createBoardingPass(
     req,
@@ -520,6 +501,9 @@ const markSuccess = async (req, id, payment) => {
     bookingAviationPayment?.PNR,
     payment.razorpay_payment_id
   );
+
+  await booking.save();
+  await aviationPayment.save();
 
   pdfPath = getBaseUrl(req) + pdfPath?.split("public")[1];
 
@@ -538,12 +522,11 @@ const seatBooking = async (type = "free", seatData, passenger) => {
         { flightInstanceKey: segmentKey },
         {
           $set: {
-            [`seatStatus.${paidSeatData.cabin}.${paidSeatData.seatNumber}.status`]:
-              type === "free" ? "available" : "reserved",
-            [`seatStatus.${paidSeatData.cabin}.${paidSeatData.seatNumber}.passengerId`]:
-              type === "free" ? "" : passenger?.id,
-            [`seatStatus.${paidSeatData.cabin}.${paidSeatData.seatNumber}.reservedAt`]:
-              type === "free" ? "" : new Date(),
+            [`seatStatus.${paidSeatData.cabin}.${paidSeatData.seatNumber}`]: {
+              status: type === "free" ? "available" : "reserved",
+              passengerId: type === "free" ? null : passenger?.id,
+              reservedAt: type === "free" ? null : new Date(),
+            },
           },
         }
       );

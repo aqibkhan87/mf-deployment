@@ -47,7 +47,7 @@ const OrderDetails = ({ order, cart }) => {
 
         <div className="payable">
           <strong>Paid Amount:</strong>
-          <strong>₹{cart?.amount}</strong>
+          <strong>₹{cart?.totalAmount}</strong>
         </div>
       </div>
 

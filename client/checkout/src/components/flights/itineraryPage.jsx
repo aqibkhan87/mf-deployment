@@ -37,7 +37,7 @@ const ItineraryPage = () => {
     }, [])
 
     return (
-        <Box sx={{ maxWidth: 900, mx: "auto", my: 3 }}>
+        <Box sx={{ maxWidth: "90%", mx: "auto", my: 3 }} mx={{ maxWidth: 900 }}>
             <Paper
                 sx={{
                     position: "relative",
@@ -45,9 +45,9 @@ const ItineraryPage = () => {
                     backgroundImage: `url(${process.env.API_BASE_URL}/images/${destinationAirport?.iata}.png)`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
-                    borderRadius: 3,
                     overflow: "hidden",
                 }}
+                className="md:rounded"
             >
                 <Box sx={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
 
@@ -324,7 +324,7 @@ const ItineraryPage = () => {
                         <Typography variant="body2" color="text.secondary">
                             Transaction ID
                         </Typography>
-                        <Typography>{itineraryDetails?.receipt}</Typography>
+                        <Typography sx={{ wordBreak: "break-word" }}>{itineraryDetails?.receipt}</Typography>
                     </Grid>
 
 

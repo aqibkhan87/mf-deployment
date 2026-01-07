@@ -101,8 +101,8 @@ router.get("/search", async (req, res) => {
             $switch: {
               branches: [
                 { case: { $regexMatch: { input: "$iata", regex } }, then: 100 },
-                { case: { $regexMatch: { input: "$name", regex } }, then: 75 },
-                { case: { $regexMatch: { input: "$city", regex } }, then: 50 },
+                { case: { $regexMatch: { input: "$city", regex } }, then: 90 },
+                { case: { $regexMatch: { input: "$name", regex } }, then: 80 },
               ],
               default: 0,
             },

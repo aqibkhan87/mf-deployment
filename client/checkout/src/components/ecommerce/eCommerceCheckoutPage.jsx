@@ -249,7 +249,7 @@ const Checkout = () => {
 
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", py: 3, px: 0 }}>
+    <Box sx={{ maxWidth: "90%", mx: "auto", py: 3, px: 0 }} mx={{ maxWidth: 1200 }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
           <Typography variant="h5" gutterBottom>

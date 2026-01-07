@@ -18,7 +18,7 @@ import {
 import FlightIcon from "@mui/icons-material/Flight";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useBookingStore } from "store/bookingStore";
-import { getCheckinDetails, downloadBoardingPDF } from "../../apis/flights/checkin";
+import { getCheckinDetails } from "../../apis/flights/checkin";
 import {
     formatDate,
     formatTime,

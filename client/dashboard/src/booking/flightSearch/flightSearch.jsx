@@ -164,7 +164,7 @@ function FlightResults() {
                     </IconButton>
                     <BookingWidget />
                 </Box>
-                {!enableBookingWidget && <Box className="flex w-4/5 md:w-1/2 mx-auto shadow border text-center items-center"
+                {!enableBookingWidget && <Box className="flex w-full md:w-1/2 mx-auto shadow border text-center items-center"
                     sx={{ backgroundColor: "aliceblue", borderRadius: 100, justifyContent: "space-evenly" }}>
                     <Typography className="border-right flex-1">
                         {sourceAirport?.city} - {destinationAirport?.city}
@@ -351,7 +351,7 @@ function FlightResults() {
                                 </div>
 
                                 {/* Price & Button */}
-                                <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
+                                <div className="flex w-full items-center justify-between md:flex-col md:w-40 md:items-end mt-4 md:mt-0">
                                     <Box className="flex text-lg font-semibold items-center">
                                         ₹ {Math.floor(fare?.totalPrice)}
                                         <Typography className="text-sm pl-1">/ adult</Typography>
