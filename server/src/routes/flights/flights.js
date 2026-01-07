@@ -42,6 +42,8 @@ apiRouter.get("/", async (req, res) => {
         logo: "https://via.placeholder.com/48?text=?",
       };
 
+      
+
       const segmentCodes = new Set();
       fare.segments.forEach((seg) => {
         if (seg.arrivalAirport) segmentCodes.add(seg.arrivalAirport);
