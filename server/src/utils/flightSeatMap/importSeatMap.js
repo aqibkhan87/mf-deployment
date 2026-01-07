@@ -19,7 +19,11 @@ const createSeatMapForSegment = (segment) => {
     Array.from({ length: cabin.rows }, (_, i) => i + 1).forEach((row) => {
       cabin.columns.forEach((col) => {
         const seatLabel = `${row}${col}`;
-        seatStatus[cabin.cabin][seatLabel].status = "available"; // default
+        seatStatus[cabin.cabin][seatLabel] = {
+          status: "available",
+          passengerId: null,
+          reservedAt: null,
+        };
       });
     });
   });
@@ -34,14 +38,19 @@ const createSeatMapForSegment = (segment) => {
     code: layout?.code,
     seatLayout: layout?.cabins,
     seatStatus,
-    flightInstanceKey: `${segment.carrierCode}-${segment.flightNumber}-${segment.departureTime.split(".")[0]}-${segment.departureAirport}-${segment.arrivalAirport}`,
+    flightInstanceKey: `${segment.carrierCode}-${segment.flightNumber}-${
+      segment.departureTime.split(".")[0]
+    }-${segment.departureAirport}-${segment.arrivalAirport}`,
     itineraryKey: segment?.itineraryKey,
   };
 };
 
 export const createSeatMapsForFare = (fare) => {
   let itineraryKey = fare?.segments
-    ?.map((s) => `${s?.carrierCode}-${s?.flightNumber}-${s?.departureTime.split(".")[0]}`)
+    ?.map(
+      (s) =>
+        `${s?.carrierCode}-${s?.flightNumber}-${s?.departureTime.split(".")[0]}`
+    )
     .join("_");
   const seatMapForFare =
     fare?.segments?.flatMap((seg) =>

@@ -9,10 +9,10 @@ const SeatMapSchema = new mongoose.Schema(
     departureDate: Date, // Date of flight
     arrivalDate: Date, // Date of flight
     aircraftCode: String, // "73J"
-    cabin: { type: String, enum: ["ECONOMY", "BUSINESS"], default: "ECONOMY" },
+    cabin: { type: String, enum: ["ECONOMY", "BUSINESS", "PREMIUM_ECONOMY"], default: "ECONOMY" },
     seatLayout: [
       {
-        cabin: { type: String, enum: ["ECONOMY", "BUSINESS"] },
+        cabin: { type: String, enum: ["ECONOMY", "BUSINESS", "PREMIUM_ECONOMY"] },
         rows: Number,
         columns: [String],
         seatPricing: {
@@ -24,7 +24,7 @@ const SeatMapSchema = new mongoose.Schema(
       },
     ],
     seatStatus: {
-      type: Map, // key: ECONOMY, BUSINESS
+      type: Map, // key: ECONOMY, BUSINESS, PREMIUM_ECONOMY
       of: {
         type: Map, // key: 1A, 1B, 1C
         of: {

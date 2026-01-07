@@ -14,7 +14,7 @@ const getGapAfter = (columns) => {
     } else if (columns?.length === 9) {
         return [1, 6]
     } else if (columns?.length === 4) {
-        return [0,2]
+        return [0, 2]
     }
 }
 const getSeatType = (columns, seatPricing, seatId, seatLayoutType, index) => {
@@ -50,7 +50,8 @@ const SeatPreview = ({ seatId, status, seatTypeWithPrice, passengerName }) => {
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                 <Box >
                     <Typography fontWeight={600}>
-                        {seatId} </Typography>
+                        {seatId} 
+                    </Typography>
                 </Box>
 
                 <Typography fontSize={13}>

@@ -455,7 +455,7 @@ function SeatSelection() {
 
         // ✅ CHECK-IN
         return calculateCheckinDelta();
-    }, [flightPassengers, isCheckin]);
+    }, [flightPassengers, isCheckin, priceBreakdown, seatPricing]);
 
     const priceBreakdownDetails = useMemo(() => {
         if (!isCheckin) {
@@ -471,7 +471,7 @@ function SeatSelection() {
             seatsPrice: seatPrices,
             totalPrice: totalPrice + addonsCheckinPrice,
         }
-    }, [bookingDetails, seatPrices, addonsCheckinPrice, seatPricing, checkinDetails]);
+    }, [bookingDetails, seatPrices, totalPrice, addonsCheckinPrice, seatPricing, checkinDetails]);
 
     return (
         <Box maxWidth="lg" mx="auto" p={2}>
@@ -578,7 +578,8 @@ function SeatSelection() {
                             sx={{
                                 overflow: "hidden",
                                 position: "relative",
-                                minHeight: 350,
+                                minHeight: 300,
+                                marginTop: 4,
                                 display: "flex",
                                 overflowX: "auto",
                                 overflowY: "hidden",
@@ -597,23 +598,28 @@ function SeatSelection() {
                                 src={PlaneNose}
                                 alt="Plane Nose"
                                 sx={{
-                                    minWidth: 300,
+                                    minWidth: 420,
                                     minHeight: 300,
                                     mr: -6,
                                     zIndex: 2,
+                                    borderTopLeftRadius: "70%",
+                                    borderBottomLeftRadius: "70%"
                                 }}
                             />
                             <Box display="flex" alignItems="center"
                                 style={{
                                     paddingLeft: 60,
                                     paddingRight: 30,
+                                    marginTop: 3,
                                     minHeight: 300,
                                     borderBottomRightRadius: 10,
                                     borderTopRightRadius: 10,
                                     backgroundColor: "#eef7ff",
                                 }}
                             >
-                                <Box display="flex" sx={{ paddingTop: 1, paddingBottom: 1, }}>
+                                <Box display="flex"
+                                    // sx={{ paddingTop: 1, paddingBottom: 1, }}
+                                >
                                     <SeatBlock
                                         layout={BUSINESS_SEAT_MAP}
                                         seatState={seatStatusMap["BUSINESS"]}

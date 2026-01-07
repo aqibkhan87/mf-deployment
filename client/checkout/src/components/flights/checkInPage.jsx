@@ -29,7 +29,7 @@ import {
 
 
 const CheckInPage = () => {
-    const { checkinDetails } = useBookingStore();
+    const { checkinDetails, setCheckinDetails } = useBookingStore();
     const history = useHistory();
     const params = new URLSearchParams(window.location.search);
     const PNR = params.get("PNR");
@@ -76,6 +76,12 @@ const CheckInPage = () => {
     useEffect(() => {
         if (PNR && email) getCheckinDetails({ PNR: PNR, emailOrLastName: email });
     }, [PNR, email])
+    
+    useEffect(() => {
+        return () => {
+            setCheckinDetails({})
+        }
+    }, [])
 
     const handleFieldChange = (e, field) => {
         setFormData({ ...formData, [field]: e?.target?.value })
