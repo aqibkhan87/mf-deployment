@@ -76,7 +76,7 @@ const CheckInPage = () => {
     useEffect(() => {
         if (PNR && email) getCheckinDetails({ PNR: PNR, emailOrLastName: email });
     }, [PNR, email])
-    
+
     useEffect(() => {
         return () => {
             setCheckinDetails({})
@@ -191,13 +191,26 @@ const CheckInPage = () => {
                 <Grid item xs={12} md={8}>
                     {bookingDetails ?
                         <Box sx={{ py: 2 }}>
-                            <Paper sx={{ my: 4, p: 2, textAlign: 'center', borderRadius: 10, bgcolor: '#1976d2', color: 'white' }}>
+                            <Paper sx={{
+                                my: 4,
+                                p: 2,
+                                textAlign: 'center',
+                                borderRadius: 10,
+                                bgcolor: '#1976d2',
+                                color: 'white'
+                            }}>
                                 <Typography align="center" fontWeight="bold">
                                     {sourceAirport?.city} to {destinationAirport?.city}
                                 </Typography>
                             </Paper>
                             <Paper>
-                                <Box sx={{ bgcolor: "#EEF7FF", mb: 2, display: "flex", justifyContent: "space-between", p: 2 }}>
+                                <Box sx={{
+                                    bgcolor: "#EEF7FF",
+                                    mb: 2,
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    p: 2
+                                }}>
                                     <Box>{formatDate(bookingDetails?.date)}</Box>
                                     <Box>PNR: {checkinDetails?.PNR}</Box>
                                 </Box>
@@ -218,38 +231,38 @@ const CheckInPage = () => {
                                                     </Box>}
                                                 <Box className="flex items-center justify-between">
                                                     <Box className="flex-1">
-                                                        <p className="text-xl font-bold">
+                                                        <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                             {formatTime(segment?.departureTime)}
-                                                            <span className="pl-2 text-xs">
+                                                            <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                                 {departureAirportObj?.iata}{segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-gray-500  text-xs">
+                                                            </Typography>
+                                                        </Typography>
+                                                        <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                             {departureAirportObj?.city} - {departureAirportObj?.name}, {departureAirportObj?.country}
-                                                        </p>
+                                                        </Typography>
                                                     </Box>
                                                     <Box className="flex-1">
-                                                        <p className="text-gray-600 text-center">
+                                                        <Typography className="text-gray-600 text-center">
                                                             {formatDuration(segment?.duration)}
-                                                        </p>
-                                                        <p style={{
+                                                        </Typography>
+                                                        <Typography sx={{
                                                             width: 60,
                                                             height: 5,
                                                             borderRadius: 8,
                                                             backgroundColor: "#1976d2",
                                                             margin: "6px auto"
-                                                        }}></p>
+                                                        }}></Typography>
                                                     </Box>
                                                     <Box className="flex-1">
-                                                        <p className="text-xl font-bold">
+                                                        <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                             {formatTime(segment?.arrivalTime)}
-                                                            <span className="pl-2 text-xs">
+                                                            <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                                 {arrivalAirportObj?.iata}{segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-gray-500 text-xs">
+                                                            </Typography>
+                                                        </Typography>
+                                                        <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                             {arrivalAirportObj?.city} - {arrivalAirportObj?.name}, {arrivalAirportObj?.country}
-                                                        </p>
+                                                        </Typography>
                                                     </Box>
                                                 </Box>
 
@@ -259,10 +272,10 @@ const CheckInPage = () => {
                                     {/* Aircraft & Cabin Info */}
                                     <Box className="text-gray-600 text-sm" sx={{ mt: 3 }}>
                                         {segments?.map((seg, idx) => (
-                                            <span key={idx}>
+                                            <Typography variant="span" key={idx}>
                                                 <FlightIcon /> {seg?.aircraftCode} • Cabin: {seg?.cabin}
                                                 {idx < segments?.length - 1 && " | "}
-                                            </span>
+                                            </Typography>
                                         ))}
                                     </Box>
                                     <Divider sx={{ my: 4 }} />

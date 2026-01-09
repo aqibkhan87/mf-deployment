@@ -178,16 +178,16 @@ function FlightResults() {
 
                         }}
                     >
-                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 } }}>
                             {sourceAirport?.city} - {destinationAirport?.city}
                         </Typography>
-                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 } }}>
                             {searchInfo?.date}
                         </Typography>
-                        <Typography className="flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                        <Typography className="flex-1" sx={{ fontSize: { xs: 14, md: 16 } }}>
                             {searchInfo?.passengers?.adult} Passenger
                         </Typography>
-                        <IconButton onClick={handleEdit} color="primary" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                        <IconButton onClick={handleEdit} color="primary" sx={{ fontSize: { xs: 14, md: 16 } }}>
                             <EditIcon />
                         </IconButton>
                     </Box>}
@@ -250,7 +250,7 @@ function FlightResults() {
                     backgroundColor: "#1976d2", borderRadius: 100, mt: 3, p: 2
                 }}>
                     <Typography variant="h6" sx={{
-                        fontWeight: {xs: 500, md: 600 }, color: "#fff", fontSize: { xs: 14, md: 24 }
+                        fontWeight: { xs: 500, md: 600 }, color: "#fff", fontSize: { xs: 14, md: 24 }
                     }}>
                         Flights from {sourceAirport?.city} to {destinationAirport?.city}
                     </Typography>
@@ -338,7 +338,7 @@ function FlightResults() {
 
                                             <Typography
                                                 sx={{
-                                                    width: {xs: 50, md: 60 },
+                                                    width: { xs: 50, md: 60 },
                                                     height: 5,
                                                     borderRadius: 8,
                                                     backgroundColor: "#1976d2",
@@ -423,26 +423,33 @@ function FlightResults() {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={closePopover}>
-                <div
+                <Box
                     key={flightInfo.providerOfferId}
-                    className="p-5 flex flex-col justify-between items-start md:items-center"
-                    style={{ borderColor: "#f7fbff", borderRadius: 2 }}
+                    className="shadow flex justify-between"
+                    sx={{
+                        borderColor: "#f7fbff",
+                        bgcolor: "#fff", borderRadius: 2, p: 3,
+                        my: 3,
+                        alignItems: { xs: "flex-start", },
+                        flexDirection: { xs: "column", }
+                    }}
                 >
+                    <Box className="flex items-center space-x-3">
+                        <Box className="flex flex-col">
+                            <Box className="text-lg font-semibold">
+                                {flightInfo?.airline?.name} ({flightInfo?.airline?.code})
+                            </Box>
+                        </Box>
+                        <Box className="flex flex-col">
+                            <Box className="text-lg font-semibold">
+                                {formatDuration(flightInfo?.duration)}
+                            </Box>
+                        </Box>
+                    </Box>
                     {/* Left Section */}
-                    <div className="flex flex-col space-y-3 w-full">
+                    <Box className="flex flex-col"
+                        sx={{ width: { xs: "100%" }, }}>
                         {/* Airline Info */}
-                        <div className="flex items-center space-x-3">
-                            <div className="flex flex-col">
-                                <div className="text-lg font-semibold">
-                                    {flightInfo?.airline?.name} ({flightInfo?.airline?.code})
-                                </div>
-                            </div>
-                            <div className="flex flex-col">
-                                <div className="text-lg font-semibold">
-                                    {formatDuration(flightInfo?.duration)}
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Flight Segments */}
                         {flightInfo?.segments?.map((segment, index) => {
@@ -452,7 +459,7 @@ function FlightResults() {
                             return (
                                 <Box key={index}>
                                     {arrivalTime &&
-                                        <Box className="flex justify-center py-4">
+                                        <Box className="flex" sx={{ py: 4, justifyContent: "center" }}>
                                             <Box>
                                                 <Typography sx={{ px: 4, py: 2, bgcolor: "#d0e5ff", borderRadius: 20 }}>
                                                     Layover at {departureAirportObj?.city} {getTimeDifference(segment?.departureTime, arrivalTime)}
@@ -461,32 +468,40 @@ function FlightResults() {
                                         </Box>}
                                     <Box className="flex items-center justify-between">
                                         <Box className="flex-1">
-                                            <p className="text-xl font-bold">
+                                            <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                 {formatTime(segment?.departureTime)}
-                                                <span className="pl-2 text-xs">
+                                                <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                     {departureAirportObj?.iata} {segment?.departureTerminal ? `, T${segment?.departureTerminal}` : ""}
-                                                </span>
-                                            </p>
-                                            <p className="text-gray-500  text-xs">
+                                                </Typography>
+                                            </Typography>
+                                            <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                 {departureAirportObj?.city} - {departureAirportObj?.name}, {departureAirportObj?.country}
-                                            </p>
+                                            </Typography>
                                         </Box>
-                                        <Box className="flex-1">
-                                            <p className="text-gray-600 text-center">
+                                        <Box className="flex-1" sx={{ textAlign: "center" }}>
+                                            <Box className="font-semibold" sx={{ fontSize: { xs: 14, md: 18 } }}>
                                                 {formatDuration(segment?.duration)}
-                                            </p>
-                                            <p style={{ width: 60, height: 5, borderRadius: 8, backgroundColor: "#1976d2", margin: "6px auto" }}></p>
+                                            </Box>
+                                            <Typography
+                                                sx={{
+                                                    width: { xs: 50, md: 60 },
+                                                    height: 5,
+                                                    borderRadius: 8,
+                                                    backgroundColor: "#1976d2",
+                                                    margin: "6px auto"
+                                                }}
+                                            />
                                         </Box>
                                         <Box className="flex-1">
-                                            <p className="text-xl font-bold">
+                                            <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                 {formatTime(segment?.arrivalTime)}
-                                                <span className="pl-2 text-xs">
+                                                <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                     {arrivalAirportObj?.iata} {segment?.arrivalTerminal ? `, T${segment?.arrivalTerminal}` : ""}
-                                                </span>
-                                            </p>
-                                            <p className="text-gray-500 text-xs">
+                                                </Typography>
+                                            </Typography>
+                                            <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                 {arrivalAirportObj?.city} - {arrivalAirportObj?.name}, {arrivalAirportObj?.country}
-                                            </p>
+                                            </Typography>
                                         </Box>
                                     </Box>
 
@@ -495,16 +510,16 @@ function FlightResults() {
                         })}
 
                         {/* Aircraft & Cabin Info */}
-                        <div className="text-gray-600 text-sm">
+                        <Box className="text-gray-600" sx={{ fontSize: { xs: 12, md: 14 }, mt: 2 }}>
                             {flightInfo?.segments?.map((seg, idx) => (
-                                <span key={idx}>
+                                <Typography variant="span" key={idx}>
                                     <FlightIcon /> {seg?.aircraftCode} • Cabin: {seg?.cabin}
                                     {idx < flightInfo?.segments?.length - 1 && " | "}
-                                </span>
+                                </Typography>
                             ))}
-                        </div>
-                    </div>
-                </div>
+                        </Box>
+                    </Box>
+                </Box>
             </ConnectingFlightPopup>
         </Box>
     );

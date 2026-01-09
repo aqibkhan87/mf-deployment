@@ -87,9 +87,10 @@ const Login = () => {
           p: 3,
           border: "1px solid #d0d7de",
           borderRadius: 1,
-          marginTop: 4
+          marginTop: 4,
+          bgcolor: "#fff"
         }}
-        className="w-100 bg-white border-1 mt-16"
+        className="w-100 border mt-16"
       >
         {errorMessage ? 
           <Box sx={{ pb: 2 }}>
