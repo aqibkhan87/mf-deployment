@@ -39,6 +39,7 @@ const prodConfig = {
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
       name: "dashboard",
+      filename: "remoteEntry.js",
       exposes: {
         "./DashboardApp": "./src/bootstrap",
       },
