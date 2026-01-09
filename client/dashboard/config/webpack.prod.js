@@ -17,8 +17,6 @@ const finalEnv = {
 const ALLOWED_KEYS = [
   "API_BASE_URL",
   "RAZORPAY_KEY_ID",
-  "AUTH_MF_ENDPOINT",
-  "CHECKOUT_MF_ENDPOINT",
   "STORE_MF_ENDPOINT",
 ];
 
@@ -33,7 +31,7 @@ const prodConfig = {
   mode: "production",
   output: {
     filename: "[name].[contenthash].js",
-    publicPath: "https://www.metacook.in/",
+    publicPath: "https://dashboard.metacook.in/",
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),

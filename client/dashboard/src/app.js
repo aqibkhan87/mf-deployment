@@ -9,20 +9,18 @@ import DestinationFlights from "./booking/destinationFlights/destinationFlights"
 
 const App = ({ history }) => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Router history={history}>
-        <Switch>
-          <Route path="/dashboard" component={DashboardPage} />
-          <Route path="/wishlist" component={ProductWishlist} />
-          <Route path="/addresses" component={AddressList} />
-          <Route path="/order-history" component={OrdersPage} />
-          <Route path="/flight-search" component={FlightResults} />
-          <Route path="/destination" component={DestinationFlights} />
-          <Route path="/" component={DashboardPage} />
-          <Route component={() => <h1>404 Not Found</h1>} />
-        </Switch>
-      </Router>
-    </div>
+    <Router history={history}>
+      <Switch>
+        <Route path="/dashboard" component={DashboardPage} />
+        <Route path="/wishlist" component={ProductWishlist} />
+        <Route path="/addresses" component={AddressList} />
+        <Route path="/order-history" component={OrdersPage} />
+        <Route path="/flight-search" component={FlightResults} />
+        <Route path="/destination" component={DestinationFlights} />
+        <Route path="/" component={DashboardPage} />
+        <Route component={() => <h1>404 Not Found</h1>} />
+      </Switch>
+    </Router>
   );
 };
 
