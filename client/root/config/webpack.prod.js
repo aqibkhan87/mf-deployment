@@ -18,6 +18,7 @@ const ALLOWED_KEYS = [
   "API_BASE_URL",
   "RAZORPAY_KEY_ID",
   "AUTH_MF_ENDPOINT",
+  "DASHBOARD_MF_ENDPOINT",
   "CHECKOUT_MF_ENDPOINT",
   "STORE_MF_ENDPOINT",
 ];
@@ -38,11 +39,10 @@ const prodConfig = {
   plugins: [
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
-      name: "dashboard",
-      exposes: {
-        "./DashboardApp": "./src/bootstrap",
-      },
       remotes: {
+        dashboard: `dashboard@https://dashboard.metacook.in/remoteEntry.js?v=${Date.now()}`,
+        auth: `auth@https://auth.metacook.in/remoteEntry.js?v=${Date.now()}`,
+        checkout: `checkout@https://checkout.metacook.in/remoteEntry.js?v=${Date.now()}`,
         store: `store@https://store.metacook.in/remoteEntry.js?v=${Date.now()}`,
       },
       shared: {

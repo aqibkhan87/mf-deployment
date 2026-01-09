@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { loadRemoteMF } from "../loadRemoteMF";
 
-const AuthApp = () => {
+const CheckoutApp = () => {
   const ref = useRef(null);
   const isMountedRef = useRef(false);
   const history = useHistory();
@@ -17,14 +17,14 @@ const AuthApp = () => {
 
   useEffect(() => {
     let unlisten;
-    
-    const loadAuthApp = async () => {
+
+    const loadCheckoutApp = async () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
       const { mount } = await loadRemoteMF(
-        `${process.env.AUTH_MF_ENDPOINT}/remoteEntry.js?${Date.now()}`,
-        "auth",
-        "./AuthApp"
+        `${process.env.CHECKOUT_MF_ENDPOINT}/remoteEntry.js?v=${Date.now()}`,
+        "checkout",
+        "./CheckoutApp"
       );
       const { updateChildHistory } = mount(ref.current, {
         updateParentHistory,
@@ -37,7 +37,7 @@ const AuthApp = () => {
       });
     };
 
-    loadAuthApp();
+    loadCheckoutApp();
 
     return () => {
       if (unlisten) unlisten();
@@ -48,4 +48,4 @@ const AuthApp = () => {
   return <div ref={ref} />;
 };
 
-export default AuthApp;
+export default CheckoutApp;

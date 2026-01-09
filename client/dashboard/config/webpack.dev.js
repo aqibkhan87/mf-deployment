@@ -16,10 +16,10 @@ console.log("envKeys", envKeys);
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8080/",
+    publicPath: "http://localhost:8081/",
   },
   devServer: {
-    port: 8080,
+    port: 8081,
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, "dist"),
@@ -29,18 +29,21 @@ const devConfig = {
   plugins: [
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
+      name: "dashboard",
+      filename: "remoteEntry.js",
       remotes: {
-        store: `store@http://localhost:8083/remoteEntry.js?v=${Date.now()}`,
+        store: `store@http://localhost:8084/remoteEntry.js?v=${Date.now()}`,
+      },
+      exposes: {
+        "./DashboardApp": "./src/bootstrap",
       },
       shared: {
         react: {
           singleton: true,
-          eager: false,
           requiredVersion: false,
         },
         "react-dom": {
           singleton: true,
-          eager: false,
           requiredVersion: false,
         },
       },

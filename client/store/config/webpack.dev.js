@@ -7,10 +7,10 @@ const path = require("path");
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8083/",
+    publicPath: "http://localhost:8084/",
   },
   devServer: {
-    port: 8083,
+    port: 8084,
     historyApiFallback: true,
     static: {
       directory: path.resolve(__dirname, "dist"),

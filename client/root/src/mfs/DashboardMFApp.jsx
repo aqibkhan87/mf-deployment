@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { loadRemoteMF } from "../loadRemoteMF";
 
-const CheckoutApp = () => {
+const DashboardApp = () => {
   const ref = useRef(null);
   const isMountedRef = useRef(false);
   const history = useHistory();
@@ -18,13 +18,13 @@ const CheckoutApp = () => {
   useEffect(() => {
     let unlisten;
 
-    const loadCheckoutApp = async () => {
+    const loadDashboardApp = async () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
       const { mount } = await loadRemoteMF(
-        `${process.env.CHECKOUT_MF_ENDPOINT}/remoteEntry.js?${Date.now()}`,
-        "checkout",
-        "./CheckoutApp"
+        `${process.env.DASHBOARD_MF_ENDPOINT}/remoteEntry.js?v=${Date.now()}`,
+        "dashboard",
+        "./DashboardApp"
       );
       const { updateChildHistory } = mount(ref.current, {
         updateParentHistory,
@@ -37,7 +37,7 @@ const CheckoutApp = () => {
       });
     };
 
-    loadCheckoutApp();
+    loadDashboardApp();
 
     return () => {
       if (unlisten) unlisten();
@@ -48,4 +48,4 @@ const CheckoutApp = () => {
   return <div ref={ref} />;
 };
 
-export default CheckoutApp;
+export default DashboardApp;

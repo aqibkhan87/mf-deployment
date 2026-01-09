@@ -16,35 +16,35 @@ console.log("envKeys", envKeys);
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8082/",
+    publicPath: "http://localhost:8080/",
   },
   devServer: {
-    port: 8082,
+    port: 8080,
     historyApiFallback: true,
     static: {
       directory: path.join(__dirname, "dist"),
     },
-    hot: true, // enables hot reloading
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,OPTIONS,HEAD,PUT,POST,DELETE",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
+    hot: true, // for hot reloading
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
-      name: "auth",
-      filename: "remoteEntry.js",
+      name: "shell",
       remotes: {
+        dashboard: `dashboard@http://localhost:8081/remoteEntry.js?v=${Date.now()}`,
+        auth: `auth@http://localhost:8082/remoteEntry.js?v=${Date.now()}`,
+        checkout: `checkout@http://localhost:8083/remoteEntry.js?v=${Date.now()}`,
         store: `store@http://localhost:8084/remoteEntry.js?v=${Date.now()}`,
       },
-      exposes: {
-        "./AuthApp": "./src/bootstrap",
-      },
       shared: {
-        react: { singleton: true, requiredVersion: false },
-        "react-dom": { singleton: true, requiredVersion: false },
+        react: {
+          singleton: true,
+          requiredVersion: false,
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: false,
+        },
       },
     }),
   ],
