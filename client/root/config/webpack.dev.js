@@ -30,7 +30,7 @@ const devConfig = {
   plugins: [
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
-      name: "shell",
+      name: "root",
       remotes: {
         dashboard: `dashboard@http://localhost:8081/remoteEntry.js?v=${Date.now()}`,
         auth: `auth@http://localhost:8082/remoteEntry.js?v=${Date.now()}`,

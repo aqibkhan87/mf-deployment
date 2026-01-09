@@ -209,7 +209,7 @@ const BookingWidget = () => {
             </Grid>
           </Box>
           <Grid container spacing={2} alignItems="center" className="inputs-row">
-            <Grid item xs={12} md={3} className="item-card !block md:!flex items-center"
+            <Grid item xs={12} md={3} className="item-card block! md:flex! items-center"
               sx={{ position: "relative" }}>
               <AirportSelector
                 label="From"
@@ -228,6 +228,7 @@ const BookingWidget = () => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <IconButton onClick={handleSwitch} sx={{
                   right: -26,
+                  top: 60,
                   position: { xs: "static", md: "absolute" },
                   margin: "auto",
                   paddingTop: { xs: 2, md: 0 },

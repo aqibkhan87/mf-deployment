@@ -164,23 +164,42 @@ function FlightResults() {
                     </IconButton>
                     <BookingWidget />
                 </Box>
-                {!enableBookingWidget && <Box className="flex w-full md:w-1/2 mx-auto shadow border text-center items-center"
-                    sx={{ backgroundColor: "aliceblue", borderRadius: 100, justifyContent: "space-evenly" }}>
-                    <Typography className="border-right flex-1">
-                        {sourceAirport?.city} - {destinationAirport?.city}
-                    </Typography>
-                    <Typography className="border-right flex-1">
-                        {searchInfo?.date}
-                    </Typography>
-                    <Typography className="flex-1">
-                        {searchInfo?.passengers?.adult} Passenger
-                    </Typography>
-                    <IconButton onClick={handleEdit} color="primary">
-                        <EditIcon />
-                    </IconButton>
-                </Box>}
+                {!enableBookingWidget &&
+                    <Box className="flex"
+                        sx={{
+                            backgroundColor: "aliceblue",
+                            borderRadius: 100,
+                            justifyContent: "space-evenly",
+                            alignItems: "center",
+                            textAlign: "center",
+                            borderWidth: "1px",
+                            margin: "auto",
+                            width: { sm: "100%", md: "50%" }
+
+                        }}
+                    >
+                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                            {sourceAirport?.city} - {destinationAirport?.city}
+                        </Typography>
+                        <Typography className="border-right flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                            {searchInfo?.date}
+                        </Typography>
+                        <Typography className="flex-1" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                            {searchInfo?.passengers?.adult} Passenger
+                        </Typography>
+                        <IconButton onClick={handleEdit} color="primary" sx={{ fontSize: { xs: 14, md: 16 }}}>
+                            <EditIcon />
+                        </IconButton>
+                    </Box>}
             </Box>
-            <Box className="w-full max-w-5xl mx-auto p-4 space-y-6 flight-search">
+            <Box className="flight-search"
+                sx={{
+                    width: "100%",
+                    maxWidth: "1024px",
+                    margin: "auto",
+                    p: 4
+                }}
+            >
                 <Swiper
                     modules={[Navigation]}
                     navigation={true}
@@ -198,12 +217,13 @@ function FlightResults() {
                                 key={i}
                                 onClick={() => handleNewDate(flightSearchDate)}
                             >
-                                <Card className="cursor-pointer h-full"
+                                <Card
                                     style={{
                                         border: `${flightSearchDate?.iso === searchInfo?.date ? "1px solid #6AA0FF" : ""}`
                                     }}
+                                    sx={{ cursor: "pointer", height: "100%" }}
                                 >
-                                    <CardContent className=" items-center">
+                                    <CardContent className="items-center">
                                         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                                             <Typography
                                                 variant="body1"
@@ -226,18 +246,22 @@ function FlightResults() {
                         )
                     })}
                 </Swiper>
-                <Box className="shadow p-4 border text-center" sx={{ backgroundColor: "#1976d2", borderRadius: 100, mt: 3 }}>
-                    <Typography variant="h6" className="text-2xl font-semibold text-white">
+                <Box className="text-center" sx={{
+                    backgroundColor: "#1976d2", borderRadius: 100, mt: 3, p: 2
+                }}>
+                    <Typography variant="h6" sx={{
+                        fontWeight: {xs: 500, md: 600 }, color: "#fff", fontSize: { xs: 14, md: 24 }
+                    }}>
                         Flights from {sourceAirport?.city} to {destinationAirport?.city}
                     </Typography>
                 </Box>
                 <Box>
-                    <p className="mt-2 text-gray-800 font-medium">
+                    <Typography className=" text-gray-800" sx={{ marginTop: 2, fontWeight: 500 }}>
                         {selectedFlight?.fares?.length || 0} Flights Found
-                    </p>
+                    </Typography>
                 </Box>
                 {/* Flight List */}
-                <div className="space-y-4">
+                <Box sx={{ py: 4 }}>
                     {selectedFlight?.fares?.map((fare) => {
                         const segments = fare?.segments || [];
 
@@ -254,55 +278,67 @@ function FlightResults() {
                             a => a?.iata === lastSegment?.arrivalAirport
                         );
                         return (
-                            <div
+                            <Box
                                 key={fare.providerOfferId}
-                                className="bg-white rounded-2xl shadow p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
-                                style={{ borderColor: "#f7fbff", borderRadius: 2 }}
+                                className="shadow flex justify-between"
+                                sx={{
+                                    borderColor: "#f7fbff",
+                                    bgcolor: "#fff", borderRadius: 2, p: 3,
+                                    my: 3,
+                                    alignItems: { xs: "flex-start", md: "center" },
+                                    flexDirection: { xs: "column", md: "row" }
+                                }}
                             >
                                 {/* Left Section */}
-                                <div className="flex flex-col space-y-3 w-full md:w-2/3">
+                                <Box className="flex flex-col"
+                                    sx={{ width: { xs: "100%", md: "80%" }, }}
+                                >
                                     {/* Airline Info */}
-                                    <div className="flex items-center space-x-3">
-                                        <img
+                                    <Box className="flex items-center" sx={{ mb: 2 }}>
+                                        <Box
                                             src={fare?.airline?.logo}
                                             alt={fare?.airline?.name}
-                                            className="w-10 h-10 object-contain rounded"
+                                            component="img"
+                                            sx={{
+                                                width: "40px", height: "40px", objectFit: "contain", borderRadius: 1,
+                                                mr: 3
+                                            }}
                                         />
-                                        <div className="flex flex-col">
-                                            <div className="text-lg font-semibold">
+                                        <Box className="flex flex-col">
+                                            <Box className="text-lg font-semibold">
                                                 {fare?.airline?.name} ({fare?.airline?.code})
-                                            </div>
-                                        </div>
-                                    </div>
+                                            </Box>
+                                        </Box>
+                                    </Box>
 
-                                    <Box className="flex items-center justify-between">
+                                    <Box className="flex items-start justify-between">
                                         {/* ORIGIN */}
                                         <Box className="flex-1">
-                                            <p className="text-xl font-bold">
+                                            <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                 {formatTime(firstSegment?.departureTime)}
-                                                <span className="pl-2 text-xs">
+                                                <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                     {departureAirportObj?.iata}
                                                     {firstSegment?.departureTerminal
                                                         ? `, T${firstSegment?.departureTerminal}`
                                                         : ""}
-                                                </span>
-                                            </p>
+                                                </Typography>
+                                            </Typography>
 
-                                            <p className="text-gray-500 text-xs">
+                                            <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                 {departureAirportObj?.city} - {departureAirportObj?.name},{" "}
                                                 {departureAirportObj?.country}
-                                            </p>
+                                            </Typography>
                                         </Box>
 
                                         {/* DURATION & STOPS */}
                                         <Box className="flex-1 text-center">
-                                            <div className="text-lg font-semibold">
+                                            <Box className="font-semibold" sx={{ fontSize: { xs: 14, md: 18 } }}>
                                                 {formatDuration(fare?.duration)}
-                                            </div>
+                                            </Box>
 
-                                            <p
-                                                style={{
-                                                    width: 60,
+                                            <Typography
+                                                sx={{
+                                                    width: {xs: 50, md: 60 },
                                                     height: 5,
                                                     borderRadius: 8,
                                                     backgroundColor: "#1976d2",
@@ -310,64 +346,78 @@ function FlightResults() {
                                                 }}
                                             />
 
-                                            <p
-                                                className="cursor-pointer text-sm"
+                                            <Typography
                                                 onClick={(e) => openPopover(e, fare)}
+                                                sx={{ cursor: "pointer", fontSize: { xs: 12, md: 14 } }}
                                             >
                                                 {segments.length > 1
                                                     ? `${segments.length - 1} Stop`
                                                     : "Non Stop"}
-                                            </p>
+                                            </Typography>
                                         </Box>
 
                                         {/* DESTINATION (FINAL, NOT CONNECTING) */}
                                         <Box className="flex-1 text-right">
-                                            <p className="text-xl font-bold">
+                                            <Typography sx={{ fontWeight: 600, fontSize: { xs: 12, md: 20 } }}>
                                                 {formatTime(lastSegment?.arrivalTime)}
-                                                <span className="pl-2 text-xs">
+                                                <Typography variant="span" className="text-xs" sx={{ pl: 1 }}>
                                                     {arrivalAirportObj?.iata}
                                                     {lastSegment?.arrivalTerminal
                                                         ? `, T${lastSegment?.arrivalTerminal}`
                                                         : ""}
-                                                </span>
-                                            </p>
+                                                </Typography>
+                                            </Typography>
 
-                                            <p className="text-gray-500 text-xs">
+                                            <Typography className="text-gray-500" sx={{ fontSize: 12 }}>
                                                 {arrivalAirportObj?.city} - {arrivalAirportObj?.name},{" "}
                                                 {arrivalAirportObj?.country}
-                                            </p>
+                                            </Typography>
                                         </Box>
                                     </Box>
 
                                     {/* Aircraft & Cabin Info */}
-                                    <div className="text-gray-600 text-sm">
+                                    <Box className="text-gray-600" sx={{ fontSize: { xs: 12, md: 14 }, mt: 2 }}>
                                         {fare?.segments?.map((seg, idx) => (
-                                            <span key={idx}>
+                                            <Typography variant="span" key={idx}>
                                                 <FlightIcon /> {seg?.aircraftCode} • Cabin: {seg?.cabin}
                                                 {idx < fare?.segments?.length - 1 && " | "}
-                                            </span>
+                                            </Typography>
                                         ))}
-                                    </div>
-                                </div>
+                                    </Box>
+                                </Box>
 
                                 {/* Price & Button */}
-                                <div className="flex w-full items-center justify-between md:flex-col md:w-40 md:items-end mt-4 md:mt-0">
-                                    <Box className="flex text-lg font-semibold items-center">
+                                <Box className="flex items-center justify-between"
+                                    sx={{
+                                        width: { xs: "100%", md: "240px" },
+                                        marginTop: { xs: 2, md: 0 },
+                                        alignItems: { xs: "center", md: "flex-end" },
+                                        flexDirection: { xs: "row", md: "column" }
+                                    }}
+                                >
+                                    <Box className="flex"
+                                        sx={{ fontSize: { xs: 16, md: 20 }, fontWeight: 600, alignItems: "center" }}
+                                    >
                                         ₹ {Math.floor(fare?.totalPrice)}
-                                        <Typography className="text-sm pl-1">/ adult</Typography>
+                                        <Typography variant="span" sx={{
+                                            fontSize: { xs: 12, md: 14 }, paddingLeft: 1, fontWeight: 500
+                                        }}>
+                                            / adult
+                                        </Typography>
                                     </Box>
                                     <Button
                                         variant="contained"
-                                        className="mt-2 px-5 py-2 transition"
+                                        className="transition"
                                         onClick={(e) => handleFlightSearch(e, fare)}
+                                        sx={{ marginTop: 2, px: { xs: 2, md: 4 }, py: { xs: 1, md: 2 } }}
                                     >
                                         Select Flight
                                     </Button>
-                                </div>
-                            </div>
+                                </Box>
+                            </Box>
                         )
                     })}
-                </div>
+                </Box>
             </Box>
             <ConnectingFlightPopup
                 anchorEl={anchorEl}

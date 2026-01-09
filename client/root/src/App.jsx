@@ -184,7 +184,7 @@ const App = () => {
             <Route component={() => <h1>404 Not Found</h1>} />
           </Switch>
         </main>
-        <footer className="border-t py-6 text-center text-xs text-muted-foreground">
+        <footer className="py-6 text-center text-xs text-muted-foreground">
           Built with ♥ as a micro-frontend project by <span className="text-black font-semibold">Aqib Khan</span>
         </footer>
         {loading && (<Loader />)}
