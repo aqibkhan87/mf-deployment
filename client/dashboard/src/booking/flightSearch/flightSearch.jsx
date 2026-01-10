@@ -250,7 +250,7 @@ function FlightResults() {
                     backgroundColor: "#1976d2", borderRadius: 100, mt: 3, p: 2
                 }}>
                     <Typography variant="h6" sx={{
-                        fontWeight: { xs: 500, md: 600 }, color: "#fff", fontSize: { xs: 14, md: 24 }
+                        fontWeight: { xs: 500, md: 600 }, color: "#fff", fontSize: { xs: 14, md: 20 }
                     }}>
                         Flights from {sourceAirport?.city} to {destinationAirport?.city}
                     </Typography>
@@ -440,7 +440,7 @@ function FlightResults() {
                                 {flightInfo?.airline?.name} ({flightInfo?.airline?.code})
                             </Box>
                         </Box>
-                        <Box className="flex flex-col">
+                        <Box className="flex flex-col" sx={{ ml: 1 }}>
                             <Box className="text-lg font-semibold">
                                 {formatDuration(flightInfo?.duration)}
                             </Box>

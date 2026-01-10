@@ -56,6 +56,8 @@ const prodConfig = {
           eager: false,
           requiredVersion: false,
         },
+        "@mui/material": { singleton: true },
+        "@mui/system": { singleton: true },
       },
     }),
   ],

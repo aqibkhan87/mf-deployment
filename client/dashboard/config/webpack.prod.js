@@ -14,11 +14,7 @@ const finalEnv = {
   ...process.env, // GitHub Actions injects here
 };
 
-const ALLOWED_KEYS = [
-  "API_BASE_URL",
-  "RAZORPAY_KEY_ID",
-  "STORE_MF_ENDPOINT",
-];
+const ALLOWED_KEYS = ["API_BASE_URL", "RAZORPAY_KEY_ID", "STORE_MF_ENDPOINT"];
 
 const envKeys = ALLOWED_KEYS.reduce((acc, key) => {
   if (finalEnv[key]) {
@@ -55,6 +51,8 @@ const prodConfig = {
           eager: false,
           requiredVersion: false,
         },
+        "@mui/material": { singleton: true },
+        "@mui/system": { singleton: true },
       },
     }),
   ],

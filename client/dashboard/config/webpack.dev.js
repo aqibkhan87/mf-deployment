@@ -46,6 +46,8 @@ const devConfig = {
           singleton: true,
           requiredVersion: false,
         },
+        "@mui/material": { singleton: true },
+        "@mui/system": { singleton: true },
       },
     }),
   ],

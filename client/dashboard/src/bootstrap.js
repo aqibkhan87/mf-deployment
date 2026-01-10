@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createMemoryHistory, createBrowserHistory } from "history";
 import App from "./app";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const roots = new Map();
 let history = null;
@@ -31,7 +33,11 @@ const mount = (
       const root = ReactDOM.createRoot(el);
       roots.set(el, root);
 
-      root.render(<App history={history} />);
+      root.render(
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <App history={history} />
+        </LocalizationProvider>
+      );
     }, 0);
     return {
       updateChildHistory: () => {},
@@ -41,7 +47,11 @@ const mount = (
   const root = ReactDOM.createRoot(el);
   roots.set(el, root);
 
-  root.render(<App history={history} />);
+  root.render(
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <App history={history} />
+    </LocalizationProvider>
+  );
 
   return {
     updateChildHistory({ pathname: nextPathname }) {

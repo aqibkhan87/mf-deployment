@@ -11,7 +11,6 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
   return prev;
 }, {});
 
-
 console.log("envKeys", envKeys);
 
 const devConfig = {
@@ -46,6 +45,8 @@ const devConfig = {
           singleton: true,
           requiredVersion: false,
         },
+        "@mui/material": { singleton: true },
+        "@mui/system": { singleton: true },
       },
     }),
   ],
