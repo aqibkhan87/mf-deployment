@@ -14,7 +14,7 @@ const CustomPopper = (props) => {
     return (
         <Popper
             {...props}
-            style={{
+            sx={{
                 ...style,
                 width: 260, // 👈 OVERRIDES inline width
             }}
@@ -42,7 +42,7 @@ const AirportSelector = ({
 }) => {
 
     return (
-        <Paper sx={{ width: "100%", borderRadius: 2, border: "1px solid #E0E0E0", p: 2 }}>
+        <Paper sx={{ width: "100%", borderRadius: 2, border: "1px solid #E0E0E0", p: 2, cursor: "pointer" }}>
             <Typography variant="caption" color="text.secondary">{label}</Typography>
 
             <Autocomplete

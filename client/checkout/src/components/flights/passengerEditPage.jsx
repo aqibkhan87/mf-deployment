@@ -320,7 +320,7 @@ function PassengerDetailsPage() {
             fullWidth
             size="large"
             variant="contained"
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, textTransform: "none" }}
             disabled={!isFormValid}
             onClick={handleNext}
           >

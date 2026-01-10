@@ -607,10 +607,10 @@ function SeatSelection() {
                                 }}
                             />
                             <Box display="flex" alignItems="center"
-                                style={{
-                                    paddingLeft: 60,
-                                    paddingRight: 30,
-                                    marginTop: 3,
+                                sx={{
+                                    paddingLeft: 8,
+                                    paddingRight: 4,
+                                    marginTop: 0.4,
                                     minHeight: 300,
                                     borderBottomRightRadius: 10,
                                     borderTopRightRadius: 10,
@@ -649,11 +649,12 @@ function SeatSelection() {
                     <TripSummary priceBreakdown={priceBreakdownDetails} />
                     <Button
                         variant="contained"
-                        fullWidth sx={{ mt: 2 }}
+                        fullWidth 
+                        sx={{ mt: 2, textTransform: "none" }}
                         onClick={handlePayment}
                         disabled={toggleProceedToPaymentBtn}
                     >
-                        Proceed to Payment
+                        Proceed to payment
                     </Button>
                     <TestPaymentDisplay />
                 </Grid>

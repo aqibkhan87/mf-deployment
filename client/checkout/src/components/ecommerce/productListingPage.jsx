@@ -135,15 +135,14 @@ const ProductListing = () => {
             <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
               <a
                 onClick={(e) => navigateToProductDetail(e, p)}
-                className="cursor-pointer"
               >
-                <Card sx={{ height: "100%" }}>
+                <Card sx={{ height: "100%", cursor: "pointer" }}>
                   <CardMedia
                     component="img"
                     height="200"
                     image={p?.productImage}
                     alt={p?.name}
-                    style={{ height: 250 }}
+                    sx={{ height: 250 }}
                   />
                   <CardContent>
                     <Typography variant="body1" gutterBottom>

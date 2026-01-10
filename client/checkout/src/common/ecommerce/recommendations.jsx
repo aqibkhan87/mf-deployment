@@ -25,9 +25,9 @@ const Recommendations = () => {
   };
 
   return (
-    <div className="p-4 recommendation">
-      <h3 className="font-bold mb-2">Recommended for you</h3>
-      <div className="flex gap-2">
+    <Box className="recommendation" sx={{ p: 2 }}>
+      <Typography sx={{ mb: 2, fontWeight: 600 }}>Recommended for you</Typography>
+      <Box className="flex gap-2">
         <Swiper
           navigation={true}
           modules={[Navigation]}
@@ -39,18 +39,17 @@ const Recommendations = () => {
           }}
         >
           {productsByCategory?.map((p, i) => (
-            <SwiperSlide key={`${i}-${p?.name}`} className="cursor-pointer">
+            <SwiperSlide key={`${i}-${p?.name}`}>
               <a
                 onClick={(e) => navigateToProductDetail(e, p)}
-                className="cursor-pointer"
               >
-                <Card sx={{ height: "100%" }}>
+                <Card sx={{ height: "100%", cursor: "pointer" }}>
                   <CardMedia
                     component="img"
                     height="200"
                     image={p?.productImage}
                     alt={p?.name}
-                    style={{ height: 250 }}
+                    sx={{ height: 250 }}
                   />
                   <CardContent>
                     <Typography variant="body1" gutterBottom>
@@ -89,8 +88,8 @@ const Recommendations = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

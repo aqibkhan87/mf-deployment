@@ -209,7 +209,7 @@ function FlightResults() {
                         768: { slidesPerView: 5 },
                         480: { slidesPerView: 3 },
                     }}
-                    style={{ marginBottom: "32px" }}
+                    sx={{ marginBottom: "32px" }}
                 >
                     {dates?.map((flightSearchDate, i) => {
                         return (
@@ -218,10 +218,10 @@ function FlightResults() {
                                 onClick={() => handleNewDate(flightSearchDate)}
                             >
                                 <Card
-                                    style={{
+                                    sx={{
                                         border: `${flightSearchDate?.iso === searchInfo?.date ? "1px solid #6AA0FF" : ""}`
+                                        , cursor: "pointer", height: "100%"
                                     }}
-                                    sx={{ cursor: "pointer", height: "100%" }}
                                 >
                                     <CardContent className="items-center">
                                         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

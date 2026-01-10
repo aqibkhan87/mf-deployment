@@ -1,6 +1,6 @@
 {
   "name": "checkout",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "dev": "npx webpack serve --config config/webpack.dev.js",
     "build": "webpack --config config/webpack.prod.js"

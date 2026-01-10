@@ -103,11 +103,12 @@ const ProductDetail = () => {
               <Box display="flex">
                 <Box display="grid" gap={2} mt={2}>
                   {product?.images?.map((img, i) => (
-                    <img
+                    <Box
+                      component={"img"}
                       key={i}
                       src={img}
                       alt={`thumb-${i}`}
-                      style={{
+                      sx={{
                         width: 100,
                         height: 100,
                         border:
@@ -123,11 +124,12 @@ const ProductDetail = () => {
                 </Box>
                 <Box
                   display="flex"
-                  style={{ width: "calc(100% - 140px)", height: 450 }}
+                  sx={{ width: "calc(100% - 140px)", height: 450 }}
                   mx={"auto"}
                   mt={2}
                 >
-                  <img
+                  <Box
+                    component={"img"}
                     src={
                       mainImg
                         ? mainImg
@@ -136,7 +138,7 @@ const ProductDetail = () => {
                           : ""
                     }
                     alt="product"
-                    style={{ width: "100%", borderRadius: 8 }}
+                    sx={{ width: "100%", borderRadius: 8 }}
                   />
                 </Box>
               </Box>

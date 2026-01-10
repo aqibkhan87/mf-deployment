@@ -42,11 +42,11 @@ const ProductWishlist = () => {
             </Typography> : <></>}
             <Grid container spacing={2} >
                 {wishlist?.length > 0 ? wishlist?.map((p, i) => (
-                    <Grid item xs={12} sm={6} md={4} key={`index-${i}`}>
-                        <a onClick={(e) => navigateToProductDetail(e, p)} className="cursor-pointer relative">
+                    <Grid item xs={12} sm={6} md={4} key={`index-${i}`} sx={{cursor: "pointer" }}>
+                        <a onClick={(e) => navigateToProductDetail(e, p)} className="relative">
                             <IconButton
                                 onClick={(e) => handleOnDelete(e, p)}
-                                className="!absolute"
+                                className="absolute!"
                                 sx={{
                                     top: 8,
                                     right: 8,
@@ -65,7 +65,7 @@ const ProductWishlist = () => {
                                     height="200"
                                     image={p?.product?.productImage}
                                     alt={p?.product?.name}
-                                    style={{ height: 250 }}
+                                    sx={{ height: 250 }}
                                 />
                                 <CardContent>
                                     <Typography variant="body1" gutterBottom>

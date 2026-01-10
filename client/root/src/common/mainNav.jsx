@@ -82,7 +82,7 @@ const MainNav = () => {
         <Box>
           <Link
             to={"/"}
-            style={{ textDecoration: "none" }}
+            sx={{ textDecoration: "none" }}
             className="text-black"
           >
             <Typography variant="h6">Metacook</Typography>
@@ -127,7 +127,7 @@ const MainNav = () => {
             </Link> : null}
           {!user?.email ? (
             <Button className="p-2" >
-              <Link to="/auth/login" style={{ textDecoration: "none" }}>
+              <Link to="/auth/login" sx={{ textDecoration: "none" }}>
                 Login
               </Link>
             </Button>

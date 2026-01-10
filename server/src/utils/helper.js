@@ -75,7 +75,7 @@ export const formatDuration = (duration) => {
 export const subtractMinutesFromUTC = (utcDateString, minutes = 30) => {
   const date = new Date(utcDateString); // parses UTC correctly
   date.setMinutes(date.getMinutes() - minutes);
-  return date;
+  return formatTime(date);
 };
 
 /**

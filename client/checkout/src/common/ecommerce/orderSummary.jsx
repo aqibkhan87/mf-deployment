@@ -7,8 +7,8 @@ const OrderSummary = () => {
 
   return (
     <Paper sx={{ p: 3 }}>
-      <Typography variant="subtitle2" gutterBottom>
-        ORDER SUMMARY
+      <Typography variant="h6" gutterBottom>
+        Order Summary
       </Typography>
       <Divider sx={{ mb: 1 }} />
       {cart?.products?.map((product, i) => (

@@ -96,17 +96,16 @@ const CheckoutItems = () => {
                 objectFit: "cover",
                 m: 1,
                 borderRadius: 2,
+                cursor: "pointer" 
               }}
               image={product?.productDetail?.productImage}
               alt={product?.productDetail?.name}
               onClick={() => navigateToProduct(product)}
-              className="cursor-pointer"
             />
           </Grid>
           <Grid item xs={9.8}>
-            <Typography sx={{ fontWeight: 600 }}
+            <Typography sx={{ fontWeight: 600, cursor: "pointer"  }}
               onClick={() => navigateToProduct(product)}
-              className="cursor-pointer"
             >
               {product?.productDetail?.name}
             </Typography>

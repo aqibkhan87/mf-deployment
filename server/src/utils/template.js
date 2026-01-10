@@ -735,17 +735,6 @@ export const singleBoardingPassGenerateTemplate = (boardingPass, PNR) => {
                                     }
                                 </div>
                             </div>
-                            <div class="block">
-                                <div class="label">Duration</div>
-                                <div class="value">
-                                    ${
-                                      boardingPass?.duration
-                                        ? formatDuration(boardingPass?.duration)
-                                        : ""
-                                    }
-                                </div>
-                            </div>
-                            
                         </div>
 
                         <div class="seat-box">

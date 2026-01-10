@@ -264,7 +264,8 @@ const BookingWidget = () => {
               <Paper sx={{
                 borderRadius: "8px",
                 border: "1px solid #E0E0E0",
-                backgroundColor: "#fff"
+                backgroundColor: "#fff",
+                cursor: "pointer"
               }}>
                 <Grid container alignItems="center" sx={{ padding: 2 }} onClick={(e) =>
                   setAnchors({ ...anchors, dateAnchor: e.currentTarget })
@@ -289,7 +290,7 @@ const BookingWidget = () => {
                 anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
                 transformOrigin={{ vertical: "top", horizontal: "left" }}
                 PaperProps={{
-                  sx: { width: 320, borderRadius: "12px", mt: 1, p: 2 },
+                  sx: { width: 350, borderRadius: "12px", mt: 1, p: 1 },
                 }}
               >
                 <DateSelector
@@ -312,12 +313,12 @@ const BookingWidget = () => {
               }}
                 className="passenger-selector"
               >
-                <Grid container alignItems="center" >
+                <Grid container alignItems="center"
+                  sx={{ cursor: "pointer" }}
+                  onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}>
                   <Grid
                     item
-                    onClick={(e) => setAnchors({ ...anchors, passengerAnchor: e.currentTarget })}
                     sx={{
-                      cursor: "pointer",
                       p: 2
                     }}
                   >

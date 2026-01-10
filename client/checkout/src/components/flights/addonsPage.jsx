@@ -331,8 +331,12 @@ const AddonsPage = () => {
                     <TripSummary
                         priceBreakdown={priceBreakdownDetails}
                     />
-                    <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSeatSelection}>
-                        Continue to Seat Selection
+                    <Button 
+                     variant="contained" 
+                     fullWidth 
+                     sx={{ mt: 2, textTransform: "none" }} 
+                     onClick={handleSeatSelection}>
+                        Continue to seat selection
                     </Button>
                 </Grid>
             </Grid>

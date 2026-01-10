@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
   return (
     <Box className="dashboard-page" data-page-type="dashboard">
-      
+
       <Box>
         <img src={bannerImage} alt="banner1" className="banner-image" />
         <BookingWidget />
@@ -70,16 +70,16 @@ export default function DashboardPage() {
               }}
             >
               {sec?.products?.map((p, i) => (
-                <SwiperSlide key={`${i}-${p?.name}`} className="cursor-pointer">
+                <SwiperSlide key={`${i}-${p?.name}`}>
                   <a onClick={(e) => navigateToProductCategory(e, sec)}>
-                    <Card sx={{ textAlign: "center" }}>
+                    <Card sx={{ textAlign: "center", cursor: "pointer"  }}>
                       <CardMedia
                         component="img"
                         image={p?.productImage}
                         alt={p?.name}
-                        style={{ height: 200 }}
+                        sx={{ height: 200 }}
                       />
-                      <CardContent style={{ paddingBottom: "16px" }}>
+                      <CardContent sx={{ paddingBottom: "16px" }}>
                         <Typography variant="body1">{p?.name}</Typography>
                         <Typography variant="body2" color="green">
                           ₹{p?.price}

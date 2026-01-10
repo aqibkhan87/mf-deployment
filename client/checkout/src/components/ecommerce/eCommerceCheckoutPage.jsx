@@ -269,11 +269,11 @@ const Checkout = () => {
           <Button
             variant="contained"
             color="primary"
-            sx={{ float: "right", fontSize: 16, px: 6, mb: 4 }}
+            sx={{ float: "right", fontSize: 16, px: 6, mb: 4, textTransform: "none" }}
             disabled={isContinueDisabled}
             onClick={handleCheckout}
           >
-            Continue to Payment
+            Continue to payment
           </Button>
         </Grid>
         <Grid item xs={12} md={4}>

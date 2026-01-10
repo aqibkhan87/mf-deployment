@@ -96,11 +96,11 @@ const Cart = () => {
                 objectFit: "cover",
                 m: 2,
                 borderRadius: 2,
+                cursor: "pointer"
               }}
               image={product?.productDetail?.productImage}
               alt={product?.productDetail?.name}
               onClick={() => navigateToProduct(product)}
-              className="cursor-pointer"
             />
             <Box
               sx={{
@@ -112,7 +112,7 @@ const Cart = () => {
               <CardContent sx={{ pb: 1 }}>
                 <Typography variant="h6" noWrap
                   onClick={() => navigateToProduct(product)}
-                  className="cursor-pointer">
+                  sx={{ cursor: "pointer" }}>
                   {product?.productDetail?.name}
                 </Typography>
                 <Typography color="text.secondary">
@@ -122,20 +122,20 @@ const Cart = () => {
                   Seller: {product?.productDetail?.seller}
                 </Typography>
                 <Typography variant="body2" sx={{ mt: 1 }}>
-                  <span
-                    style={{
+                  <Typography
+                    sx={{
                       textDecoration: "line-through",
                       color: "#888",
                     }}
                   >
                     ₹{product?.productDetail?.actualPrice}
-                  </span>
-                  <span style={{ fontWeight: 600, marginLeft: 8 }}>
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, marginLeft: 0 }}>
                     ₹{product?.productDetail?.price}
-                  </span>
-                  <span style={{ color: "green", marginLeft: 8 }}>
+                  </Typography>
+                  <Typography sx={{ color: "green", marginLeft: 0 }}>
                     {product?.productDetail?.discountedPrice}
-                  </span>
+                  </Typography>
                 </Typography>
               </CardContent>
               <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -198,13 +198,11 @@ const Cart = () => {
         variant="contained"
         type="submit"
         color="primary"
-        sx={{ float: "right", my: 8, fontSize: 18 }}
+        sx={{ float: "right", my: 8, fontSize: 18, textTransform: "none" }}
         onClick={navigateToCheckout}
         aria-label="Proceed To Checkout"
-        tabIndex={0}
-        role="button"
       >
-        Proceed To Checkout
+        Proceed to checkout
       </Button>
     </Grid>
   );
