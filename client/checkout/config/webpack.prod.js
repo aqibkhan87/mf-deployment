@@ -4,6 +4,8 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 const commonConfig = require("./webpack.common");
 const path = require("path");
 const dotenv = require("dotenv");
+const packageJson = require("../package.json");
+const version = packageJson.version; 
 
 const envFile = path.resolve(__dirname, "../.env.production");
 const fileEnv = dotenv.config({ path: envFile }).parsed || {};
@@ -29,8 +31,9 @@ const envKeys = ALLOWED_KEYS.reduce((acc, key) => {
 const prodConfig = {
   mode: "production",
   output: {
+    path: path.resolve(__dirname, './../dist', version),
     filename: "[name].[contenthash].js",
-    publicPath: "https://checkout.metacook.in/",
+    publicPath: `https://checkout.metacook.in/${version}/`,
   },
   plugins: [
     new webpack.DefinePlugin(envKeys),

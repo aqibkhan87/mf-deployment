@@ -104,7 +104,7 @@ const Login = () => {
           size="small"
           variant="outlined"
           sx={{ mb: 2, bgcolor: "white" }}
-          label="Email Address or UserName"
+          label="Email Address or Mobile no."
           name="contact"
           value={contact}
           onChange={(e) => handleFormData("contact", e?.target?.value)}

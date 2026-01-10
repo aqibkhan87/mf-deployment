@@ -21,8 +21,11 @@ const DashboardApp = () => {
     const loadDashboardApp = async () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
+
+      const config = window.__MF_CONFIG__;
+      const version = config.dashboard;
       const { mount } = await loadRemoteMF(
-        `${process.env.DASHBOARD_MF_ENDPOINT}/remoteEntry.js?v=${Date.now()}`,
+        `${process.env.DASHBOARD_MF_ENDPOINT}/${version}/remoteEntry.js?v=${Date.now()}`,
         "dashboard",
         "./DashboardApp"
       );

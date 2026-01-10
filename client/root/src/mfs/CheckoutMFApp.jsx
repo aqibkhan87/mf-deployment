@@ -21,8 +21,10 @@ const CheckoutApp = () => {
     const loadCheckoutApp = async () => {
       if (isMountedRef.current) return;
       isMountedRef.current = true;
+      const config = window.__MF_CONFIG__;
+      const version = config.checkout;
       const { mount } = await loadRemoteMF(
-        `${process.env.CHECKOUT_MF_ENDPOINT}/remoteEntry.js?v=${Date.now()}`,
+        `${process.env.CHECKOUT_MF_ENDPOINT}/${version}/remoteEntry.js?v=${Date.now()}`,
         "checkout",
         "./CheckoutApp"
       );

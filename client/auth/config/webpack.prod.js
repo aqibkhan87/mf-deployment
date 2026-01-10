@@ -6,6 +6,8 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 const dotenv = require("dotenv");
+const packageJson = require("../package.json");
+const version = packageJson.version; 
 
 const envFile = path.resolve(__dirname, "../.env.production");
 const fileEnv = dotenv.config({ path: envFile }).parsed || {};
@@ -31,8 +33,9 @@ const envKeys = ALLOWED_KEYS.reduce((acc, key) => {
 const prodConfig = {
   mode: "production",
   output: {
+    path: path.resolve(__dirname, './../dist', version),
     filename: "[name].[contenthash].js",
-    publicPath: "https://auth.metacook.in/",
+    publicPath: `https://auth.metacook.in/${version}/`,
   },
   optimization: {
     splitChunks: {

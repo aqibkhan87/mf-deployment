@@ -40,9 +40,6 @@ const prodConfig = {
     new webpack.DefinePlugin(envKeys),
     new ModuleFederationPlugin({
       remotes: {
-        dashboard: `dashboard@https://dashboard.metacook.in/remoteEntry.js?v=${Date.now()}`,
-        auth: `auth@https://auth.metacook.in/remoteEntry.js?v=${Date.now()}`,
-        checkout: `checkout@https://checkout.metacook.in/remoteEntry.js?v=${Date.now()}`,
         store: `store@https://store.metacook.in/remoteEntry.js?v=${Date.now()}`,
       },
       shared: {

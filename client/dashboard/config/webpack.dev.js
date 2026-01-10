@@ -5,6 +5,8 @@ const commonConfig = require("./webpack.common");
 const path = require("path");
 const dotenv = require("dotenv");
 const env = dotenv.config({ path: path.resolve(__dirname, "../.env") }).parsed;
+const packageJson = require("../package.json");
+const version = packageJson.version; 
 
 const envKeys = Object.keys(env).reduce((prev, next) => {
   prev[`process.env.${next}`] = JSON.stringify(env[next]);
@@ -16,7 +18,7 @@ console.log("envKeys", envKeys);
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8081/",
+    publicPath: `http://localhost:8081/${version}/`,
   },
   devServer: {
     port: 8081,

@@ -11,6 +11,7 @@ const envKeys = Object.keys(env).reduce((prev, next) => {
   return prev;
 }, {});
 
+
 console.log("envKeys", envKeys);
 
 const devConfig = {
@@ -31,9 +32,6 @@ const devConfig = {
     new ModuleFederationPlugin({
       name: "root",
       remotes: {
-        dashboard: `dashboard@http://localhost:8081/remoteEntry.js?v=${Date.now()}`,
-        auth: `auth@http://localhost:8082/remoteEntry.js?v=${Date.now()}`,
-        checkout: `checkout@http://localhost:8083/remoteEntry.js?v=${Date.now()}`,
         store: `store@http://localhost:8084/remoteEntry.js?v=${Date.now()}`,
       },
       shared: {

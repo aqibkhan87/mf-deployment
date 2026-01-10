@@ -2,6 +2,8 @@ name: Deploy Store MF
 
 on:
   push:
+    tags:
+      - v1.0.1
     branches:
       - main
     paths:
@@ -22,7 +24,7 @@ jobs:
 
       - name: Deploy to S3
         uses: shinyinc/action-aws-cli@v1.2
-      - run: aws s3 sync dist s3://${{ secrets.MFE_STORE_CONTAINER }}/ --delete --cache-control max-age=31536000,public
+      - run: aws s3 sync dist s3://${{ secrets.MFE_STORE_CONTAINER }}/${{ github.ref_name }}/ --cache-control max-age=31536000,public
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
