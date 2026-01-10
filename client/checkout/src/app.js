@@ -11,6 +11,7 @@ import ItineraryPage from "./components/flights/itineraryPage";
 import CheckInPage from "./components/flights/checkInPage";
 
 const App = ({ history }) => {
+  
   return (
     <Router history={history}>
       <Switch>
