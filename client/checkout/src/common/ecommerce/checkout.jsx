@@ -76,7 +76,7 @@ const CheckoutItems = () => {
           />
         </Grid>
         <Grid item xs>
-          <Typography sx={{ fontWeight: 600 }}>CHECKOUT ITEMS</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Checkout Items</Typography>
         </Grid>
       </Grid>
       <Divider sx={{ my: 1 }} />
@@ -86,25 +86,25 @@ const CheckoutItems = () => {
           container
           spacing={2}
           key={ind}
+          sx={{ mb: 2 }}
         >
-          <Grid item xs={2.2}>
+          <Grid item xs={4}>
             <CardMedia
               component="img"
               sx={{
-                width: 100,
-                height: 100,
+                width: { xs: 80, mx: 100 },
+                height: { xs: 80, mx: 100 },
                 objectFit: "cover",
-                m: 1,
                 borderRadius: 2,
-                cursor: "pointer" 
+                cursor: "pointer"
               }}
               image={product?.productDetail?.productImage}
               alt={product?.productDetail?.name}
               onClick={() => navigateToProduct(product)}
             />
           </Grid>
-          <Grid item xs={9.8}>
-            <Typography sx={{ fontWeight: 600, cursor: "pointer"  }}
+          <Grid item xs={8}>
+            <Typography sx={{ fontWeight: 600, cursor: "pointer" }}
               onClick={() => navigateToProduct(product)}
             >
               {product?.productDetail?.name}

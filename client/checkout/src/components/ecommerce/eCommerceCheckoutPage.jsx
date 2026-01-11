@@ -266,18 +266,20 @@ const Checkout = () => {
               </Typography>
             </Paper>
           )}
+
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <OrderSummary />
           <Button
+            fullWidth
             variant="contained"
             color="primary"
-            sx={{ float: "right", fontSize: 16, px: 6, mb: 4, textTransform: "none" }}
+            sx={{ fontSize: 16, my: 2, textTransform: "none" }}
             disabled={isContinueDisabled}
             onClick={handleCheckout}
           >
             Continue to payment
           </Button>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <OrderSummary />
           <TestPaymentDisplay />
         </Grid>
       </Grid>

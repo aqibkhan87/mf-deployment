@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { useCartStore } from "store/cartStore";
 import OrderSummary from "../../common/ecommerce/orderSummary";
@@ -15,6 +15,10 @@ const CartPage = () => {
     }
   }, []);
 
+  const navigateToCheckout = () => {
+    history.push("/ecommerce/checkout");
+  }
+
   return (
     <div className="">
       {!cart?.products?.length ? (
@@ -29,6 +33,18 @@ const CartPage = () => {
             </Grid>
             <Grid item xs={12} md={4}>
               <OrderSummary />
+              <Button
+                fullWidth
+                size="large"
+                variant="contained"
+                type="submit"
+                color="primary"
+                sx={{ my: 2, fontSize: 18, textTransform: "none" }}
+                onClick={navigateToCheckout}
+                aria-label="Proceed To Checkout"
+              >
+                Proceed to checkout
+              </Button>
             </Grid>
           </Grid>
         </Box>
