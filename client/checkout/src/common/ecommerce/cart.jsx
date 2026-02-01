@@ -88,8 +88,8 @@ const Cart = () => {
               <CardMedia
                 component="img"
                 sx={{
-                  width: { xs: 90, mx: 120 },
-                  height: { xs: 90, mx: 120 },
+                  width: { xs: 90, md: 120 },
+                  height: { xs: 90, md: 120 },
                   objectFit: "cover",
                   m: 2,
                   borderRadius: 2,

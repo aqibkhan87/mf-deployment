@@ -92,8 +92,8 @@ const CheckoutItems = () => {
             <CardMedia
               component="img"
               sx={{
-                width: { xs: 80, mx: 100 },
-                height: { xs: 80, mx: 100 },
+                width: { xs: 80, md: 100 },
+                height: { xs: 80, md: 100 },
                 objectFit: "cover",
                 borderRadius: 2,
                 cursor: "pointer"

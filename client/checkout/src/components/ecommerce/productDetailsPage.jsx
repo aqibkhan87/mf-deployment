@@ -104,13 +104,13 @@ const ProductDetail = () => {
                 <Box display="grid" gap={2} mt={2}>
                   {product?.images?.map((img, i) => (
                     <Box
-                      component={"img"}
+                      component="img"
                       key={i}
                       src={img}
                       alt={`thumb-${i}`}
                       sx={{
-                        width: { xs: 50, mx: 100 },
-                        height: { xs: 50, mx: 100 },
+                        width: { xs: 50, md: 100 },
+                        height: { xs: 50, md: 100 },
                         border:
                           mainImg === img
                             ? "2px solid #1976d2"
@@ -124,7 +124,7 @@ const ProductDetail = () => {
                 </Box>
                 <Box
                   display="flex"
-                  sx={{ width: {xs: "calc(100% - 100px)", mx: "calc(100% - 140px)"}, height: { xs: 250, md: 450 } }}
+                  sx={{ width: {xs: "calc(100% - 100px)", md: "calc(100% - 140px)"}, height: { xs: 250, md: 450 } }}
                   mx={"auto"}
                   mt={2}
                 >
