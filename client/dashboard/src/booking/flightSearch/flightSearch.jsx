@@ -12,7 +12,7 @@ import { IconButton } from '@mui/material';
 import dayjs from "dayjs";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../../apis/flights/booking";
-const BookingWidget = lazy(() => import("../bookingwidget/bookingWidget"));
+import BookingWidget from "../bookingwidget/bookingWidget";
 import { eventEmitter, formatTime, formatDuration, getTimeDifference } from "../../utils/helper"
 import ConnectingFlightPopup from "../../common/simplePopup";
 import "./flightSearch.scss"

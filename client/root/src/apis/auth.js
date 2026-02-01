@@ -10,16 +10,17 @@ export const login = async ({ contact, password }) => {
     });
   } catch (error) {
     console.error("Error during login:", error);
+    return error?.response;
   } finally {
     useLoaderStore.getState().setLoading(false);
   }
 };
 
-export const signup = (data) => {
+export const signup = async (data) => {
   const { email, password, firstName, lastName } = data;
   useLoaderStore.getState().setLoading(true);
   try {
-    return httpRequest("post", `/api/auth/signup`, {
+    return await httpRequest("post", `/api/auth/signup`, {
       email,
       password,
       firstName,
@@ -27,6 +28,7 @@ export const signup = (data) => {
     });
   } catch (error) {
     console.error("Error during signup:", error);
+    return error?.response;
   } finally {
     useLoaderStore.getState().setLoading(false);
   }

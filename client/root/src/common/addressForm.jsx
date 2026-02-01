@@ -150,15 +150,9 @@ const AddressForm = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Locality"
+                  label="Locality (Optional)"
                   name="locality"
                   value={fields.locality}
-                  error={errors.locality && touched.locality}
-                  helperText={
-                    errors.locality && touched.locality
-                      ? "Please fill out this field."
-                      : ""
-                  }
                   onBlur={() => handleBlur("locality")}
                   onChange={handleChange}
                 />

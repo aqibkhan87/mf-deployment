@@ -8,6 +8,7 @@ import {
     Box,
     Grid,
     Link,
+    Typography
 } from "@mui/material";
 import { signup } from "../apis/auth";
 
@@ -20,6 +21,7 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
         password: "",
     });
     const [touched, setTouched] = useState({});
+    const [errorMessage, setErrorMessage] = useState("");
 
     const requiredFields = ["firstName", "lastName", "email", "password"];
 
@@ -46,7 +48,8 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
             const response = await signup(signupData);
             if (response?.data?.status === 200) {
                 onClose();
-            } else {
+            } else if (response?.data?.message) {
+                setErrorMessage(response?.data?.message)
             }
         }
     };
@@ -55,6 +58,10 @@ const SignupFormPopup = ({ open, onClose, setFormType }) => {
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Signup</DialogTitle>
             <DialogContent>
+                {errorMessage ?
+                    <Box sx={{ pb: 2 }}>
+                        <Typography variant="span" color="red">{errorMessage}</Typography>
+                    </Box> : null}
                 <form onSubmit={handleSignup}>
                     <Box sx={{ mt: 1 }}>
                         <TextField

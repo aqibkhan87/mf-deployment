@@ -12,6 +12,7 @@ const Signup = () => {
     password: "",
   });
   const [touched, setTouched] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const requiredFields = ["firstName", "lastName", "email", "password"];
 
@@ -38,6 +39,8 @@ const Signup = () => {
       const response = await signup(signupData);
       if (response?.data?.status === 200) {
         history.push("/auth/login");
+      } else if (response?.message) {
+        setErrorMessage(response?.message)
       }
     }
   };
@@ -58,6 +61,10 @@ const Signup = () => {
           <Box sx={{ pb: 2 }}>
             <Typography variant="h5">Create Account</Typography>
           </Box>
+          {errorMessage ?
+            <Box sx={{ pb: 2 }}>
+              <Typography variant="span" color="red">{errorMessage}</Typography>
+            </Box> : null}
           <Box>
             <TextField
               label="First Name"

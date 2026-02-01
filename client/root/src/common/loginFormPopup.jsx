@@ -8,6 +8,7 @@ import {
     Box,
     Grid,
     Link,
+    Typography
 } from "@mui/material";
 import { useAuthStore } from "store/authStore";
 import { login } from "../apis/auth";
@@ -23,6 +24,7 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
     });
     const [touched, setTouched] = useState({});
     const [openMergePopup, setOpenMergePopup] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const isEmail = (str) => /\S+@\S+\.\S+/.test(str);
     const isMobile = (str) => /^[0-9]{10}$/.test(str);
 
@@ -62,7 +64,7 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
                     setOpenMergePopup(true)
                 } else {
                     const response = await updateUserIdInCart(
-                        user?._id,
+                        userDetails?.data?.user?._id,
                         JSON.parse(localStorage.getItem("cartId")),
                         true
                     );
@@ -73,6 +75,8 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
                     onClose();
                 }
                 setUser(userDetails?.data?.user);
+            } else if (userDetails?.data?.message) {
+                setErrorMessage(userDetails?.data?.message)
             }
         }
     };
@@ -82,6 +86,10 @@ const LoginFormPopup = ({ open, onClose, setFormType }) => {
             <Dialog open={open} onClose={onClose}>
                 <DialogTitle>Login</DialogTitle>
                 <DialogContent>
+                    {errorMessage ?
+                        <Box sx={{ pb: 2 }}>
+                            <Typography variant="span" color="red">{errorMessage}</Typography>
+                        </Box> : null}
                     <form onSubmit={handleLogin}>
                         <Box sx={{ mt: 1, maxWidth: 500 }}>
                             <TextField
