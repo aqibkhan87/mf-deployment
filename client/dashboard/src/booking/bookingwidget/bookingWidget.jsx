@@ -233,7 +233,9 @@ const BookingWidget = () => {
                   margin: "auto",
                   paddingTop: { xs: 2, md: 0 },
                   paddingBottom: { xs: 0, }
-                }}>
+                }}
+                  aria-label="Switch location Button"
+                >
                   <SyncAltIcon sx={{
                     fontSize: "20px",
                     transform: { xs: "rotate(90deg)", md: "rotate(0deg)" }, // rotate the icon

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy } from "react";
 import {
   Typography,
   Box,
@@ -15,8 +15,8 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useProductStore } from "store/productStore";
 import { getAllProductsCategoryies } from "../../apis/ecommerce/products";
-import BookingWidget from "../../booking/bookingwidget/bookingWidget";
 import "./dashboard.scss";
+const BookingWidget = lazy(() => import("../../booking/bookingwidget/bookingWidget"));
 import bannerImage from "../../assets/images/booking-banner.png";
 
 export default function DashboardPage() {

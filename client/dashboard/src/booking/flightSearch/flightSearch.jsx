@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import { useHistory } from "react-router-dom";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,7 +12,7 @@ import { IconButton } from '@mui/material';
 import dayjs from "dayjs";
 import { useBookingStore } from "store/bookingStore";
 import { searchFlights } from "../../apis/flights/booking";
-import BookingWidget from "../bookingwidget/bookingWidget";
+const BookingWidget = lazy(() => import("../bookingwidget/bookingWidget"));
 import { eventEmitter, formatTime, formatDuration, getTimeDifference } from "../../utils/helper"
 import ConnectingFlightPopup from "../../common/simplePopup";
 import "./flightSearch.scss"

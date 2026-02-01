@@ -126,7 +126,7 @@ const MainNav = () => {
               </IconButton>
             </Link> : null}
           {!user?.email ? (
-            <Button className="p-2" >
+            <Button className="p-2" sx={{ ml: 1 }}>
               <Link to="/auth/login" sx={{ textDecoration: "none" }}>
                 Login
               </Link>
