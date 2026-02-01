@@ -36,7 +36,7 @@ export default function DashboardPage() {
     <Box className="dashboard-page" data-page-type="dashboard">
 
       <Box>
-        <img src={bannerImage} alt="banner1" className="banner-image" />
+        <img src={bannerImage} alt="banner1" className="banner-image" fetchpriority="high" />
         <BookingWidget />
       </Box>
 
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                         component="img"
                         image={p?.productImage}
                         alt={p?.name}
-                        sx={{ height: 200 }}
+                        sx={{ height: 200, width: 400 }}
                       />
                       <CardContent sx={{ paddingBottom: "16px" }}>
                         <Typography variant="body1">{p?.name}</Typography>
